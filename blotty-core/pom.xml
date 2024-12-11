@@ -9,8 +9,6 @@
   </parent>
 
   <artifactId>blotty-core</artifactId>
-  <groupId>com.blotty</groupId>
-  <version>0.0.1</version>
   <description>Blotty Core</description>
   <packaging>jar</packaging>
   
