@@ -1,11 +1,14 @@
 package com.blotty.core.common.models.types.impl;
 
+import java.util.Arrays;
+
+import com.blotty.core.common.models.commons.GenericField;
 import com.blotty.core.common.models.types.FieldType;
-import com.blotty.core.common.models.types.GenericField;
 
 public class StringField implements GenericField {
 
 	private byte[] value;
+	private int hash;
 	
 	public static StringField of( String v ) {
 		return new StringField( v.getBytes() );
@@ -13,11 +16,32 @@ public class StringField implements GenericField {
 	
 	StringField( byte[] v ){
 		this.value = v;
+		this.hash = Arrays.hashCode( v );
 	}
 	
 	@Override
 	public FieldType getType() {
 		return FieldType.STRING_TYPE;
+	}
+	
+	@Override
+	public int hashCode() {
+		return hash;
+	}
+
+	@Override
+	public boolean equals( Object other ) {
+		return 
+			this==other
+			|| ( other instanceof StringField
+		    	&& Arrays.equals(value, ((StringField)other).value)
+			)
+		;
+	}
+
+	@Override
+	public String toString() {
+		return "StringField [value=" + Arrays.toString(value) + "]";
 	}
 	
 }

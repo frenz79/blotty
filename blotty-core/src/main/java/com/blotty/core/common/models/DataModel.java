@@ -1,7 +1,9 @@
 package com.blotty.core.common.models;
 
 import com.blotty.core.common.exceptions.RowsModelException;
+import com.blotty.core.common.exceptions.RowsTypeException;
 import com.blotty.core.common.models.commons.Consumer;
+import com.blotty.core.common.models.commons.GenericField;
 
 public class DataModel {
 
@@ -13,16 +15,37 @@ public class DataModel {
 		this.rowsModel = new RowsModel( columnsModel );
 	}
 	
-	public RowsBuilder getRowsBuilder() {
-		return new RowsBuilder();
+	public RowBuilder getRowBuilder() {
+		return new RowBuilder( columnsModel );
 	}
 	
-	public static class RowsBuilder {
+	public class RowBuilder {
 		
 		private Row row;
-				
-		public Row build() {
-			return row;
+		private final ColumnsModel columnsModel;
+		
+		public RowBuilder( ColumnsModel columnsModel ) {
+			this.columnsModel = columnsModel;
+		}
+		
+		public RowBuilder newRow(String key) {
+			this.row = new Row(key, columnsModel);
+			return this;
+		}
+		
+		public RowBuilder set( String colName, GenericField fVal ) throws RowsTypeException {
+			this.row.set(columnsModel.getColumn(colName), fVal);
+			return this;
+		}
+		
+		public RowBuilder set( String colName, String val ) throws RowsTypeException {
+			this.row.set(columnsModel.getColumn(colName), val);
+			return this;
+		}
+		
+		public RowBuilder addToModel() throws RowsModelException {
+			addRow( row );
+			return this;
 		}		
 	}
 
@@ -41,5 +64,9 @@ public class DataModel {
 				break;
 			}
 		}
+	}
+
+	public ColumnsModel getColumnsModel() {
+		return columnsModel;
 	}
 }

@@ -3,6 +3,7 @@ package com.blotty.core.common.models;
 import java.util.LinkedHashMap;
 
 import com.blotty.core.common.exceptions.ColumnsModelException;
+import com.blotty.core.common.models.types.FieldType;
 
 public class ColumnsModel {
 
@@ -35,6 +36,10 @@ public class ColumnsModel {
 			col.setId(model.columns.size());
 			model.columns.put(col.getName(), col);
 			return this;
+		}
+		
+		public ColumnsModelBuilder add( String colName, FieldType type ) throws ColumnsModelException {
+			return add(new Column(colName, FieldType.STRING_TYPE));
 		}
 		
 		public ColumnsModel build(){

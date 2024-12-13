@@ -17,32 +17,40 @@ class DataModelTest {
 	@Test
 	void testAddAndStreamRows() throws Exception {
 		ColumnsModel colModel = new ColumnsModelBuilder()
+			// Adding a column providing the Column instance
 			.add( new Column("COL_1", FieldType.STRING_TYPE) )
-			.add( new Column("COL_2", FieldType.STRING_TYPE) )
+			// ..or just giving the name and the type
+			.add( "COL_2", FieldType.STRING_TYPE )
 			.build();
 		
+		// Adding rows using addRow from model
 		DataModel dataModel = new DataModel( colModel )
 			.addRow( new Row("KEY_1", colModel)
-				.set(colModel.getColumn("COL_1"), StringField.of("V1_1"))
-				.set(colModel.getColumn("COL_2"), StringField.of("V1_2"))
+				.set(colModel.getColumn("COL_1"), "V1_1")
+				.set(colModel.getColumn("COL_2"), "V1_2")
 			)
 			.addRow( new Row("KEY_2", colModel)
-				.set(colModel.getColumn("COL_1"), StringField.of("V2_1"))
-				.set(colModel.getColumn("COL_2"), StringField.of("V2_2"))
+				.set(colModel.getColumn("COL_1"), "V2_1")
+				.set(colModel.getColumn("COL_2"), "V2_2")
 			)
 			.addRow( new Row("KEY_3", colModel)
 				.set(colModel.getColumn("COL_1"), StringField.of("V3_1"))
 				.set(colModel.getColumn("COL_2"), StringField.of("V3_2"))
-			)
-			.addRow( new Row("KEY_4", colModel)
-				.set(colModel.getColumn("COL_1"), StringField.of("V4_1"))
-				.set(colModel.getColumn("COL_2"), StringField.of("V4_2"))
-			)
+			)			
 		;
 		
-		assertEquals(4, dataModel.getRowsCount());
+		// Adding rows using the RowBuilder
+		dataModel.getRowBuilder()
+			.newRow("KEY_4")
+				.set("COL_1", "V4_1")
+				.addToModel()
+			.newRow("KEY_5")
+				.set("COL_1", "V5_1")
+				.addToModel();
 		
-		final CountDownLatch l1 = new CountDownLatch(4);
+		assertEquals(5, dataModel.getRowsCount());
+		
+		final CountDownLatch l1 = new CountDownLatch(5);
 		dataModel.stream( new Consumer<Row>() {
 
 			@Override

@@ -1,4 +1,6 @@
-package com.blotty.core.common.models.types;
+package com.blotty.core.common.models.commons;
+
+import com.blotty.core.common.models.types.FieldType;
 
 public interface GenericField {
 

@@ -3,7 +3,11 @@ package com.blotty.core.common.models;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.blotty.core.common.exceptions.RowsTypeException;
+import com.blotty.core.common.models.commons.GenericField;
 import com.blotty.core.common.models.types.FieldType;
+import com.blotty.core.common.models.types.impl.NullField;
+import com.blotty.core.common.models.types.impl.StringField;
 
 public class Column {
 	
@@ -45,5 +49,13 @@ public class Column {
 
 	public FieldType getType() {
 		return type;
+	}
+
+	public GenericField fieldOf(String str) throws RowsTypeException {
+		switch ( type ) {
+			case NULL: return NullField.NULL;
+			case STRING_TYPE: return StringField.of(str);		
+		}
+		throw new RowsTypeException(String.format("Missing impl for type:%s", String.valueOf(type)));
 	}
 }

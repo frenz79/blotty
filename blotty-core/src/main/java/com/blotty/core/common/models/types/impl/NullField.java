@@ -1,7 +1,7 @@
 package com.blotty.core.common.models.types.impl;
 
+import com.blotty.core.common.models.commons.GenericField;
 import com.blotty.core.common.models.types.FieldType;
-import com.blotty.core.common.models.types.GenericField;
 
 public class NullField implements GenericField {
 
@@ -13,6 +13,11 @@ public class NullField implements GenericField {
 
 	@Override
 	public FieldType getType() {
-		return null;
+		return FieldType.NULL;
+	}
+	
+	@Override
+	public boolean equals( Object other ) {
+		return false;
 	}
 }
