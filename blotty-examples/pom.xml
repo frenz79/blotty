@@ -9,8 +9,6 @@
   </parent>
 
   <artifactId>blotty-examples</artifactId>
-  <groupId>com.blotty</groupId>
-  <version>0.0.1</version>
   <description>Blotty Examples</description>
   <packaging>jar</packaging>
   
@@ -34,6 +32,20 @@
             <artifactId>maven-core</artifactId>
             <version>${maven.version}</version>
         </dependency>
+	
+		<dependency>
+		    <groupId>com.blotty</groupId>
+		    <artifactId>blotty-core</artifactId>
+		    <version>0.0.1</version>
+		</dependency>
+        
+		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-csv -->
+		<dependency>
+		    <groupId>org.apache.commons</groupId>
+		    <artifactId>commons-csv</artifactId>
+		    <version>1.12.0</version>
+		</dependency>
+
 </dependencies>
   
 <build>

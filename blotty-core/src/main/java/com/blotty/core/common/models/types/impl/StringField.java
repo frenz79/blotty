@@ -41,7 +41,7 @@ public class StringField implements GenericField {
 
 	@Override
 	public String toString() {
-		return "StringField [value=" + Arrays.toString(value) + "]";
+		return new String(value);
 	}
 	
 }

@@ -9,6 +9,9 @@ import org.junit.jupiter.api.Test;
 
 import com.blotty.core.common.models.ColumnsModel.ColumnsModelBuilder;
 import com.blotty.core.common.models.commons.Consumer;
+import com.blotty.core.common.models.modifiers.filters.FilterExpression;
+import com.blotty.core.common.models.modifiers.filters.FilterExpressionBuilder;
+import com.blotty.core.common.models.modifiers.filters.conditions.Equal;
 import com.blotty.core.common.models.types.FieldType;
 import com.blotty.core.common.models.types.impl.StringField;
 
@@ -77,4 +80,30 @@ class DataModelTest {
 		assertEquals(3l, l2.getCount());
 	}
 
+	@Test
+	void testCreateView() throws Exception {
+		ColumnsModel colModel = new ColumnsModelBuilder()
+			.add( "COL_1", FieldType.STRING_TYPE )
+			.add( "COL_2", FieldType.STRING_TYPE )
+			.build();
+			
+		DataModel dataModel = new DataModel( colModel )
+			.getRowBuilder()
+			.newRow("K1").set("COL_1", "1").addToModel()
+			.newRow("K2").set("COL_1", "2").addToModel()
+			.newRow("K3").set("COL_1", "3").addToModel()
+			.newRow("K4").set("COL_1", "4").addToModel()
+			.newRow("K5").set("COL_1", "5").addToModel()
+			.getDataModel();
+		
+		FilterExpression filter = new FilterExpressionBuilder()
+			.begin(	new Equal(colModel.getColumn("COL_1"), StringField.of("2")) )
+			.or( new Equal(colModel.getColumn("COL_1"), StringField.of("3")) )
+			.build();
+		
+		DataModelView view = dataModel.createView("2_or_3", filter);
+		
+		assertEquals(5, dataModel.getRowsCount() );
+		assertEquals(2, view.getRowsCount() );
+	}
 }

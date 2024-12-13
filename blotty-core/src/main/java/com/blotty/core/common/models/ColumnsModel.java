@@ -1,5 +1,6 @@
 package com.blotty.core.common.models;
 
+import java.util.Collection;
 import java.util.LinkedHashMap;
 
 import com.blotty.core.common.exceptions.ColumnsModelException;
@@ -19,6 +20,10 @@ public class ColumnsModel {
 	
 	public Column getColumn(String name) {
 		return columns.get(name);
+	}
+	
+	public Collection<Column> getColumns(){
+		return columns.values();
 	}
 	
 	public static class ColumnsModelBuilder {
