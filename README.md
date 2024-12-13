@@ -2,12 +2,9 @@
 Blotter Library
 
 
-Examples
+Example taken from  "SimpleCvsLoader"
 
-SimpleCvsLoader
-
-
-Column model descriptor creation:
+1 - Column model descriptor creation:
 
 	ColumnsModel colModel = new ColumnsModelBuilder()
 				.add( "Organization Id", FieldType.STRING_TYPE )
@@ -20,12 +17,12 @@ Column model descriptor creation:
 				.add( "Number of employees", FieldType.INTEGER_TYPE )				
 				.build();	
 
-Data model creation with RowBuilder helper used for easy row creation and insertion:
+2 - Data model creation with RowBuilder helper used for easy row creation and insertion:
 
     DataModel dataModel = new DataModel( colModel );   
     RowBuilder rowBuilder = dataModel.getRowBuilder();
 
-Than line by line, we read the csv record putting data into our model
+3 - Than line by line, we read the csv record putting data into our model
   
 		Reader in = new FileReader("src/main/resources/organizations-10000.csv");
 		Iterable<CSVRecord> records = CSVFormat.DEFAULT.parse(in);
@@ -50,7 +47,7 @@ Than line by line, we read the csv record putting data into our model
 		
 		System.out.println("Model size:"+dataModel.getRowsCount());
 
-Searching data is done using a FilterExpression object and chaining all conditions: 
+4 - Searching data is done using a FilterExpression object and chaining all conditions: 
   
 		FilterExpression filter = new FilterExpressionBuilder()
 				.begin(	new Equal(colModel.getColumn("Country"), StringField.of("Italy")) )
@@ -58,7 +55,7 @@ Searching data is done using a FilterExpression object and chaining all conditio
 				.and( new Like(colModel.getColumn("Industry"), StringField.of("Engineering")) )
 				.build();
 
-We create a view on our model applying the previous filter:
+5 - We create a view on our model applying the previous filter:
 
 		DataModelView view = dataModel.createView("ItalianOrganizations", filter);
 
