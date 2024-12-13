@@ -8,13 +8,16 @@ import org.apache.commons.csv.CSVRecord;
 
 import com.blotty.core.common.models.ColumnsModel;
 import com.blotty.core.common.models.ColumnsModel.ColumnsModelBuilder;
-import com.blotty.core.common.models.modifiers.filters.FilterExpression;
-import com.blotty.core.common.models.modifiers.filters.FilterExpressionBuilder;
-import com.blotty.core.common.models.modifiers.filters.conditions.Equal;
 import com.blotty.core.common.models.DataModel;
 import com.blotty.core.common.models.DataModelView;
 import com.blotty.core.common.models.RowBuilder;
+import com.blotty.core.common.models.modifiers.filters.FilterExpression;
+import com.blotty.core.common.models.modifiers.filters.FilterExpressionBuilder;
+import com.blotty.core.common.models.modifiers.filters.conditions.Equal;
+import com.blotty.core.common.models.modifiers.filters.conditions.GreaterThanEqual;
+import com.blotty.core.common.models.modifiers.filters.conditions.Like;
 import com.blotty.core.common.models.types.FieldType;
+import com.blotty.core.common.models.types.impl.IntegerField;
 import com.blotty.core.common.models.types.impl.StringField;
 
 public class SimpleCvsLoader {
@@ -28,7 +31,7 @@ public class SimpleCvsLoader {
 				.add( "Description", FieldType.STRING_TYPE )
 				.add( "Founded", FieldType.STRING_TYPE )
 				.add( "Industry", FieldType.STRING_TYPE )
-				.add( "Number of employees", FieldType.STRING_TYPE )				
+				.add( "Number of employees", FieldType.INTEGER_TYPE )				
 				.build();
 		
 		DataModel dataModel = new DataModel( colModel );
@@ -36,18 +39,22 @@ public class SimpleCvsLoader {
 		
 		Reader in = new FileReader("src/main/resources/organizations-10000.csv");
 		Iterable<CSVRecord> records = CSVFormat.DEFAULT.parse(in);
+		int rowNumber = 0;
 		for (CSVRecord record : records) {
-			rowBuilder.newRow(record.get(0))
-				.set("Organization Id", record.get(1))
-				.set("Name", record.get(2))
-				.set("Website", record.get(3))
-				.set("Country", record.get(4))
-				.set("Description", record.get(5))
-				.set("Founded", record.get(6))
-				.set("Industry", record.get(7))
-				.set("Number of employees", record.get(8))	
-			.addToModel();
-		}
+			if ( rowNumber>0 ) {
+				rowBuilder.newRow(record.get(0))
+					.set("Organization Id", record.get(1))
+					.set("Name", record.get(2))
+					.set("Website", record.get(3))
+					.set("Country", record.get(4))
+					.set("Description", record.get(5))
+					.set("Founded", record.get(6))
+					.set("Industry", record.get(7))
+					.set("Number of employees", record.get(8))	
+				.addToModel();
+			}
+			rowNumber++;
+		}		
 		
 		in.close();
 		
@@ -55,6 +62,8 @@ public class SimpleCvsLoader {
 				
 		FilterExpression filter = new FilterExpressionBuilder()
 				.begin(	new Equal(colModel.getColumn("Country"), StringField.of("Italy")) )
+				.and( new GreaterThanEqual(colModel.getColumn("Number of employees"), IntegerField.of(5000)) )
+				.and( new Like(colModel.getColumn("Industry"), StringField.of("Engineering")) )
 				.build();
 		
 		DataModelView view = dataModel.createView("ItalianOrganizations", filter);

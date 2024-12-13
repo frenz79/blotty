@@ -43,5 +43,15 @@ public class StringField implements GenericField {
 	public String toString() {
 		return new String(value);
 	}
+
+	@Override
+	public int compareTo(GenericField other) {
+		return Arrays.compare(value, ((StringField)other).value);
+	}
+
+	// TODO: Optimize me!!!
+	public boolean like(StringField other) {
+		return other.toString().contains(this.toString());
+	}
 	
 }

@@ -27,7 +27,7 @@ class DataModelTest {
 			.build();
 		
 		// Adding rows using addRow from model
-		DataModel dataModel = new DataModel( colModel )
+		DataModel dataModel = (DataModel) new DataModel( colModel )
 			.addRow( new Row("KEY_1", colModel)
 				.set(colModel.getColumn("COL_1"), "V1_1")
 				.set(colModel.getColumn("COL_2"), "V1_2")

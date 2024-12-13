@@ -44,7 +44,7 @@ public class ColumnsModel {
 		}
 		
 		public ColumnsModelBuilder add( String colName, FieldType type ) throws ColumnsModelException {
-			return add(new Column(colName, FieldType.STRING_TYPE));
+			return add(new Column(colName, type));
 		}
 		
 		public ColumnsModel build(){

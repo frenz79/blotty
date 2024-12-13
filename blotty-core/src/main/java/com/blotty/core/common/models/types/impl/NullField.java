@@ -20,4 +20,9 @@ public class NullField implements GenericField {
 	public boolean equals( Object other ) {
 		return false;
 	}
+	
+	@Override
+	public int compareTo(GenericField other) {
+		return -1;
+	}
 }

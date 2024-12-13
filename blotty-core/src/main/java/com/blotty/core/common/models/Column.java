@@ -6,6 +6,7 @@ import java.util.Map;
 import com.blotty.core.common.exceptions.RowsTypeException;
 import com.blotty.core.common.models.commons.GenericField;
 import com.blotty.core.common.models.types.FieldType;
+import com.blotty.core.common.models.types.impl.IntegerField;
 import com.blotty.core.common.models.types.impl.NullField;
 import com.blotty.core.common.models.types.impl.StringField;
 
@@ -52,9 +53,13 @@ public class Column {
 	}
 
 	public GenericField fieldOf(String str) throws RowsTypeException {
+		if (str==null || str.length()==0 ) {
+			return NullField.NULL;
+		}
 		switch ( type ) {
 			case NULL: return NullField.NULL;
-			case STRING_TYPE: return StringField.of(str);		
+			case STRING_TYPE: return StringField.of(str);	
+			case INTEGER_TYPE:  return IntegerField.of(str);					
 		}
 		throw new RowsTypeException(String.format("Missing impl for type:%s", String.valueOf(type)));
 	}
