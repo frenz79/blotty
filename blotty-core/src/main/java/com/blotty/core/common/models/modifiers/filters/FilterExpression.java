@@ -65,4 +65,8 @@ public class FilterExpression {
 	public String toString() {
 		return "FilterExpression [conditionsChain=" + conditionsChain + "]";
 	}
+
+	public FilterConditionChain getConditionsChain() {
+		return conditionsChain;
+	}
 } 

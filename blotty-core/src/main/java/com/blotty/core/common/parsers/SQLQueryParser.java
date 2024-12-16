@@ -100,35 +100,14 @@ public class SQLQueryParser {
 			
 			if ( step==1 ) {
 				char nextCh = query.charAt(i+1);
+				operator = buildOperator( ch, nextCh );
 				
-				if ( ch=='=' ) {
-					operator = new Equal();
-				}				
-				else if ( ch=='!' && nextCh=='=' ) {
-					operator = new NotEqual();
-				}				
-				else if ( ch=='>') {
-					if (  nextCh=='=' ) {
-						operator = new GreaterThanEqual();
-					} else {
-						operator = new GreaterThan();
+				if ( operator==null ) {				
+					if ( ch=='I' && nextCh=='S' ) {
+						// unary op here!
+						// no need for step 2
+						step++; 
 					}
-				}
-				else if ( ch=='<') {
-					if (  nextCh=='=' ) {
-						operator = new LesserThan();
-					} else {
-						operator = new LesserThanEqual();
-					}				
-				}
-				else if ( ch=='L' && nextCh=='I' ) {
-					operator = new Like();
-				}
-								
-				else if ( ch=='I' && nextCh=='S' ) {
-					// unary op here!
-					// no need for step 2
-					step++; 
 				}
 				step++;
 			}
@@ -157,23 +136,63 @@ public class SQLQueryParser {
 				if ( builder==null ) {
 					builder = new FilterExpressionBuilder().begin( filterCondition );
 				} else {
-					switch ( conjunction ) {
-					case AND:
-						builder.and(filterCondition);
-						break;
-					case OR:
-						builder.or(filterCondition);
-						break;					
-					}
+					addConjunction( builder, filterCondition, conjunction );
 				}
 				
 				operator = null;
 				step = 0;
 			}
 		}
+		
+		IFilterCondition filterCondition= null;
+		if ( rightOperand==null ) {
+			filterCondition = new UnaryCondition(null, (IUnaryOperator)operator);
+		} else {
+			filterCondition = buildCondition(colsModel, leftOperand, leftOperandType, rightOperand, rightOperandType, operator);
+		}
+		
+		addConjunction( builder, filterCondition, conjunction );		
 		return builder.build();
 	}
 	
+	private FilterExpressionBuilder addConjunction( FilterExpressionBuilder builder, IFilterCondition filterCondition, Conjunction conjunction ) throws FilterExpressionException {
+		switch ( conjunction ) {
+		case AND:
+			builder.and(filterCondition);
+			break;
+		case OR:
+			builder.or(filterCondition);
+			break;					
+		}
+		return builder;
+	}
+	
+	private IOperator buildOperator( char ch1, char ch2 ) {
+		if ( ch1=='=' ) {
+			return new Equal();
+		}				
+		else if ( ch1=='!' && ch2=='=' ) {
+			return new NotEqual();
+		}				
+		else if ( ch1=='>') {
+			if (  ch2=='=' ) {
+				return new GreaterThanEqual();
+			} else {
+				return new GreaterThan();
+			}
+		}
+		else if ( ch1=='<') {
+			if (  ch2=='=' ) {
+				return new LesserThanEqual();
+			} else {
+				return new LesserThan();
+			}				
+		}
+		else if ( ch1=='L' && ch2=='I' ) {
+			return new Like();
+		}
+		return null;
+	}
 	
 	private IFilterCondition buildCondition( 
 			ColumnsModel colsModel,
@@ -183,28 +202,28 @@ public class SQLQueryParser {
 			OperandType rightOperandType,
 			IOperator operator ) {
 		
+		if ( OperandType.CONST.equals(rightOperandType) && OperandType.CONST.equals(leftOperandType) ) {
+			throw new RuntimeException("Invalid const to const expression");
+		}		
 		if ( OperandType.CONST.equals(leftOperandType) ) {
-			if ( OperandType.CONST.equals(rightOperandType) ) {
-				throw new RuntimeException("Invalid const to const expression");
-			}
 			return new BinaryCondition(
 				Operand.of(leftOperand), 
 				(IBinaryOperator)operator, 
 				Operand.of(colsModel.getColumn(rightOperand))
 			);
 		} 
-		else if ( OperandType.CONST.equals(rightOperandType) ) {
-			if ( OperandType.CONST.equals(leftOperandType) ) {
-				throw new RuntimeException("Invalid const to const expression");
-			}
+		if ( OperandType.CONST.equals(rightOperandType) ) {
 			return new BinaryCondition(
 				Operand.of(colsModel.getColumn(leftOperand)),
 				(IBinaryOperator)operator, 
 				Operand.of(rightOperand)
 			);
-		}
-		
-		throw new RuntimeException("Cannot build any condition");
+		} 
+		return new BinaryCondition(
+			Operand.of(colsModel.getColumn(leftOperand)),
+			(IBinaryOperator)operator, 
+			Operand.of(colsModel.getColumn(rightOperand))
+		);
 	}
 	
 	private String readStringUntil(char endChar, int i, String str) {
