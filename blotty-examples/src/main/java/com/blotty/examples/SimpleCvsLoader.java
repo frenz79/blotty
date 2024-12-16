@@ -16,6 +16,7 @@ import com.blotty.core.common.models.modifiers.filters.FilterExpressionBuilder;
 import com.blotty.core.common.models.modifiers.filters.conditions.Operand;
 import com.blotty.core.common.models.modifiers.filters.conditions.binary.BinaryCondition;
 import com.blotty.core.common.models.types.FieldType;
+import com.blotty.core.common.parsers.SQLQueryParser;
 
 public class SimpleCvsLoader {
 
@@ -40,14 +41,14 @@ public class SimpleCvsLoader {
 		for (CSVRecord record : records) {
 			if ( rowNumber>0 ) {
 				rowBuilder.newRow(record.get(0))
-					.set(colModel.getColumn(1), record.get(1))
-					.set(colModel.getColumn(2), record.get(2))
-					.set(colModel.getColumn(3), record.get(3))
-					.set(colModel.getColumn(4), record.get(4))
-					.set(colModel.getColumn(5), record.get(5))
-					.set(colModel.getColumn(6), record.get(6))
-					.set(colModel.getColumn(7), record.get(7))
-					.set(colModel.getColumn(8), record.get(8))	
+					.set(colModel.getColumn(0), record.get(1))
+					.set(colModel.getColumn(1), record.get(2))
+					.set(colModel.getColumn(2), record.get(3))
+					.set(colModel.getColumn(3), record.get(4))
+					.set(colModel.getColumn(4), record.get(5))
+					.set(colModel.getColumn(5), record.get(6))
+					.set(colModel.getColumn(6), record.get(7))
+					.set(colModel.getColumn(7), record.get(8))	
 				.addToModel();
 			}
 			rowNumber++;
@@ -66,5 +67,12 @@ public class SimpleCvsLoader {
 		DataModelView view = dataModel.createView("ItalianOrganizations", filter);
 		
 		System.out.println(view.dumpToString());
+		
+		DataModelView sqlFilteredView = dataModel.createView("ItalianOrganizations_1", 
+			new SQLQueryParser().parse(colModel, " \"Country\" = 'Italy' AND \"Number of employees\" >= '5000' AND \"Industry\" LIKE 'Engineering' ")
+		);
+				
+		System.out.println(sqlFilteredView.dumpToString());
+		
 	}
 }

@@ -1,6 +1,7 @@
 package com.blotty.core.common.parsers;
 
 import com.blotty.core.common.exceptions.FilterExpressionException;
+import com.blotty.core.common.exceptions.RowsTypeException;
 import com.blotty.core.common.models.ColumnsModel;
 import com.blotty.core.common.models.modifiers.filters.FilterExpression;
 import com.blotty.core.common.models.modifiers.filters.FilterExpressionBuilder;
@@ -44,10 +45,10 @@ public class SQLQueryParser {
 		OR
 	}
 	
-	public FilterExpression parse( ColumnsModel colsModel, String query ) throws FilterExpressionException {
+	public FilterExpression parse( ColumnsModel colsModel, String query ) throws FilterExpressionException, RowsTypeException {
 		FilterExpressionBuilder builder = null;
 		
-		query = query.trim().toUpperCase();
+		query = query.trim();
 		
 		// 0 : waiting for left operand
 		// 1 : waiting for operator
@@ -188,7 +189,7 @@ public class SQLQueryParser {
 				return new LesserThan();
 			}				
 		}
-		else if ( ch1=='L' && ch2=='I' ) {
+		else if (Character.toUpperCase(ch1)=='L' && Character.toUpperCase(ch2)=='I' ) {
 			return new Like();
 		}
 		return null;
@@ -200,14 +201,14 @@ public class SQLQueryParser {
 			OperandType leftOperandType,
 			String rightOperand,			
 			OperandType rightOperandType,
-			IOperator operator ) {
+			IOperator operator ) throws RowsTypeException {
 		
 		if ( OperandType.CONST.equals(rightOperandType) && OperandType.CONST.equals(leftOperandType) ) {
 			throw new RuntimeException("Invalid const to const expression");
 		}		
 		if ( OperandType.CONST.equals(leftOperandType) ) {
 			return new BinaryCondition(
-				Operand.of(leftOperand), 
+				Operand.of(leftOperand, colsModel.getColumn(rightOperand)), 
 				(IBinaryOperator)operator, 
 				Operand.of(colsModel.getColumn(rightOperand))
 			);
@@ -216,7 +217,7 @@ public class SQLQueryParser {
 			return new BinaryCondition(
 				Operand.of(colsModel.getColumn(leftOperand)),
 				(IBinaryOperator)operator, 
-				Operand.of(rightOperand)
+				Operand.of(rightOperand, colsModel.getColumn(leftOperand) )
 			);
 		} 
 		return new BinaryCondition(

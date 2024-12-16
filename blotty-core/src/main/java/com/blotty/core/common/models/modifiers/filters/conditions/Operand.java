@@ -1,5 +1,6 @@
 package com.blotty.core.common.models.modifiers.filters.conditions;
 
+import com.blotty.core.common.exceptions.RowsTypeException;
 import com.blotty.core.common.models.Column;
 import com.blotty.core.common.models.commons.GenericField;
 import com.blotty.core.common.models.types.impl.IntegerField;
@@ -11,7 +12,11 @@ public class Operand {
 		CONST,
 		FIELD
 	}
-		
+	
+	public static Operand of(String v, Column c) throws RowsTypeException {
+		return new Operand(c.fieldOf(v), Type.CONST);
+	}
+	
 	public static Operand of( Column c ) {
 		return new Operand(c, Type.FIELD);
 	}
