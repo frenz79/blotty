@@ -33,8 +33,38 @@ public class Row {
 		return this;
 	}
 	
-	public Row set( Column c, String str) throws RowsTypeException {
-		this.fields[c.getId()] = c.fieldOf( str );
+	public Row set( Column c, short v) throws RowsTypeException {
+		this.fields[c.getId()] = c.fieldOf( v );
+		return this;
+	}
+	
+	public Row set( Column c, boolean v) throws RowsTypeException {
+		this.fields[c.getId()] = c.fieldOf( v );
+		return this;
+	}
+	
+	public Row set( Column c, float v) throws RowsTypeException {
+		this.fields[c.getId()] = c.fieldOf( v );
+		return this;
+	}
+	
+	public Row set( Column c, double v) throws RowsTypeException {
+		this.fields[c.getId()] = c.fieldOf( v );
+		return this;
+	}
+	
+	public Row set( Column c, long v) throws RowsTypeException {
+		this.fields[c.getId()] = c.fieldOf( v );
+		return this;
+	}
+	
+	public Row set( Column c, int v) throws RowsTypeException {
+		this.fields[c.getId()] = c.fieldOf( v );
+		return this;
+	}
+		
+	public Row set( Column c, String v) throws RowsTypeException {
+		this.fields[c.getId()] = c.fieldOf( v );
 		return this;
 	}
 	

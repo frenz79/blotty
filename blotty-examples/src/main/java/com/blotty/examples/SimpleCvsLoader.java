@@ -15,12 +15,7 @@ import com.blotty.core.common.models.modifiers.filters.FilterExpression;
 import com.blotty.core.common.models.modifiers.filters.FilterExpressionBuilder;
 import com.blotty.core.common.models.modifiers.filters.conditions.Operand;
 import com.blotty.core.common.models.modifiers.filters.conditions.binary.BinaryCondition;
-import com.blotty.core.common.models.modifiers.filters.conditions.binary.operators.Equal;
-import com.blotty.core.common.models.modifiers.filters.conditions.binary.operators.GreaterThanEqual;
-import com.blotty.core.common.models.modifiers.filters.conditions.binary.operators.Like;
 import com.blotty.core.common.models.types.FieldType;
-import com.blotty.core.common.models.types.impl.IntegerField;
-import com.blotty.core.common.models.types.impl.StringField;
 
 public class SimpleCvsLoader {
 
