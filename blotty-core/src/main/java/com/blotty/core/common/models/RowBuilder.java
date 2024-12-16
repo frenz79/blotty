@@ -20,6 +20,16 @@ public class RowBuilder {
 		return this;
 	}
 	
+	public RowBuilder set( Column col, GenericField fVal ) throws RowsTypeException {
+		this.row.set(col, fVal);
+		return this;
+	}
+	
+	public RowBuilder set( Column col, String val ) throws RowsTypeException {
+		this.row.set(col, val);
+		return this;
+	}
+	
 	public RowBuilder set( String colName, GenericField fVal ) throws RowsTypeException {
 		this.row.set(columnsModel.getColumn(colName), fVal);
 		return this;

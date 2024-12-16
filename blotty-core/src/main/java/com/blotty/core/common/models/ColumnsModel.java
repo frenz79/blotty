@@ -1,7 +1,9 @@
 package com.blotty.core.common.models;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.List;
 
 import com.blotty.core.common.exceptions.ColumnsModelException;
 import com.blotty.core.common.models.types.FieldType;
@@ -9,6 +11,7 @@ import com.blotty.core.common.models.types.FieldType;
 public class ColumnsModel {
 
 	private final LinkedHashMap<String,Column> columns = new LinkedHashMap<>();
+	private List<Column> columnsId = new ArrayList<>();
 	
 	private ColumnsModel(){
 		
@@ -20,6 +23,10 @@ public class ColumnsModel {
 	
 	public Column getColumn(String name) {
 		return columns.get(name);
+	}
+	
+	public Column getColumn(int id) {
+		return columnsId.get(id);
 	}
 	
 	public Collection<Column> getColumns(){
@@ -40,6 +47,7 @@ public class ColumnsModel {
 			}
 			col.setId(model.columns.size());
 			model.columns.put(col.getName(), col);
+			model.columnsId.add(col.getId(), col);
 			return this;
 		}
 		

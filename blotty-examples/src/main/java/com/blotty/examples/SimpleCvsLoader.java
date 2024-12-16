@@ -40,14 +40,14 @@ public class SimpleCvsLoader {
 		for (CSVRecord record : records) {
 			if ( rowNumber>0 ) {
 				rowBuilder.newRow(record.get(0))
-					.set("Organization Id", record.get(1))
-					.set("Name", record.get(2))
-					.set("Website", record.get(3))
-					.set("Country", record.get(4))
-					.set("Description", record.get(5))
-					.set("Founded", record.get(6))
-					.set("Industry", record.get(7))
-					.set("Number of employees", record.get(8))	
+					.set(colModel.getColumn(1), record.get(1))
+					.set(colModel.getColumn(2), record.get(2))
+					.set(colModel.getColumn(3), record.get(3))
+					.set(colModel.getColumn(4), record.get(4))
+					.set(colModel.getColumn(5), record.get(5))
+					.set(colModel.getColumn(6), record.get(6))
+					.set(colModel.getColumn(7), record.get(7))
+					.set(colModel.getColumn(8), record.get(8))	
 				.addToModel();
 			}
 			rowNumber++;
