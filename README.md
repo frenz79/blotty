@@ -30,14 +30,14 @@ Example taken from  "SimpleCvsLoader"
 		for (CSVRecord record : records) {
 			if ( rowNumber>0 ) {
 				rowBuilder.newRow(record.get(0))
-					.set(colModel.getColumn(1), record.get(1))
-					.set(colModel.getColumn(2), record.get(2))
-					.set(colModel.getColumn(3), record.get(3))
-					.set(colModel.getColumn(4), record.get(4))
-					.set(colModel.getColumn(5), record.get(5))
-					.set(colModel.getColumn(6), record.get(6))
-					.set(colModel.getColumn(7), record.get(7))
-					.set(colModel.getColumn(8), record.get(8))	
+					.set(colModel.getColumn(0), record.get(1))
+					.set(colModel.getColumn(1), record.get(2))
+					.set(colModel.getColumn(2), record.get(3))
+					.set(colModel.getColumn(3), record.get(4))
+					.set(colModel.getColumn(4), record.get(5))
+					.set(colModel.getColumn(5), record.get(6))
+					.set(colModel.getColumn(6), record.get(7))
+					.set(colModel.getColumn(7), record.get(8))	
 				.addToModel();
 			}
 			rowNumber++;
