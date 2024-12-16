@@ -30,14 +30,14 @@ Example taken from  "SimpleCvsLoader"
 		for (CSVRecord record : records) {
 			if ( rowNumber>0 ) {
 				rowBuilder.newRow(record.get(0))
-					.set("Organization Id", record.get(1))
-					.set("Name", record.get(2))
-					.set("Website", record.get(3))
-					.set("Country", record.get(4))
-					.set("Description", record.get(5))
-					.set("Founded", record.get(6))
-					.set("Industry", record.get(7))
-					.set("Number of employees", record.get(8))	
+					.set(colModel.getColumn(1), record.get(1))
+					.set(colModel.getColumn(2), record.get(2))
+					.set(colModel.getColumn(3), record.get(3))
+					.set(colModel.getColumn(4), record.get(4))
+					.set(colModel.getColumn(5), record.get(5))
+					.set(colModel.getColumn(6), record.get(6))
+					.set(colModel.getColumn(7), record.get(7))
+					.set(colModel.getColumn(8), record.get(8))	
 				.addToModel();
 			}
 			rowNumber++;
@@ -50,10 +50,10 @@ Example taken from  "SimpleCvsLoader"
 4 - Searching data is done using a FilterExpression object and chaining all conditions: 
   
 		FilterExpression filter = new FilterExpressionBuilder()
-				.begin(	new Equal(colModel.getColumn("Country"), StringField.of("Italy")) )
-				.and( new GreaterThanEqual(colModel.getColumn("Number of employees"), IntegerField.of(5000)) )
-				.and( new Like(colModel.getColumn("Industry"), StringField.of("Engineering")) )
-				.build();
+			.begin(	BinaryCondition.Equal(Operand.of(colModel.getColumn("Country")), Operand.of("Italy"))) 
+			.and( BinaryCondition.GreaterThanEqual(Operand.of(colModel.getColumn("Number of employees")), Operand.of(5000))) 
+			.and( BinaryCondition.Like(Operand.of(colModel.getColumn("Industry")), Operand.of("Engineering")))
+		.build();
 
 5 - We create a view on our model applying the previous filter:
 
