@@ -12,13 +12,15 @@ import com.blotty.core.common.models.Column;
 import com.blotty.core.common.models.ColumnsModel;
 import com.blotty.core.common.models.ColumnsModel.ColumnsModelBuilder;
 import com.blotty.core.common.models.Row;
-import com.blotty.core.common.models.modifiers.filters.conditions.Equal;
-import com.blotty.core.common.models.modifiers.filters.conditions.IsNotNull;
-import com.blotty.core.common.models.modifiers.filters.conditions.IsNull;
-import com.blotty.core.common.models.modifiers.filters.conditions.NotEqual;
+import com.blotty.core.common.models.modifiers.filters.conditions.Operand;
+import com.blotty.core.common.models.modifiers.filters.conditions.binary.BinaryCondition;
+import com.blotty.core.common.models.modifiers.filters.conditions.binary.operators.Equal;
+import com.blotty.core.common.models.modifiers.filters.conditions.binary.operators.NotEqual;
+import com.blotty.core.common.models.modifiers.filters.conditions.unary.UnaryCondition;
+import com.blotty.core.common.models.modifiers.filters.conditions.unary.operators.IsNotNull;
+import com.blotty.core.common.models.modifiers.filters.conditions.unary.operators.IsNull;
 import com.blotty.core.common.models.types.FieldType;
 import com.blotty.core.common.models.types.impl.NullField;
-import com.blotty.core.common.models.types.impl.StringField;
 
 class FilterExpressionTest {
 
@@ -31,7 +33,7 @@ class FilterExpressionTest {
 		Column col1 = colModel.getColumn("COL_1");
 		
 		FilterExpression equal = new FilterExpression(
-			new Equal(col1, StringField.of("TEST_VALUE_2"))
+			new BinaryCondition(Operand.of(col1), new Equal(), Operand.of("TEST_VALUE_2"))
 		);
 		
 		Row row1 = new Row("KEY_1", colModel).set(col1, "TEST_VALUE_1");
@@ -41,7 +43,7 @@ class FilterExpressionTest {
 		assertTrue ( equal.apply( row2 ) );
 		
 		FilterExpression notEqual = new FilterExpression(
-			new NotEqual(col1, StringField.of("TEST_VALUE_2"))
+			new BinaryCondition(Operand.of(col1), new NotEqual(), Operand.of("TEST_VALUE_2"))
 		);
 		
 		assertTrue ( notEqual.apply( row1 ) );		
@@ -64,11 +66,11 @@ class FilterExpressionTest {
 		Column col1 = colModel.getColumn("COL_1");
 		
 		FilterExpression isNull = new FilterExpression(
-			new IsNull(col1)
+			new UnaryCondition(Operand.of(col1), new IsNull())
 		);
 		
 		FilterExpression isNotNull = new FilterExpression(
-			new IsNotNull(col1)
+			new UnaryCondition(Operand.of(col1), new IsNotNull())
 		);
 		
 		Row row1 = new Row("KEY_1", colModel).set(col1, "TEST_VALUE_1");
@@ -101,8 +103,8 @@ class FilterExpressionTest {
 		Row row5 = new Row("KEY_4", colModel).set(col1, "XXX").set(col2, "ZZZ");
 		
 		FilterExpression exprBuilder1 = new FilterExpressionBuilder()
-			.begin(	new Equal(col1, StringField.of("XXX")) )
-			.and( new Equal(col2, StringField.of("ZZZ")))
+			.begin(	new BinaryCondition(Operand.of(col1), new Equal(), Operand.of("XXX")))
+			.and( new BinaryCondition(Operand.of(col2), new Equal(), Operand.of("ZZZ")))
 		.build();
 		
 		assertFalse( exprBuilder1.apply( row1 ) );
@@ -112,8 +114,8 @@ class FilterExpressionTest {
 		assertTrue ( exprBuilder1.apply( row5 ) );	
 		
 		FilterExpression exprBuilder2 = new FilterExpressionBuilder()
-			.begin(	new Equal(col1, StringField.of("XXX")) )
-			.or( new Equal(col2, StringField.of("ZZZ")))
+			.begin(	new BinaryCondition(Operand.of(col1), new Equal(), Operand.of("XXX")))
+			.or( new BinaryCondition(Operand.of(col2), new Equal(), Operand.of("ZZZ")))
 		.build();
 		
 		assertFalse( exprBuilder2.apply( row1 ) );
@@ -123,9 +125,9 @@ class FilterExpressionTest {
 		assertTrue ( exprBuilder2.apply( row5 ) );
 		
 		FilterExpression exprBuilder3 = new FilterExpressionBuilder()
-			.begin(	new Equal(col1, StringField.of("XXX")) )
-			.or ( new Equal(col1, StringField.of("YYY")) )
-			.and( new Equal(col2, StringField.of("ZZZ")))
+			.begin(	new BinaryCondition(Operand.of(col1), new Equal(), Operand.of("XXX")))
+			.or ( new BinaryCondition(Operand.of(col1), new Equal(), Operand.of("YYY")))
+			.and( new BinaryCondition(Operand.of(col2), new Equal(), Operand.of("ZZZ")))
 		.build();
 		
 		assertFalse( exprBuilder3.apply( row1 ) );

@@ -1,7 +1,7 @@
 package com.blotty.core.common.models.modifiers.filters;
 
 import com.blotty.core.common.exceptions.FilterExpressionException;
-import com.blotty.core.common.models.modifiers.filters.FilterConditionChain.FilterConditionChainOperator;
+import com.blotty.core.common.models.modifiers.filters.FilterConditionChain.FilterConditionConjunction;
 
 public class FilterExpressionBuilder {
 
@@ -11,25 +11,25 @@ public class FilterExpressionBuilder {
 	public FilterExpressionBuilder() {
 	}
 	
-	public FilterExpressionBuilder begin( FilterCondition c) {			
+	public FilterExpressionBuilder begin( IFilterCondition c) {			
 		this.chainRef = new FilterConditionChain( c ); 
 		this.expression = new FilterExpression( this.chainRef );
 		return this;
 	}
 	
-	public FilterExpressionBuilder or(FilterCondition c) throws FilterExpressionException {
-		return concat( c, FilterConditionChainOperator.OR);
+	public FilterExpressionBuilder or(IFilterCondition c) throws FilterExpressionException {
+		return concat( c, FilterConditionConjunction.OR);
 	}
 	
-	public FilterExpressionBuilder and(FilterCondition c) throws FilterExpressionException {
-		return concat( c, FilterConditionChainOperator.AND);
+	public FilterExpressionBuilder and(IFilterCondition c) throws FilterExpressionException {
+		return concat( c, FilterConditionConjunction.AND);
 	}
 	
-	private FilterExpressionBuilder concat( FilterCondition c, FilterConditionChainOperator op) throws FilterExpressionException {
+	private FilterExpressionBuilder concat( IFilterCondition c, FilterConditionConjunction op) throws FilterExpressionException {
 		if (chainRef==null) {
 			throw new FilterExpressionException("Cannot concatenate expression.Please call begin() first.");
 		}
-		chainRef.setOperator( op );
+		chainRef.setConjunction( op );
 		chainRef.setNextCondition( new FilterConditionChain( c ) );
 		chainRef = chainRef.getNextCondition();
 		return this;

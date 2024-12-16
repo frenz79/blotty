@@ -1,17 +1,17 @@
 package com.blotty.core.common.models.modifiers.filters;
 
 import com.blotty.core.common.models.Row;
-import com.blotty.core.common.models.modifiers.filters.FilterConditionChain.FilterConditionChainOperator;
+import com.blotty.core.common.models.modifiers.filters.FilterConditionChain.FilterConditionConjunction;
 
 public class FilterExpression {
 	
 	private final FilterConditionChain conditionsChain;
 	
-	public FilterExpression( FilterCondition condition ) {
+	public FilterExpression( IFilterCondition condition ) {
 		this.conditionsChain = new FilterConditionChain( condition );
 	}
 	
-	public FilterExpression( FilterCondition ...conditions ) {
+	public FilterExpression( IFilterCondition ...conditions ) {
 		this.conditionsChain = new FilterConditionChain( conditions[0] );
 			
 		FilterConditionChain chainRef = this.conditionsChain;
@@ -24,7 +24,7 @@ public class FilterExpression {
 		this.conditionsChain = chain;
 	}
 		
-	private FilterConditionChain addConditionToChain(FilterConditionChain nextCondition, FilterCondition filterCondition) {
+	private FilterConditionChain addConditionToChain(FilterConditionChain nextCondition, IFilterCondition filterCondition) {
 		nextCondition = new FilterConditionChain( filterCondition ); 
 		return nextCondition;
 	}
@@ -32,10 +32,8 @@ public class FilterExpression {
 	public boolean apply( Row row ) {		
 		// Just 1 condition
 		if ( conditionsChain.getNextCondition()==null ) {
-			FilterCondition condition = conditionsChain.getCondition();
-			return condition.apply( 
-				row.getFields()[ condition.getLeftOperand().getId()] 
-			);
+			IFilterCondition condition = conditionsChain.getCondition();
+			return condition.apply( row );
 		}
 		return applyChain( conditionsChain, row );
 	}
@@ -44,24 +42,27 @@ public class FilterExpression {
 		if (chainRef==null) {
 			return true;
 		}
-		FilterCondition condition = chainRef.getCondition();
 		
-		boolean conditionResult = condition.apply( 
-			row.getFields()[ condition.getLeftOperand().getId()] 
-		);
+		boolean conditionResult = chainRef.getCondition().apply( row ); 
+		
 		// This is false...
 		if ( !conditionResult ) {
-			if (FilterConditionChainOperator.AND.equals(chainRef.getOperator())) {
+			if (FilterConditionConjunction.AND.equals(chainRef.getConjunction())) {
 				return false;
 			}
 			// Evaluate next one
 			return applyChain( chainRef.getNextCondition(), row );
 		}
 		// ..else true
-		if (FilterConditionChainOperator.OR.equals(chainRef.getOperator())) {
+		if (FilterConditionConjunction.OR.equals(chainRef.getConjunction())) {
 			return true;
 		}
 		// Evaluate next one
 		return applyChain( chainRef.getNextCondition(), row );
 	}
-}
+
+	@Override
+	public String toString() {
+		return "FilterExpression [conditionsChain=" + conditionsChain + "]";
+	}
+} 

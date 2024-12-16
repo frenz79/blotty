@@ -63,4 +63,9 @@ public class Column {
 		}
 		throw new RowsTypeException(String.format("Missing impl for type:%s", String.valueOf(type)));
 	}
+
+	@Override
+	public String toString() {
+		return "Column [id=" + id + ", name=" + name + ", type=" + type + "]";
+	}
 }

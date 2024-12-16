@@ -10,5 +10,5 @@ public interface GenericField {
 	
 	public FieldType getType();
 
-	public int compareTo(GenericField rightOperand);
+	public int compareTo(GenericField other);
 }

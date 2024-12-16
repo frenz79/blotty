@@ -11,7 +11,8 @@ import com.blotty.core.common.models.ColumnsModel.ColumnsModelBuilder;
 import com.blotty.core.common.models.commons.Consumer;
 import com.blotty.core.common.models.modifiers.filters.FilterExpression;
 import com.blotty.core.common.models.modifiers.filters.FilterExpressionBuilder;
-import com.blotty.core.common.models.modifiers.filters.conditions.Equal;
+import com.blotty.core.common.models.modifiers.filters.conditions.Operand;
+import com.blotty.core.common.models.modifiers.filters.conditions.binary.BinaryCondition;
 import com.blotty.core.common.models.types.FieldType;
 import com.blotty.core.common.models.types.impl.StringField;
 
@@ -97,8 +98,8 @@ class DataModelTest {
 			.getDataModel();
 		
 		FilterExpression filter = new FilterExpressionBuilder()
-			.begin(	new Equal(colModel.getColumn("COL_1"), StringField.of("2")) )
-			.or( new Equal(colModel.getColumn("COL_1"), StringField.of("3")) )
+			.begin(	BinaryCondition.Equal(Operand.of(colModel.getColumn("COL_1")), Operand.of("2")))
+			.or( BinaryCondition.Equal(Operand.of(colModel.getColumn("COL_1")), Operand.of("3")))
 			.build();
 		
 		DataModelView view = dataModel.createView("2_or_3", filter);

@@ -13,9 +13,11 @@ import com.blotty.core.common.models.DataModelView;
 import com.blotty.core.common.models.RowBuilder;
 import com.blotty.core.common.models.modifiers.filters.FilterExpression;
 import com.blotty.core.common.models.modifiers.filters.FilterExpressionBuilder;
-import com.blotty.core.common.models.modifiers.filters.conditions.Equal;
-import com.blotty.core.common.models.modifiers.filters.conditions.GreaterThanEqual;
-import com.blotty.core.common.models.modifiers.filters.conditions.Like;
+import com.blotty.core.common.models.modifiers.filters.conditions.Operand;
+import com.blotty.core.common.models.modifiers.filters.conditions.binary.BinaryCondition;
+import com.blotty.core.common.models.modifiers.filters.conditions.binary.operators.Equal;
+import com.blotty.core.common.models.modifiers.filters.conditions.binary.operators.GreaterThanEqual;
+import com.blotty.core.common.models.modifiers.filters.conditions.binary.operators.Like;
 import com.blotty.core.common.models.types.FieldType;
 import com.blotty.core.common.models.types.impl.IntegerField;
 import com.blotty.core.common.models.types.impl.StringField;
@@ -61,10 +63,10 @@ public class SimpleCvsLoader {
 		System.out.println("Model size:"+dataModel.getRowsCount());
 				
 		FilterExpression filter = new FilterExpressionBuilder()
-				.begin(	new Equal(colModel.getColumn("Country"), StringField.of("Italy")) )
-				.and( new GreaterThanEqual(colModel.getColumn("Number of employees"), IntegerField.of(5000)) )
-				.and( new Like(colModel.getColumn("Industry"), StringField.of("Engineering")) )
-				.build();
+			.begin(	BinaryCondition.Equal(Operand.of(colModel.getColumn("Country")), Operand.of("Italy"))) 
+			.and( BinaryCondition.GreaterThanEqual(Operand.of(colModel.getColumn("Number of employees")), Operand.of(5000))) 
+			.and( BinaryCondition.Like(Operand.of(colModel.getColumn("Industry")), Operand.of("Engineering")))
+		.build();
 		
 		DataModelView view = dataModel.createView("ItalianOrganizations", filter);
 		

@@ -50,7 +50,7 @@ public class StringField implements GenericField {
 	}
 
 	// TODO: Optimize me!!!
-	public boolean like(StringField other) {
+	public boolean contains(StringField other) {
 		return other.toString().contains(this.toString());
 	}
 	

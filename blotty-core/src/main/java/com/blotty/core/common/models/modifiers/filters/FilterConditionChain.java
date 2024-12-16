@@ -2,23 +2,23 @@ package com.blotty.core.common.models.modifiers.filters;
 
 public class FilterConditionChain {
 
-	public static enum FilterConditionChainOperator {
+	public static enum FilterConditionConjunction {
 		AND,
 		OR
 	};
 	
-	private final FilterCondition condition;
-	private FilterConditionChainOperator operator;
+	private final IFilterCondition condition;
+	private FilterConditionConjunction conjunction;
 	private FilterConditionChain nextCondition;
 	
-	public FilterConditionChain( FilterCondition condition, FilterConditionChainOperator op, FilterConditionChain nextCondition) {
+	public FilterConditionChain( IFilterCondition condition, FilterConditionConjunction op, FilterConditionChain nextCondition) {
 		this.condition = condition;
-		this.operator = op;
+		this.conjunction = op;
 		this.nextCondition = nextCondition;
 	}
 	
-	public FilterConditionChain( FilterCondition condition) {
-		this(condition, FilterConditionChainOperator.AND, null);
+	public FilterConditionChain( IFilterCondition c) {
+		this(c, FilterConditionConjunction.AND, null);
 	}
 
 	public FilterConditionChain getNextCondition() {
@@ -29,15 +29,21 @@ public class FilterConditionChain {
 		this.nextCondition = nextCondition;
 	}
 
-	public FilterConditionChainOperator getOperator() {
-		return operator;
-	}
-
-	public void setOperator(FilterConditionChainOperator operator) {
-		this.operator = operator;
-	}
-
-	public FilterCondition getCondition() {
+	public IFilterCondition getCondition() {
 		return condition;
+	}
+
+	@Override
+	public String toString() {
+		return "FilterConditionChain [condition=" + condition + ", conjunction=" + conjunction + ", nextCondition="
+				+ nextCondition + "]";
+	}
+
+	public FilterConditionConjunction getConjunction() {
+		return conjunction;
+	}
+
+	public void setConjunction(FilterConditionConjunction conjunction) {
+		this.conjunction = conjunction;
 	}
 }
