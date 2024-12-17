@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import com.blotty.core.common.exceptions.ColumnsModelException;
 import com.blotty.core.common.exceptions.FilterExpressionException;
+import com.blotty.core.common.exceptions.RowsTypeException;
 import com.blotty.core.common.models.ColumnsModel;
 import com.blotty.core.common.models.ColumnsModel.ColumnsModelBuilder;
 import com.blotty.core.common.models.modifiers.filters.FilterExpression;
@@ -21,7 +22,7 @@ import com.blotty.core.common.models.types.impl.StringField;
 class SQLQueryParserTest {
 
 	@Test
-	void testSQLQuery() throws ColumnsModelException, FilterExpressionException {
+	void testSQLQuery() throws ColumnsModelException, FilterExpressionException, RowsTypeException {
 		ColumnsModel colsModel = new ColumnsModelBuilder()
 			.add("COL_1", FieldType.STRING_TYPE)
 			.add("COL_2", FieldType.STRING_TYPE)

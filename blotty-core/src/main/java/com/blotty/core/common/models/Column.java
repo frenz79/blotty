@@ -67,18 +67,18 @@ public class Column {
 	}
 	
 	public GenericField fieldOf(String v) throws RowsTypeException {
-		if (str==null || str.length()==0 ) {
+		if (v==null || v.length()==0 ) {
 			return NullField.NULL;
 		}
 		switch ( type ) {
 		case NULL: 	return NullField.NULL;
 		case STRING_TYPE: return from(v);
-		case INTEGER_TYPE: return IntegerField.of((int)v);
+		case INTEGER_TYPE: return IntegerField.of(v);
 		case LONG_TYPE:  return LongField.of(v);
-		case BOOLEAN_TYPE: return BooleanField.of((int)v);
+		case BOOLEAN_TYPE: return BooleanField.of(v);
 		case DOUBLE_TYPE: return DoubleField.of(v);
 		case FLOAT_TYPE: return FloatField.of(v);
-		case SHORT_TYPE: return ShortField.of((short)v);
+		case SHORT_TYPE: return ShortField.of(v);
 		default: throw new RowsTypeException(String.format("Missing impl for type:%s", String.valueOf(type)));
 		}		
 	}
@@ -134,7 +134,7 @@ public class Column {
 		case LONG_TYPE:  return LongField.of((long)v);
 		case BOOLEAN_TYPE: return BooleanField.of((int)v);
 		case DOUBLE_TYPE: return DoubleField.of(v);
-		case FLOAT_TYPE: return FloatField.of(v);
+		case FLOAT_TYPE: return FloatField.of((float)v);
 		case SHORT_TYPE: return ShortField.of((short)v);
 		default: throw new RowsTypeException(String.format("Missing impl for type:%s", String.valueOf(type)));
 		}
@@ -144,12 +144,12 @@ public class Column {
 		switch ( type ) {
 		case NULL: return NullField.NULL;
 		case STRING_TYPE: return from(String.valueOf(v));
-		case INTEGER_TYPE: return IntegerField.of(v);
-		case LONG_TYPE:  return LongField.of((long)v);
+	//	case INTEGER_TYPE: return IntegerField.of(v);
+	//	case LONG_TYPE:  return LongField.of((long)v);
 		case BOOLEAN_TYPE: return BooleanField.of(v);
-		case DOUBLE_TYPE: return DoubleField.of(v);
-		case FLOAT_TYPE: return FloatField.of(v);
-		case SHORT_TYPE: return ShortField.of((short)v);
+	//	case DOUBLE_TYPE: return DoubleField.of(v);
+	//	case FLOAT_TYPE: return FloatField.of(v);
+	//	case SHORT_TYPE: return ShortField.of((short)v);
 		default: throw new RowsTypeException(String.format("Missing impl for type:%s", String.valueOf(type)));
 		}
 	}

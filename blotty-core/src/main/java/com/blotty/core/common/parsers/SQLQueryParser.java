@@ -74,7 +74,7 @@ public class SQLQueryParser {
 
 			// step0 : retrieve left operand
 			// step2 : retrieve right operand (if exists)
-			if ( step==1 || step==2) {
+			if ( step==0 || step==2) {
 				OperandType operandType = null;
 				String operand = null;
 						
@@ -135,7 +135,7 @@ public class SQLQueryParser {
 					}
 				}
 				
-				FilterCondition filterCondition = buildFilterCondition(colsModel, leftOperand, leftOperandType, rightOperand, rightOperandType, operator);
+				IFilterCondition filterCondition = buildFilterCondition(colsModel, leftOperand, leftOperandType, rightOperand, rightOperandType, operator);
 				if ( builder==null ) {
 					builder = new FilterExpressionBuilder().begin( filterCondition );
 				} else {
