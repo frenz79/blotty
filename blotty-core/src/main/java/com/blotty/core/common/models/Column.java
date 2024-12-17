@@ -66,166 +66,105 @@ public class Column {
 				: StringField.of(str);
 	}
 	
-	public GenericField fieldOf(String str) throws RowsTypeException {
+	public GenericField fieldOf(String v) throws RowsTypeException {
 		if (str==null || str.length()==0 ) {
 			return NullField.NULL;
 		}
 		switch ( type ) {
-		case NULL: 			return NullField.NULL;
-		case STRING_TYPE:	return from(str);
-		case INTEGER_TYPE: 
-			return IntegerField.of(str);
-		case LONG_TYPE: 
-			return LongField.of(str);
-		case BOOLEAN_TYPE:
-			return BooleanField.of(str);
-		case DOUBLE_TYPE:
-			return DoubleField.of(str);
-		case FLOAT_TYPE:
-			return FloatField.of(str);
-		case SHORT_TYPE:
-			return ShortField.of(str);
-		default:
-			throw new RowsTypeException(String.format("Missing impl for type:%s", String.valueOf(type)));
+		case NULL: 	return NullField.NULL;
+		case STRING_TYPE: return from(v);
+		case INTEGER_TYPE: return IntegerField.of((int)v);
+		case LONG_TYPE:  return LongField.of(v);
+		case BOOLEAN_TYPE: return BooleanField.of((int)v);
+		case DOUBLE_TYPE: return DoubleField.of(v);
+		case FLOAT_TYPE: return FloatField.of(v);
+		case SHORT_TYPE: return ShortField.of((short)v);
+		default: throw new RowsTypeException(String.format("Missing impl for type:%s", String.valueOf(type)));
 		}		
 	}
 	
-	public GenericField fieldOf(long str) throws RowsTypeException {
+	public GenericField fieldOf(long v) throws RowsTypeException {
 		switch ( type ) {
-		case NULL: 			return NullField.NULL;
-		case STRING_TYPE:	return from(String.valueOf(str));
-		/*
-		case INTEGER_TYPE: 
-			return IntegerField.of(str);
-		case LONG_TYPE: 
-			return LongField.of(str);
-		case BOOLEAN_TYPE:
-			return BooleanField.of(str);
-		case DOUBLE_TYPE:
-			return DoubleField.of(str);
-		case FLOAT_TYPE:
-			return FloatField.of(str);
-		case SHORT_TYPE:
-			return ShortField.of(str);
-		*/
-		default:
-			throw new RowsTypeException(String.format("Missing impl for type:%s", String.valueOf(type)));
+		case NULL: 	return NullField.NULL;
+		case STRING_TYPE: return from(String.valueOf(v));
+		case INTEGER_TYPE: return IntegerField.of((int)v);
+		case LONG_TYPE:  return LongField.of(v);
+		case BOOLEAN_TYPE: return BooleanField.of((int)v);
+		case DOUBLE_TYPE: return DoubleField.of(v);
+		case FLOAT_TYPE: return FloatField.of(v);
+		case SHORT_TYPE: return ShortField.of((short)v);
+		default: throw new RowsTypeException(String.format("Missing impl for type:%s", String.valueOf(type)));
 		}
 	}
 	
-	public GenericField fieldOf(int str) throws RowsTypeException {
+	public GenericField fieldOf(int v) throws RowsTypeException {
 		switch ( type ) {
-		case NULL: 			return NullField.NULL;
-		case STRING_TYPE:	return from(String.valueOf(str));
-		/*
-		case INTEGER_TYPE: 
-			return IntegerField.of(str);
-		case LONG_TYPE: 
-			return LongField.of(str);
-		case BOOLEAN_TYPE:
-			return BooleanField.of(str);
-		case DOUBLE_TYPE:
-			return DoubleField.of(str);
-		case FLOAT_TYPE:
-			return FloatField.of(str);
-		case SHORT_TYPE:
-			return ShortField.of(str);
-		*/
-		default:
-			throw new RowsTypeException(String.format("Missing impl for type:%s", String.valueOf(type)));
+		case NULL: return NullField.NULL;
+		case STRING_TYPE: return from(String.valueOf(v));
+		case INTEGER_TYPE: return IntegerField.of(v);
+		case LONG_TYPE:  return LongField.of((long)v);
+		case BOOLEAN_TYPE: return BooleanField.of(v);
+		case DOUBLE_TYPE: return DoubleField.of(v);
+		case FLOAT_TYPE: return FloatField.of(v);
+		case SHORT_TYPE: return ShortField.of((short)v);
+		default: throw new RowsTypeException(String.format("Missing impl for type:%s", String.valueOf(type)));
 		}
 	}
 	
 
-	public GenericField fieldOf(float str) throws RowsTypeException {
+	public GenericField fieldOf(float v) throws RowsTypeException {
 		switch ( type ) {
-		case NULL: 			return NullField.NULL;
-		case STRING_TYPE:	return from(String.valueOf(str));
-		/*
-		case INTEGER_TYPE: 
-			return IntegerField.of(str);
-		case LONG_TYPE: 
-			return LongField.of(str);
-		case BOOLEAN_TYPE:
-			return BooleanField.of(str);
-		case DOUBLE_TYPE:
-			return DoubleField.of(str);
-		case FLOAT_TYPE:
-			return FloatField.of(str);
-		case SHORT_TYPE:
-			return ShortField.of(str);
-		*/
-		default:
-			throw new RowsTypeException(String.format("Missing impl for type:%s", String.valueOf(type)));
+		case NULL: return NullField.NULL;
+		case STRING_TYPE: return from(String.valueOf(v));
+		case INTEGER_TYPE: return IntegerField.of((int)v);
+		case LONG_TYPE:  return LongField.of((long)v);
+		case BOOLEAN_TYPE: return BooleanField.of((int)v);
+		case DOUBLE_TYPE: return DoubleField.of(v);
+		case FLOAT_TYPE: return FloatField.of(v);
+		case SHORT_TYPE: return ShortField.of((short)v);
+		default: throw new RowsTypeException(String.format("Missing impl for type:%s", String.valueOf(type)));
 		}
 	}
 	
-	public GenericField fieldOf(double str) throws RowsTypeException {
+	public GenericField fieldOf(double v) throws RowsTypeException {
 		switch ( type ) {
-		case NULL: 			return NullField.NULL;
-		case STRING_TYPE:	return from(String.valueOf(str));
-		/*
-		case INTEGER_TYPE: 
-			return IntegerField.of(str);
-		case LONG_TYPE: 
-			return LongField.of(str);
-		case BOOLEAN_TYPE:
-			return BooleanField.of(str);
-		case DOUBLE_TYPE:
-			return DoubleField.of(str);
-		case FLOAT_TYPE:
-			return FloatField.of(str);
-		case SHORT_TYPE:
-			return ShortField.of(str);
-		*/
-		default:
-			throw new RowsTypeException(String.format("Missing impl for type:%s", String.valueOf(type)));
+		case NULL: return NullField.NULL;
+		case STRING_TYPE: return from(String.valueOf(v));
+		case INTEGER_TYPE: return IntegerField.of((int)v);
+		case LONG_TYPE:  return LongField.of((long)v);
+		case BOOLEAN_TYPE: return BooleanField.of((int)v);
+		case DOUBLE_TYPE: return DoubleField.of(v);
+		case FLOAT_TYPE: return FloatField.of(v);
+		case SHORT_TYPE: return ShortField.of((short)v);
+		default: throw new RowsTypeException(String.format("Missing impl for type:%s", String.valueOf(type)));
 		}
 	}
 	
-	public GenericField fieldOf(boolean str) throws RowsTypeException {
+	public GenericField fieldOf(boolean v) throws RowsTypeException {
 		switch ( type ) {
-		case NULL: 			return NullField.NULL;
-		case STRING_TYPE:	return from(String.valueOf(str));
-		/*
-		case INTEGER_TYPE: 
-			return IntegerField.of(str);
-		case LONG_TYPE: 
-			return LongField.of(str);
-		case BOOLEAN_TYPE:
-			return BooleanField.of(str);
-		case DOUBLE_TYPE:
-			return DoubleField.of(str);
-		case FLOAT_TYPE:
-			return FloatField.of(str);
-		case SHORT_TYPE:
-			return ShortField.of(str);
-		*/
-		default:
-			throw new RowsTypeException(String.format("Missing impl for type:%s", String.valueOf(type)));
+		case NULL: return NullField.NULL;
+		case STRING_TYPE: return from(String.valueOf(v));
+		case INTEGER_TYPE: return IntegerField.of(v);
+		case LONG_TYPE:  return LongField.of((long)v);
+		case BOOLEAN_TYPE: return BooleanField.of(v);
+		case DOUBLE_TYPE: return DoubleField.of(v);
+		case FLOAT_TYPE: return FloatField.of(v);
+		case SHORT_TYPE: return ShortField.of((short)v);
+		default: throw new RowsTypeException(String.format("Missing impl for type:%s", String.valueOf(type)));
 		}
 	}
 	
-	public GenericField fieldOf(short str) throws RowsTypeException {
+	public GenericField fieldOf(short v) throws RowsTypeException {
 		switch ( type ) {
-		case NULL: 			return NullField.NULL;
-		case STRING_TYPE:	return from(String.valueOf(str));
-		/*
-		case INTEGER_TYPE: 
-			return IntegerField.of(str);
-		case LONG_TYPE: 
-			return LongField.of(str);
-		case BOOLEAN_TYPE:
-			return BooleanField.of(str);
-		case DOUBLE_TYPE:
-			return DoubleField.of(str);
-		case FLOAT_TYPE:
-			return FloatField.of(str);
-		case SHORT_TYPE:
-			return ShortField.of(str);
-		*/
-		default:
-			throw new RowsTypeException(String.format("Missing impl for type:%s", String.valueOf(type)));
+		case NULL: return NullField.NULL;
+		case STRING_TYPE: return from(String.valueOf(v));
+		case INTEGER_TYPE: return IntegerField.of((int)v);
+		case LONG_TYPE:  return LongField.of((long)v);
+		case BOOLEAN_TYPE: return BooleanField.of(v);
+		case DOUBLE_TYPE: return DoubleField.of(v);
+		case FLOAT_TYPE: return FloatField.of(v);
+		case SHORT_TYPE: return ShortField.of((short)v);
+		default: throw new RowsTypeException(String.format("Missing impl for type:%s", String.valueOf(type)));
 		}
 	}
 	
