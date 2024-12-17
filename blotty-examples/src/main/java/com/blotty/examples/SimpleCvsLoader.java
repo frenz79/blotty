@@ -6,17 +6,17 @@ import java.io.Reader;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 
-import com.blotty.core.common.models.ColumnsModel;
-import com.blotty.core.common.models.ColumnsModel.ColumnsModelBuilder;
-import com.blotty.core.common.models.DataModel;
-import com.blotty.core.common.models.DataModelView;
-import com.blotty.core.common.models.RowBuilder;
-import com.blotty.core.common.models.modifiers.filters.FilterExpression;
-import com.blotty.core.common.models.modifiers.filters.FilterExpressionBuilder;
-import com.blotty.core.common.models.modifiers.filters.conditions.Operand;
-import com.blotty.core.common.models.modifiers.filters.conditions.binary.BinaryCondition;
-import com.blotty.core.common.models.types.FieldType;
-import com.blotty.core.common.parsers.SQLQueryParser;
+import com.blotty.core.models.ColumnsModel;
+import com.blotty.core.models.DataModel;
+import com.blotty.core.models.DataModelView;
+import com.blotty.core.models.RowBuilder;
+import com.blotty.core.models.ColumnsModel.ColumnsModelBuilder;
+import com.blotty.core.modifiers.filters.FilterExpression;
+import com.blotty.core.modifiers.filters.FilterExpressionBuilder;
+import com.blotty.core.modifiers.filters.conditions.Operand;
+import com.blotty.core.modifiers.filters.conditions.binary.BinaryCondition;
+import com.blotty.core.parsers.SQLQueryParser;
+import com.blotty.core.types.FieldType;
 
 public class SimpleCvsLoader {
 
