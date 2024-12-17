@@ -100,7 +100,7 @@ public class SQLQueryParser {
 			}
 			
 			if ( step==1 ) {
-				char nextCh = query.charAt(i+1);
+				char nextCh = Character.toUpperCase(query.charAt(i+1));
 				operator = buildOperator( ch, nextCh );
 				
 				if ( operator==null ) {				
@@ -115,12 +115,15 @@ public class SQLQueryParser {
 			
 			if ( step==3 ) {
 				for ( int j=i; j<query.length(); j++ ) {
-					if ( query.charAt(j)=='A' && query.charAt(j+1)=='N' ) {
+					char chj=Character.toUpperCase(query.charAt(j));
+					char chjj=Character.toUpperCase(query.charAt(j+1));
+					
+					if ( chj=='A' && chjj=='N' ) {
 						conjunction = Conjunction.AND;
 						i = j+2;
 						break;
 					}
-					else if ( query.charAt(j)=='O' && query.charAt(j+1)=='R' ) {
+					else if ( chj=='O' && chjj=='R' ) {
 						conjunction = Conjunction.OR;
 						i = j+1;
 						break;
@@ -131,7 +134,7 @@ public class SQLQueryParser {
 				if ( rightOperand==null ) {
 					filterCondition = new UnaryCondition(null, (IUnaryOperator)operator);
 				} else {
-					filterCondition = buildCondition(colsModel, leftOperand, leftOperandType, rightOperand, rightOperandType, operator);
+					filterCondition = buildBinaryCondition(colsModel, leftOperand, leftOperandType, rightOperand, rightOperandType, operator);
 				}
 				
 				if ( builder==null ) {
@@ -149,7 +152,7 @@ public class SQLQueryParser {
 		if ( rightOperand==null ) {
 			filterCondition = new UnaryCondition(null, (IUnaryOperator)operator);
 		} else {
-			filterCondition = buildCondition(colsModel, leftOperand, leftOperandType, rightOperand, rightOperandType, operator);
+			filterCondition = buildBinaryCondition(colsModel, leftOperand, leftOperandType, rightOperand, rightOperandType, operator);
 		}
 		
 		addConjunction( builder, filterCondition, conjunction );		
@@ -168,26 +171,18 @@ public class SQLQueryParser {
 		return builder;
 	}
 	
-	private IOperator buildOperator( char ch1, char ch2 ) {
-		if ( ch1=='=' ) {
-			return new Equal();
-		}				
-		else if ( ch1=='!' && ch2=='=' ) {
+	private IOperator buildOperator( char ch1, char ch2 ) {			
+		if ( ch1=='!' && ch2=='=' ) {
 			return new NotEqual();
 		}				
 		else if ( ch1=='>') {
-			if (  ch2=='=' ) {
-				return new GreaterThanEqual();
-			} else {
-				return new GreaterThan();
-			}
+			return (ch2=='=')? new GreaterThanEqual():new GreaterThan();
 		}
 		else if ( ch1=='<') {
-			if (  ch2=='=' ) {
-				return new LesserThanEqual();
-			} else {
-				return new LesserThan();
-			}				
+			return (ch2=='=')? new LesserThanEqual():new LesserThan();			
+		}
+		else if ( ch1=='=' ) {
+			return new Equal();
 		}
 		else if (Character.toUpperCase(ch1)=='L' && Character.toUpperCase(ch2)=='I' ) {
 			return new Like();
@@ -195,7 +190,7 @@ public class SQLQueryParser {
 		return null;
 	}
 	
-	private IFilterCondition buildCondition( 
+	private IFilterCondition buildBinaryCondition( 
 			ColumnsModel colsModel,
 			String leftOperand,
 			OperandType leftOperandType,
