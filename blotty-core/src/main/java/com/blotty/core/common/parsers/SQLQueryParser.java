@@ -202,26 +202,18 @@ public class SQLQueryParser {
 		
 		if ( OperandType.CONST.equals(rightOperandType) && OperandType.CONST.equals(leftOperandType) ) {
 			throw new RuntimeException("Invalid const to const expression");
-		}		
+		}
+		Operand left = null;
+		Operand right = null;
+		
 		if ( OperandType.CONST.equals(leftOperandType) ) {
-			return new BinaryCondition(
-				Operand.of(leftOperand, colsModel.getColumn(rightOperand)), 
-				(IBinaryOperator)operator, 
-				Operand.of(colsModel.getColumn(rightOperand))
-			);
+			left = Operand.of(leftOperand, colsModel.getColumn(rightOperand));
+			right = Operand.of(colsModel.getColumn(rightOperand));	
+		}  else if ( OperandType.CONST.equals(rightOperandType) ) {
+			left = Operand.of(colsModel.getColumn(leftOperand));
+			right = Operand.of(rightOperand, colsModel.getColumn(leftOperand) );	
 		} 
-		if ( OperandType.CONST.equals(rightOperandType) ) {
-			return new BinaryCondition(
-				Operand.of(colsModel.getColumn(leftOperand)),
-				(IBinaryOperator)operator, 
-				Operand.of(rightOperand, colsModel.getColumn(leftOperand) )
-			);
-		} 
-		return new BinaryCondition(
-			Operand.of(colsModel.getColumn(leftOperand)),
-			(IBinaryOperator)operator, 
-			Operand.of(colsModel.getColumn(rightOperand))
-		);
+		return new BinaryCondition( left, (IBinaryOperator)operator, right );
 	}
 	
 	private String readStringUntil(char endChar, int i, String str) {
