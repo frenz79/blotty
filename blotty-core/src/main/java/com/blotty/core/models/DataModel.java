@@ -40,7 +40,7 @@ public class DataModel extends AbstractDataModel {
 		for( IListener<RowEvent> l : this.rowsEventListeners.values() ) {
 			l.onEvent(event);
 		}
-	}	
+	}
 	
 	public void addRowsListener( String id, IListener<RowEvent> listener ) {
 		this.rowsEventListeners.put(id, listener);

@@ -4,11 +4,13 @@ import com.blotty.core.commons.IConsumer;
 import com.blotty.core.commons.IListener;
 import com.blotty.core.commons.exceptions.RowsModelException;
 import com.blotty.core.modifiers.filters.FilterExpression;
+import com.blotty.core.modifiers.sorters.SorterConditionChain;
 
 public class DataModelView extends AbstractDataModel implements IListener<RowEvent> {
 
 	private final FilterExpression filter;
 	private final DataModel parentDataModel;
+	private SorterConditionChain sorter;
 	
 	public DataModelView(String id, FilterExpression filter, DataModel parentDataModel) throws RowsModelException {
 		super(id, parentDataModel.getColumnsModel());
@@ -57,5 +59,10 @@ public class DataModelView extends AbstractDataModel implements IListener<RowEve
 
 	public DataModel getParentDataModel() {
 		return parentDataModel;
+	}
+	
+	public void sort( SorterConditionChain sorter ) {
+		this.sorter = sorter;
+		this.sorter.apply( getRowsModel() );
 	}
 }

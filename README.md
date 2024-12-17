@@ -81,3 +81,13 @@ DataModelView sqlFilteredView = dataModel.createView("ItalianOrganizations_1",
 		AND \"Number of employees\" >= '5000' 
 		AND \"Industry\" LIKE 'Engineering' "));
 ```
+
+6. **Sorting** the view it easy enough, just chain all needed sorting expressions this way:
+```
+		sqlFilteredView.sort(
+			new SorterExpressionBuilder(colModel)
+				.DescNullLast("Number of employees") 
+				.AscNullLast("Industry")
+				.build()	
+		);
+```

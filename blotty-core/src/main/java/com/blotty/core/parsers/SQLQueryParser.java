@@ -6,7 +6,7 @@ import com.blotty.core.models.ColumnsModel;
 import com.blotty.core.modifiers.filters.FilterExpression;
 import com.blotty.core.modifiers.filters.FilterExpressionBuilder;
 import com.blotty.core.modifiers.filters.IFilterCondition;
-import com.blotty.core.modifiers.filters.conditions.IOperator;
+import com.blotty.core.modifiers.filters.conditions.IFilterOperator;
 import com.blotty.core.modifiers.filters.conditions.Operand;
 import com.blotty.core.modifiers.filters.conditions.binary.BinaryCondition;
 import com.blotty.core.modifiers.filters.conditions.binary.IBinaryOperator;
@@ -61,7 +61,7 @@ public class SQLQueryParser {
 		OperandType rightOperandType = null;
 		String rightOperand = null;
 		
-		IOperator operator = null;
+		IFilterOperator operator = null;
 		
 		Conjunction conjunction = null;
 		
@@ -160,7 +160,7 @@ public class SQLQueryParser {
 		return builder;
 	}
 	
-	private IOperator buildOperator( char ch1, char ch2 ) {			
+	private IFilterOperator buildOperator( char ch1, char ch2 ) {			
 		if ( ch1=='!' && ch2=='=' ) {
 			return new NotEqual();
 		}				
@@ -185,7 +185,7 @@ public class SQLQueryParser {
 			OperandType leftOperandType,
 			String rightOperand,			
 			OperandType rightOperandType,
-			IOperator operator ) throws RowsTypeException {
+			IFilterOperator operator ) throws RowsTypeException {
 		if ( rightOperand==null ) {
 			return new UnaryCondition(null, (IUnaryOperator)operator);
 		}
@@ -198,7 +198,7 @@ public class SQLQueryParser {
 			OperandType leftOperandType,
 			String rightOperand,			
 			OperandType rightOperandType,
-			IOperator operator ) throws RowsTypeException {
+			IFilterOperator operator ) throws RowsTypeException {
 		
 		if ( OperandType.CONST.equals(rightOperandType) && OperandType.CONST.equals(leftOperandType) ) {
 			throw new RuntimeException("Invalid const to const expression");

@@ -7,14 +7,15 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 
 import com.blotty.core.models.ColumnsModel;
+import com.blotty.core.models.ColumnsModel.ColumnsModelBuilder;
 import com.blotty.core.models.DataModel;
 import com.blotty.core.models.DataModelView;
 import com.blotty.core.models.RowBuilder;
-import com.blotty.core.models.ColumnsModel.ColumnsModelBuilder;
 import com.blotty.core.modifiers.filters.FilterExpression;
 import com.blotty.core.modifiers.filters.FilterExpressionBuilder;
 import com.blotty.core.modifiers.filters.conditions.Operand;
 import com.blotty.core.modifiers.filters.conditions.binary.BinaryCondition;
+import com.blotty.core.modifiers.sorters.SorterExpressionBuilder;
 import com.blotty.core.parsers.SQLQueryParser;
 import com.blotty.core.types.FieldType;
 
@@ -73,6 +74,14 @@ public class SimpleCvsLoader {
 		);
 				
 		System.out.println(sqlFilteredView.dumpToString());
+						
+		sqlFilteredView.sort(
+			new SorterExpressionBuilder(colModel)
+				.DescNullLast("Number of employees") 
+				.AscNullLast("Industry")
+				.build()	
+		);
 		
+		System.out.println(sqlFilteredView.dumpToString());
 	}
 }

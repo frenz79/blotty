@@ -1,5 +1,6 @@
 package com.blotty.core.models;
 
+import java.util.List;
 import java.util.UUID;
 
 import com.blotty.core.commons.IConsumer;
@@ -37,6 +38,10 @@ public abstract class AbstractDataModel {
 				break;
 			}
 		}
+	}
+	
+	protected IRowsModel getRowsModel() {
+		return rowsModel;
 	}
 
 	public ColumnsModel getColumnsModel() {

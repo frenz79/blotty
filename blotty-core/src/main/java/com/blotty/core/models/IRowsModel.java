@@ -1,6 +1,6 @@
 package com.blotty.core.models;
 
-import java.util.Collection;
+import java.util.List;
 
 import com.blotty.core.commons.exceptions.RowsModelException;
 
@@ -10,6 +10,6 @@ public interface IRowsModel {
 
 	int getRowsCount();
 
-	Collection<Row> getAllRows();
+	List<Row> getAllRows();
 
 }

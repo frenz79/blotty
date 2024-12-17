@@ -15,7 +15,6 @@ import com.blotty.core.modifiers.filters.conditions.binary.BinaryCondition;
 import com.blotty.core.modifiers.filters.conditions.binary.operators.Equal;
 import com.blotty.core.modifiers.filters.conditions.binary.operators.GreaterThan;
 import com.blotty.core.modifiers.filters.conditions.binary.operators.LesserThan;
-import com.blotty.core.parsers.SQLQueryParser;
 import com.blotty.core.types.FieldType;
 import com.blotty.core.types.impl.IntegerField;
 import com.blotty.core.types.impl.StringField;
