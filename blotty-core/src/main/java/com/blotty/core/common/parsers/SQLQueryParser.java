@@ -71,33 +71,38 @@ public class SQLQueryParser {
 			if ( ch==' ' ) {
 				continue;
 			}
-			
-			OperandType operandType = null;
-			String operand = null;
+
+			// step0 : retrieve left operand
+			// step2 : retrieve right operand (if exists)
+			if ( step==1 || step==2) {
+				OperandType operandType = null;
+				String operand = null;
 						
-			if (ch=='"') {	// Column name					
-				operandType = OperandType.COLUMN;
-				operand = readStringUntil('\"', i+1,query);
-				i += operand.length()+1;
-			} else if (ch=='\'') {	// Const Value	
-				operandType = OperandType.CONST;
-				operand = readStringUntil('\'', i+1,query);
-				i += operand.length()+1;
-			} 			
-			if ( operandType!=null ) {
-				if ( step==0 ) {
-					leftOperandType = operandType;
-					leftOperand = operand;
-				} else if ( step==2 ) {
-					rightOperandType = operandType;
-					rightOperand = operand;
-				} else {
-					throw new RuntimeException("Invalid Syntax!");
+				if (ch=='"') {	// Column name					
+					operandType = OperandType.COLUMN;
+					operand = readStringUntil('\"', i+1,query);
+					i += operand.length()+1;
+				} else if (ch=='\'') {	// Const Value	
+					operandType = OperandType.CONST;
+					operand = readStringUntil('\'', i+1,query);
+					i += operand.length()+1;
+				} 			
+				if ( operandType!=null ) {
+					if ( step==0 ) {
+						leftOperandType = operandType;
+						leftOperand = operand;
+					} else if ( step==2 ) {
+						rightOperandType = operandType;
+						rightOperand = operand;
+					} else {
+						throw new RuntimeException("Invalid Syntax!");
+					}
+					step++;
+					continue;				
 				}
-				step++;
-				continue;				
 			}
 			
+			// step1 : retrieve the operator
 			if ( step==1 ) {
 				char nextCh = Character.toUpperCase(query.charAt(i+1));
 				operator = buildOperator( ch, nextCh );
@@ -111,7 +116,8 @@ public class SQLQueryParser {
 				}
 				step++;
 			}
-			
+
+			// step3 : retrieve the conjunction (if exists)
 			if ( step==3 ) {
 				for ( int j=i; j<query.length(); j++ ) {
 					char chj=Character.toUpperCase(query.charAt(j));
@@ -129,13 +135,7 @@ public class SQLQueryParser {
 					}
 				}
 				
-				IFilterCondition filterCondition= null;
-				if ( rightOperand==null ) {
-					filterCondition = new UnaryCondition(null, (IUnaryOperator)operator);
-				} else {
-					filterCondition = buildBinaryCondition(colsModel, leftOperand, leftOperandType, rightOperand, rightOperandType, operator);
-				}
-				
+				FilterCondition filterCondition = buildFilterCondition(colsModel, leftOperand, leftOperandType, rightOperand, rightOperandType, operator);
 				if ( builder==null ) {
 					builder = new FilterExpressionBuilder().begin( filterCondition );
 				} else {
@@ -147,25 +147,15 @@ public class SQLQueryParser {
 			}
 		}
 		
-		IFilterCondition filterCondition= null;
-		if ( rightOperand==null ) {
-			filterCondition = new UnaryCondition(null, (IUnaryOperator)operator);
-		} else {
-			filterCondition = buildBinaryCondition(colsModel, leftOperand, leftOperandType, rightOperand, rightOperandType, operator);
-		}
-		
+		IFilterCondition filterCondition = buildFilterCondition(colsModel, leftOperand, leftOperandType, rightOperand, rightOperandType, operator);
 		addConjunction( builder, filterCondition, conjunction );		
 		return builder.build();
 	}
 	
 	private FilterExpressionBuilder addConjunction( FilterExpressionBuilder builder, IFilterCondition filterCondition, Conjunction conjunction ) throws FilterExpressionException {
 		switch ( conjunction ) {
-		case AND:
-			builder.and(filterCondition);
-			break;
-		case OR:
-			builder.or(filterCondition);
-			break;					
+		case AND: return builder.and(filterCondition);
+		case OR: return builder.or(filterCondition);		
 		}
 		return builder;
 	}
@@ -187,6 +177,19 @@ public class SQLQueryParser {
 			return new Like();
 		}
 		return null;
+	}
+	
+	private IFilterCondition buildFilterCondition ( 
+			ColumnsModel colsModel,
+			String leftOperand,
+			OperandType leftOperandType,
+			String rightOperand,			
+			OperandType rightOperandType,
+			IOperator operator ) throws RowsTypeException {
+		if ( rightOperand==null ) {
+			return new UnaryCondition(null, (IUnaryOperator)operator);
+		}
+		return buildBinaryCondition(colsModel, leftOperand, leftOperandType, rightOperand, rightOperandType, operator);
 	}
 	
 	private IFilterCondition buildBinaryCondition( 
