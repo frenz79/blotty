@@ -1,7 +1,9 @@
 
 # blotty
-A library for importing, filtering and sorting data from static sources (ex: csv) and live feeds (ex: kafka).
+A library for importing, filtering and sorting data from static or streaming sources.
 Mapped data is stored in an in memory tabular object called **DataModel** structured according its own **ColumnModel** descriptor.
+Applying any filter generates a derived model called **DataModelView** .
+When a row changes in the parent model, all linked views are notified (different kind of events are dispactched: INS, UPD or DEL).
 
 ## Import and search csv data
 Example taken from  "**SimpleCvsLoader**"
