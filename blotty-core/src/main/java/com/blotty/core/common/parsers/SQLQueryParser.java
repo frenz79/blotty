@@ -22,17 +22,16 @@ import com.blotty.core.common.models.modifiers.filters.conditions.unary.UnaryCon
 
 public class SQLQueryParser {
 
-	/**
-	 *      "COL1" = 10
-	 *      AND "COL2" = 'PIPPO'
-	 *      OR  "COL3" IS NULL
-	 *      OR "COL3" = "COL4"
-	 *      ;      
-	 *      
-	 *      " : column name delimiter
-	 *      ' : constant value delimiter
-	 *      AND , OR, =, !=, >, <, >=, <=, LIKE, IS NULL, IS NOT NULL
-	 *      
+	/** 
+	 *  Process a string containing an SQL like syntax:     
+	 *  - every column name must be delimited by " character
+	 *  - every constant valies must be delimited by ' character
+  	 *  - const vs const comparison is not allowed
+     	 *  - supported operators are: =, !=, >, <, >=, <=, LIKE, IS NULL, IS NOT NULL
+	 *  - supported conjuctions are: AND , OR
+	 *  
+  	 *  Example:
+         *  "COLUMN_1" = 'example value' OR "COLUMN_2" LIKE 'xxx' AND "COLUMN_3" >= "COLUMN_4"
 	 */
 	
 	static enum OperandType {
