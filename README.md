@@ -73,7 +73,7 @@ That's the final output:
     |83Ce9d2f643Db95    |Mays PLC    |https://crosby.com/|Italy     |Switchable 24/7 model    |1977     |Mechanical or Industrial Engineering |5800               |
     |8a14ebD20eA8D7A    |Watson LLC  |http://noble.com/  |Italy     |Secured modular attitude |2000     |Computer Software / Engineering      |8775               |
 ```
-But filters can be created using a simpler **SQL** like **syntax** too, like following:
+Filters can be created using a simpler **SQL** like **syntax** too, like following:
 ```
 DataModelView sqlFilteredView = dataModel.createView("ItalianOrganizations_1", 
 	new SQLQueryParser().parse(colModel, 
