@@ -38,4 +38,14 @@ public class InMemoryRowsModel implements IRowsModel {
 	public List<Row> getAllRows() {
 		return rows;
 	}
+
+	@Override
+	public Row getRow(int position) {
+		return rows.get(position);
+	}
+
+	@Override
+	public Row getRow(String key) {
+		return rowsByKey.get(key);
+	}
 }

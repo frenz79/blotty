@@ -1,6 +1,5 @@
 package com.blotty.core.models;
 
-import java.util.List;
 import java.util.UUID;
 
 import com.blotty.core.commons.IConsumer;
@@ -62,7 +61,7 @@ public abstract class AbstractDataModel {
 			}
 		}
 		
-		ret.append("|");
+		ret.append("|KEY  |");
 		for ( Column c : columnsModel.getColumns() ) {
 			ret.append(c.getName());
 			for ( int i=c.getName().length(); i<colsSize; i++ ) {
@@ -80,7 +79,7 @@ public abstract class AbstractDataModel {
 		ret.append("\n");
 		
 		for ( Row r : rowsModel.getAllRows() ) {
-			ret.append("|");
+			ret.append("|").append(r.getKey()).append("|");
 			for ( IGenericField f : r.getFields() ) {
 				String str = f.toString();
 				ret.append(str);

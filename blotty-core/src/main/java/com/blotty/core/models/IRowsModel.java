@@ -12,4 +12,8 @@ public interface IRowsModel {
 
 	List<Row> getAllRows();
 
+	Row getRow(int position);
+
+	Row getRow(String key);
+
 }

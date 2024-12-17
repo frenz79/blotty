@@ -65,4 +65,12 @@ public class DataModelView extends AbstractDataModel implements IListener<RowEve
 		this.sorter = sorter;
 		this.sorter.apply( getRowsModel() );
 	}
+	
+	public Row getRow( int position ) {
+		return getRowsModel().getRow( position );
+	}
+	
+	public Row getRow( String key ) {
+		return getRowsModel().getRow( key );
+	}
 }

@@ -77,8 +77,8 @@ public class SimpleCvsLoader {
 						
 		sqlFilteredView.sort(
 			new SorterExpressionBuilder(colModel)
-				.DescNullLast("Number of employees") 
-				.AscNullLast("Industry")
+				.AscNullLast("Number of employees") 
+				.DescNullLast("Industry")
 				.build()	
 		);
 		

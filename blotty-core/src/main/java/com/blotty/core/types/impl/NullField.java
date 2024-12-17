@@ -25,4 +25,9 @@ public class NullField implements IGenericField {
 	public int compareTo(IGenericField other) {
 		return -1;
 	}
+
+	@Override
+	public String toString() {
+		return "NULL";
+	}
 }
