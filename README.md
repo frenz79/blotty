@@ -93,3 +93,8 @@ DataModelView sqlFilteredView = dataModel.createView("ItalianOrganizations_1",
 				.build()	
 		);
 ```
+
+## A simple UI
+In the examples there's a simple UI made using Swing and using blotty lib as backend for filtering and sorting logic:
+
+![CSVExplorer](https://github.com/user-attachments/assets/905f0184-00fc-41b5-ad80-f83e2bf22fc7)
