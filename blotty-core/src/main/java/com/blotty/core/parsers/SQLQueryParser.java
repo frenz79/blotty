@@ -212,7 +212,10 @@ public class SQLQueryParser {
 		}  else if ( OperandType.CONST.equals(rightOperandType) ) {
 			left = Operand.of(colsModel.getColumn(leftOperand));
 			right = Operand.of(rightOperand, colsModel.getColumn(leftOperand) );	
-		} 
+		} else {
+			left = Operand.of(leftOperand, colsModel.getColumn(leftOperand));
+			right = Operand.of(rightOperand, colsModel.getColumn(rightOperand) );	
+		}
 		return new BinaryCondition( left, (IBinaryOperator)operator, right );
 	}
 	
