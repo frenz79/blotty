@@ -3,6 +3,7 @@ package com.blotty.core.models;
 import com.blotty.core.commons.exceptions.RowsModelException;
 import com.blotty.core.commons.exceptions.RowsTypeException;
 import com.blotty.core.types.IGenericField;
+import com.blotty.core.types.impl.LongField;
 
 public class RowBuilder {
 	
@@ -15,8 +16,20 @@ public class RowBuilder {
 		this.columnsModel = columnsModel;
 	}
 	
-	public RowBuilder newRow() {
+	public RowBuilder newRow() throws RowsTypeException {
 		this.row = new Row(columnsModel);
+		if ( columnsModel.hasAutoKey() ) {
+			set(columnsModel.getKey(), LongField.of( columnsModel.getAutoKeyValue()));
+		}
+		return this;
+	}
+	
+	public RowBuilder set( String[] values ) throws RowsTypeException {
+		int shiftIdx = columnsModel.hasAutoKey()?1:0;
+
+		for (int i=0; i<values.length; i++) {
+			this.row.set(columnsModel.getColumn(i+shiftIdx), values[i]);
+		}		
 		return this;
 	}
 	

@@ -189,8 +189,6 @@ public class MainView extends JFrame {
 			public void run() {
 				try {
 					DefaultTableModel tableModel = new DefaultTableModel();
-					tableModel.addColumn("PK");
-
 					columnFilter.removeAllItems();
 					
 					for(Column col : colModel.getColumns()){

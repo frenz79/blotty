@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
 import com.blotty.core.commons.exceptions.ColumnsModelException;
 import com.blotty.core.types.FieldType;
@@ -14,6 +15,8 @@ public class ColumnsModel {
 	private List<Column> columnsId = new ArrayList<>();
 	
 	private Column key;
+	private boolean hasAutoKey = false;
+	private AtomicLong autoKeyValue = new AtomicLong(0);
 	
 	private ColumnsModel(){
 		
@@ -56,8 +59,13 @@ public class ColumnsModel {
 					throw new ColumnsModelException(String.format("More than one columns defined as key"));
 				}
 				model.key = col;
+				model.hasAutoKey = col.isAutoKey();
 			}
 			return this;
+		}
+		
+		public ColumnsModelBuilder addAutoKey( String colName ) throws ColumnsModelException {
+			return add(new Column(colName, true, true, FieldType.LONG_TYPE));
 		}
 		
 		public ColumnsModelBuilder addKey( String colName, FieldType type ) throws ColumnsModelException {
@@ -78,5 +86,13 @@ public class ColumnsModel {
 
 	public Column getKey() {
 		return key;
+	}
+
+	public boolean hasAutoKey() {
+		return hasAutoKey;
+	}
+
+	public long getAutoKeyValue() {
+		return autoKeyValue.incrementAndGet();
 	}
 }

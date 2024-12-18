@@ -74,7 +74,7 @@ class SorterExpressionBuilderTest {
 |B    |C    |NULL |
 */
 		System.out.println("DescNullLast\n"+sqlFilteredView.dumpToString());
-		assertEquals("K5", sqlFilteredView.getRow(sqlFilteredView.getRowsCount()-1).getFields() [colModel.getKey().getId()]);
+		assertEquals("K5", sqlFilteredView.getRow(sqlFilteredView.getRowsCount()-1).getFields() [colModel.getKey().getId()].toString());
 		
 		sqlFilteredView.sort(
 				new SorterExpressionBuilder(colModel)
@@ -91,7 +91,7 @@ class SorterExpressionBuilderTest {
 |A    |A    |1    | 
 */
 		System.out.println("DescNullFirst\n"+sqlFilteredView.dumpToString());
-		assertEquals("K5", sqlFilteredView.getRow( 0).getFields() [colModel.getKey().getId()]);
+		assertEquals("K5", sqlFilteredView.getRow( 0).getFields() [colModel.getKey().getId()].toString());
 		
 		sqlFilteredView.sort(
 				new SorterExpressionBuilder(colModel)
@@ -108,7 +108,7 @@ class SorterExpressionBuilderTest {
 |B    |C    |NULL | 
 */
 		System.out.println("AscNullLast\n"+sqlFilteredView.dumpToString());
-		assertEquals("K5", sqlFilteredView.getRow( sqlFilteredView.getRowsCount()-1).getFields() [colModel.getKey().getId()]);
+		assertEquals("K5", sqlFilteredView.getRow( sqlFilteredView.getRowsCount()-1).getFields() [colModel.getKey().getId()].toString());
 				
 		sqlFilteredView.sort(
 				new SorterExpressionBuilder(colModel)
@@ -125,7 +125,7 @@ class SorterExpressionBuilderTest {
 |B    |C    |3    |
 */
 		System.out.println("AscNullFirst\n"+sqlFilteredView.dumpToString());
-		assertEquals("K5", sqlFilteredView.getRow( 0).getFields() [colModel.getKey().getId()]);
+		assertEquals("K5", sqlFilteredView.getRow( 0).getFields() [colModel.getKey().getId()].toString());
 	}
 
 }

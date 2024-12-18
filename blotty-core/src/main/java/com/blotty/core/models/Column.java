@@ -18,11 +18,17 @@ import com.blotty.core.types.impl.StringField;
 
 public class Column {
 
+	private static enum KEY {
+		KEY,
+		KEY_AUTO,
+		NOT_KEY
+	}
+	
 	private int id = -1;
 	private final String name;
 	private final FieldType type;
 	private final boolean cacheable;
-	private final boolean key;
+	private KEY keyType;
 
 	private final Map<String,Object> properties = new HashMap<>();
 	private final Map<String,StringField> stringFieldsCache = new ConcurrentHashMap<>();
@@ -31,16 +37,23 @@ public class Column {
 		this.name = n;
 		this.type = type;
 		this.cacheable = false;
-		this.key = false;
+		this.keyType = KEY.NOT_KEY;
 	}
 	
 	public Column( String n, boolean isKey, FieldType type ){
 		this.name = n;
 		this.type = type;
 		this.cacheable = false;
-		this.key = isKey;
+		this.keyType = (isKey)?KEY.KEY:KEY.NOT_KEY;
 	}
 
+	public Column( String n, boolean isKey, boolean autoKey, FieldType type ){
+		this.name = n;
+		this.type = type;
+		this.cacheable = false;
+		this.keyType = (isKey)?((autoKey)?KEY.KEY_AUTO:KEY.KEY):KEY.NOT_KEY;
+	}
+	
 	public int getId() {
 		return id;
 	}
@@ -183,6 +196,10 @@ public class Column {
 	}
 
 	public boolean isKey() {
-		return key;
+		return !this.keyType.equals(KEY.NOT_KEY);
+	}
+	
+	public boolean isAutoKey() {
+		return this.keyType.equals(KEY.KEY_AUTO);
 	}
 }

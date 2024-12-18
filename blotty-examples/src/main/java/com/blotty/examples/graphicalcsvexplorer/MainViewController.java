@@ -46,25 +46,22 @@ public class MainViewController {
 		for (CSVRecord record : records) {
 			if ( recordNumber==0 ) {
 				ColumnsModelBuilder colModelBuilder = new ColumnsModelBuilder();
+				colModelBuilder.addAutoKey("AUTO_KEY");
 				
 				// Header : col=0 is the key
 				for ( int i=0; i<record.size(); i++ ) {
-					if (i==0) {
-						colModelBuilder.addKey( record.get(i), FieldType.STRING_TYPE);
-					} else {
-						colModelBuilder.add( new Column(record.get(i), FieldType.STRING_TYPE));
-					}
+					colModelBuilder.add( new Column(record.get(i), FieldType.STRING_TYPE));
 				}
+				
 				colModel = colModelBuilder.build();
 				dataModel = new DataModel( colModel );
 				rowBuilder = dataModel.getRowBuilder();
 				view.setTableColumns( colModel );
 			} else {
-				rowBuilder.newRow();
-				for ( int i=0; i<record.size(); i++ ) {
-					rowBuilder.set(colModel.getColumn(i), record.get(i));
-				}
-				rowBuilder.addToModel();
+				rowBuilder.newRow()
+					.set( record.values() )
+					.addToModel();
+				
 			}
 			recordNumber++;
 		}		
