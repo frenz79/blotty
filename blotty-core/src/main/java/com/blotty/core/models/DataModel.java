@@ -7,6 +7,7 @@ import com.blotty.core.commons.IListener;
 import com.blotty.core.commons.exceptions.RowsModelException;
 import com.blotty.core.models.RowEvent.RowAction;
 import com.blotty.core.modifiers.filters.FilterExpression;
+import com.blotty.core.modifiers.sorters.SorterConditionChain;
 
 public class DataModel extends AbstractDataModel {
 	
@@ -29,6 +30,11 @@ public class DataModel extends AbstractDataModel {
 		return view;
 	}
 
+	public DataModelView createView( String viewId, SorterConditionChain sorter ) throws RowsModelException {
+		DataModelView view = new DataModelView( viewId, sorter, this );
+		return view;
+	}
+	
 	@Override
 	public AbstractDataModel addRow(Row r) throws RowsModelException {
 		super.addRow(r);

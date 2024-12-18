@@ -1,4 +1,4 @@
-package com.blotty.examples;
+package com.blotty.examples.simplecsvloader;
 
 import java.io.FileReader;
 import java.io.Reader;
