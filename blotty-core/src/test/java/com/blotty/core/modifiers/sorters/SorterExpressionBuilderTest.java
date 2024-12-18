@@ -22,6 +22,7 @@ class SorterExpressionBuilderTest {
 	@Test
 	void test() throws ColumnsModelException, RowsModelException, RowsTypeException, FilterExpressionException {
 		ColumnsModel colModel = new ColumnsModelBuilder()
+				.addKey( "PK", FieldType.STRING_TYPE )
 				.add( "COL_1", FieldType.STRING_TYPE )
 				.add( "COL_2", FieldType.STRING_TYPE )
 				.add( "COL_3", FieldType.INTEGER_TYPE )		
@@ -30,25 +31,26 @@ class SorterExpressionBuilderTest {
 		DataModel dataModel = new DataModel( colModel );
 
 		dataModel.getRowBuilder()
-		.newRow("K1")
-		.set(colModel.getColumn(0), "A").set(colModel.getColumn(1), "A").set(colModel.getColumn(2), IntegerField.of(1) )
-		.addToModel()
-
-		.newRow("K2")
-		.set(colModel.getColumn(0), "A").set(colModel.getColumn(1), "B").set(colModel.getColumn(2), IntegerField.of(2) )
-		.addToModel()
-
-		.newRow("K3")
-		.set(colModel.getColumn(0), "A").set(colModel.getColumn(1), "C").set(colModel.getColumn(2), IntegerField.of(3) )
-		.addToModel()
-
-		.newRow("K4")
-		.set(colModel.getColumn(0), "B").set(colModel.getColumn(1), "C").set(colModel.getColumn(2), IntegerField.of(3) )
-		.addToModel()
-
-		.newRow("K5")
-		.set(colModel.getColumn(0), "B").set(colModel.getColumn(1), "C").set(colModel.getColumn(2), NullField.NULL )
-		.addToModel()
+		.newRow()
+			.set(colModel.getKey(), "K1")
+			.set(colModel.getColumn("COL_1"), "A").set(colModel.getColumn("COL_2"), "A").set(colModel.getColumn("COL_3"), IntegerField.of(1) )
+			.addToModel()
+		.newRow()
+			.set(colModel.getKey(), "K2")
+			.set(colModel.getColumn("COL_1"), "A").set(colModel.getColumn("COL_2"), "B").set(colModel.getColumn("COL_3"), IntegerField.of(2) )
+			.addToModel()
+		.newRow()
+			.set(colModel.getKey(), "K3")
+			.set(colModel.getColumn("COL_1"), "A").set(colModel.getColumn("COL_2"), "C").set(colModel.getColumn("COL_3"), IntegerField.of(3) )
+			.addToModel()
+		.newRow()
+			.set(colModel.getKey(), "K4")
+			.set(colModel.getColumn("COL_1"), "B").set(colModel.getColumn("COL_2"), "C").set(colModel.getColumn("COL_3"), IntegerField.of(3) )
+			.addToModel()
+		.newRow()
+			.set(colModel.getKey(), "K5")
+			.set(colModel.getColumn("COL_1"), "B").set(colModel.getColumn("COL_2"), "C").set(colModel.getColumn("COL_3"), NullField.NULL )
+			.addToModel()
 		;		
 
 		DataModelView sqlFilteredView = dataModel.createView("TEST", 
@@ -72,7 +74,7 @@ class SorterExpressionBuilderTest {
 |B    |C    |NULL |
 */
 		System.out.println("DescNullLast\n"+sqlFilteredView.dumpToString());
-		assertEquals("K5", sqlFilteredView.getRow(sqlFilteredView.getRowsCount()-1).getKey() );
+		assertEquals("K5", sqlFilteredView.getRow(sqlFilteredView.getRowsCount()-1).getFields() [colModel.getKey().getId()]);
 		
 		sqlFilteredView.sort(
 				new SorterExpressionBuilder(colModel)
@@ -89,7 +91,7 @@ class SorterExpressionBuilderTest {
 |A    |A    |1    | 
 */
 		System.out.println("DescNullFirst\n"+sqlFilteredView.dumpToString());
-		assertEquals("K5", sqlFilteredView.getRow( 0).getKey() );
+		assertEquals("K5", sqlFilteredView.getRow( 0).getFields() [colModel.getKey().getId()]);
 		
 		sqlFilteredView.sort(
 				new SorterExpressionBuilder(colModel)
@@ -106,7 +108,7 @@ class SorterExpressionBuilderTest {
 |B    |C    |NULL | 
 */
 		System.out.println("AscNullLast\n"+sqlFilteredView.dumpToString());
-		assertEquals("K5", sqlFilteredView.getRow( sqlFilteredView.getRowsCount()-1).getKey() );
+		assertEquals("K5", sqlFilteredView.getRow( sqlFilteredView.getRowsCount()-1).getFields() [colModel.getKey().getId()]);
 				
 		sqlFilteredView.sort(
 				new SorterExpressionBuilder(colModel)
@@ -123,7 +125,7 @@ class SorterExpressionBuilderTest {
 |B    |C    |3    |
 */
 		System.out.println("AscNullFirst\n"+sqlFilteredView.dumpToString());
-		assertEquals("K5", sqlFilteredView.getRow( 0).getKey() );
+		assertEquals("K5", sqlFilteredView.getRow( 0).getFields() [colModel.getKey().getId()]);
 	}
 
 }

@@ -35,6 +35,11 @@ public class DataModel extends AbstractDataModel {
 		return view;
 	}
 	
+	public DataModelView createView( String viewId, FilterExpression filter, SorterConditionChain sorter ) throws RowsModelException {
+		DataModelView view = new DataModelView( viewId, filter, sorter, this );
+		return view;
+	}
+	
 	@Override
 	public AbstractDataModel addRow(Row r) throws RowsModelException {
 		super.addRow(r);

@@ -8,11 +8,6 @@ import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.Test;
 
 import com.blotty.core.commons.IConsumer;
-import com.blotty.core.models.Column;
-import com.blotty.core.models.ColumnsModel;
-import com.blotty.core.models.DataModel;
-import com.blotty.core.models.DataModelView;
-import com.blotty.core.models.Row;
 import com.blotty.core.models.ColumnsModel.ColumnsModelBuilder;
 import com.blotty.core.modifiers.filters.FilterExpression;
 import com.blotty.core.modifiers.filters.FilterExpressionBuilder;
@@ -27,6 +22,7 @@ class DataModelTest {
 	void testAddAndStreamRows() throws Exception {
 		ColumnsModel colModel = new ColumnsModelBuilder()
 			// Adding a column providing the Column instance
+			.addKey("PK", FieldType.STRING_TYPE)
 			.add( new Column("COL_1", FieldType.STRING_TYPE) )
 			// ..or just giving the name and the type
 			.add( "COL_2", FieldType.STRING_TYPE )
@@ -34,15 +30,18 @@ class DataModelTest {
 		
 		// Adding rows using addRow from model
 		DataModel dataModel = (DataModel) new DataModel( colModel )
-			.addRow( new Row("KEY_1", colModel)
+			.addRow( new Row(colModel)
+				.set(colModel.getKey(), "KEY_1")
 				.set(colModel.getColumn("COL_1"), "V1_1")
 				.set(colModel.getColumn("COL_2"), "V1_2")
 			)
-			.addRow( new Row("KEY_2", colModel)
+			.addRow( new Row(colModel)
+				.set(colModel.getKey(), "KEY_2")
 				.set(colModel.getColumn("COL_1"), "V2_1")
 				.set(colModel.getColumn("COL_2"), "V2_2")
 			)
-			.addRow( new Row("KEY_3", colModel)
+			.addRow( new Row(colModel)
+				.set(colModel.getKey(), "KEY_3")
 				.set(colModel.getColumn("COL_1"), StringField.of("V3_1"))
 				.set(colModel.getColumn("COL_2"), StringField.of("V3_2"))
 			)			
@@ -50,10 +49,12 @@ class DataModelTest {
 		
 		// Adding rows using the RowBuilder
 		dataModel.getRowBuilder()
-			.newRow("KEY_4")
+			.newRow()
+				.set(colModel.getKey(), "KEY_4")
 				.set("COL_1", "V4_1")
 				.addToModel()
-			.newRow("KEY_5")
+			.newRow()
+				.set(colModel.getKey(), "KEY_5")
 				.set("COL_1", "V5_1")
 				.addToModel();
 		
@@ -89,17 +90,18 @@ class DataModelTest {
 	@Test
 	void testCreateView() throws Exception {
 		ColumnsModel colModel = new ColumnsModelBuilder()
+			.addKey("PK", FieldType.STRING_TYPE)
 			.add( "COL_1", FieldType.STRING_TYPE )
 			.add( "COL_2", FieldType.STRING_TYPE )
 			.build();
 			
 		DataModel dataModel = new DataModel( colModel )
 			.getRowBuilder()
-			.newRow("K1").set("COL_1", "1").addToModel()
-			.newRow("K2").set("COL_1", "2").addToModel()
-			.newRow("K3").set("COL_1", "3").addToModel()
-			.newRow("K4").set("COL_1", "4").addToModel()
-			.newRow("K5").set("COL_1", "5").addToModel()
+			.newRow().set(colModel.getKey(), "K1").set("COL_1", "1").addToModel()
+			.newRow().set(colModel.getKey(), "K2").set("COL_1", "2").addToModel()
+			.newRow().set(colModel.getKey(), "K3").set("COL_1", "3").addToModel()
+			.newRow().set(colModel.getKey(), "K4").set("COL_1", "4").addToModel()
+			.newRow().set(colModel.getKey(), "K5").set("COL_1", "5").addToModel()
 			.getDataModel();
 		
 		FilterExpression filter = new FilterExpressionBuilder()

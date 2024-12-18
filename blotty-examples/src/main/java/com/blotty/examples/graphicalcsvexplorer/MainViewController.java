@@ -5,8 +5,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 
-import javax.swing.SwingUtilities;
-
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 
@@ -17,14 +15,13 @@ import com.blotty.core.commons.exceptions.RowsTypeException;
 import com.blotty.core.models.Column;
 import com.blotty.core.models.ColumnsModel;
 import com.blotty.core.models.ColumnsModel.ColumnsModelBuilder;
-import com.blotty.core.modifiers.filters.FilterExpression;
+import com.blotty.core.models.DataModel;
+import com.blotty.core.models.DataModelView;
+import com.blotty.core.models.RowBuilder;
 import com.blotty.core.modifiers.filters.FilterExpressionBuilder;
 import com.blotty.core.modifiers.filters.conditions.Operand;
 import com.blotty.core.modifiers.filters.conditions.binary.BinaryCondition;
 import com.blotty.core.modifiers.sorters.SorterExpressionBuilder;
-import com.blotty.core.models.DataModel;
-import com.blotty.core.models.DataModelView;
-import com.blotty.core.models.RowBuilder;
 import com.blotty.core.types.FieldType;
 
 public class MainViewController {
@@ -51,17 +48,21 @@ public class MainViewController {
 				ColumnsModelBuilder colModelBuilder = new ColumnsModelBuilder();
 				
 				// Header : col=0 is the key
-				for ( int i=1; i<record.size(); i++ ) {
-					colModelBuilder.add( new Column(record.get(i), FieldType.STRING_TYPE));
+				for ( int i=0; i<record.size(); i++ ) {
+					if (i==0) {
+						colModelBuilder.addKey( record.get(i), FieldType.STRING_TYPE);
+					} else {
+						colModelBuilder.add( new Column(record.get(i), FieldType.STRING_TYPE));
+					}
 				}
 				colModel = colModelBuilder.build();
 				dataModel = new DataModel( colModel );
 				rowBuilder = dataModel.getRowBuilder();
 				view.setTableColumns( colModel );
 			} else {
-				rowBuilder.newRow(record.get(0));
-				for ( int i=1; i<record.size(); i++ ) {
-					rowBuilder.set(colModel.getColumn(i-1), record.get(i));
+				rowBuilder.newRow();
+				for ( int i=0; i<record.size(); i++ ) {
+					rowBuilder.set(colModel.getColumn(i), record.get(i));
 				}
 				rowBuilder.addToModel();
 			}
@@ -80,7 +81,7 @@ public class MainViewController {
 	}
 
 	public void applySorting(int colId, boolean ascending) throws RowsModelException, FilterExpressionException {
-		Column col = dataModel.getColumnsModel().getColumn(colId-1);
+		Column col = dataModel.getColumnsModel().getColumn(colId);
 		
 		DataModelView sortedView = dataModel.createView("Sort:"+col.getName(), 
 			(ascending)?

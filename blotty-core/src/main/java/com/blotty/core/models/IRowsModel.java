@@ -3,6 +3,7 @@ package com.blotty.core.models;
 import java.util.List;
 
 import com.blotty.core.commons.exceptions.RowsModelException;
+import com.blotty.core.types.IGenericField;
 
 public interface IRowsModel {
 
@@ -14,6 +15,6 @@ public interface IRowsModel {
 
 	Row getRow(int position);
 
-	Row getRow(String key);
+	Row getRow(IGenericField key);
 
 }

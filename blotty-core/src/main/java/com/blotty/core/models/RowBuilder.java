@@ -15,8 +15,8 @@ public class RowBuilder {
 		this.columnsModel = columnsModel;
 	}
 	
-	public RowBuilder newRow(String key) {
-		this.row = new Row(key, columnsModel);
+	public RowBuilder newRow() {
+		this.row = new Row(columnsModel);
 		return this;
 	}
 	

@@ -13,6 +13,8 @@ public class ColumnsModel {
 	private final LinkedHashMap<String,Column> columns = new LinkedHashMap<>();
 	private List<Column> columnsId = new ArrayList<>();
 	
+	private Column key;
+	
 	private ColumnsModel(){
 		
 	}
@@ -48,15 +50,33 @@ public class ColumnsModel {
 			col.setId(model.columns.size());
 			model.columns.put(col.getName(), col);
 			model.columnsId.add(col.getId(), col);
+			
+			if ( col.isKey() ) {
+				if (model.key!=null) {
+					throw new ColumnsModelException(String.format("More than one columns defined as key"));
+				}
+				model.key = col;
+			}
 			return this;
+		}
+		
+		public ColumnsModelBuilder addKey( String colName, FieldType type ) throws ColumnsModelException {
+			return add(new Column(colName, true, type));
 		}
 		
 		public ColumnsModelBuilder add( String colName, FieldType type ) throws ColumnsModelException {
 			return add(new Column(colName, type));
 		}
 		
-		public ColumnsModel build(){
+		public ColumnsModel build() throws ColumnsModelException{
+			if ( model.key==null ) {
+				throw new ColumnsModelException(String.format("No key defined"));
+			}
 			return model;
 		}
+	}
+
+	public Column getKey() {
+		return key;
 	}
 }

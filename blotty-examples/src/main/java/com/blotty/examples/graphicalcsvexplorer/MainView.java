@@ -241,16 +241,9 @@ public class MainView extends JFrame {
 
 					dataModel.stream( new IConsumer<Row>() {
 
-						private Object[] rowWithKey( Row row ) {
-							Object[] ret = new Object[row.getFields().length+1];
-							ret[0] = row.getKey();
-							System.arraycopy(row.getFields(), 0, ret, 1, row.getFields().length);
-							return ret;
-						}
-
 						@Override
 						public boolean stream(Row row) throws RowsModelException {
-							model.addRow( rowWithKey(row));
+							model.addRow( row.getFields());
 							return true;
 						}            			
 					});

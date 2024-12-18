@@ -6,19 +6,13 @@ import com.blotty.core.types.impl.NullField;
 
 public class Row {
 
-	private final String key;
 	private final IGenericField[] fields;
 	
-	public Row( String key, ColumnsModel colModel ) {
-		this.key = key;
+	public Row( ColumnsModel colModel ) {
 		this.fields = new IGenericField[ colModel.getColumnsCount() ];
 		for (int i=0; i<this.fields.length; i++) {
 			this.fields[i] = NullField.NULL;
 		}
-	}
-
-	public String getKey() {
-		return key;
 	}
 
 	public IGenericField[] getFields() {

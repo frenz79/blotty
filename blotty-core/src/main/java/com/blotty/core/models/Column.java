@@ -22,6 +22,7 @@ public class Column {
 	private final String name;
 	private final FieldType type;
 	private final boolean cacheable;
+	private final boolean key;
 
 	private final Map<String,Object> properties = new HashMap<>();
 	private final Map<String,StringField> stringFieldsCache = new ConcurrentHashMap<>();
@@ -30,6 +31,14 @@ public class Column {
 		this.name = n;
 		this.type = type;
 		this.cacheable = false;
+		this.key = false;
+	}
+	
+	public Column( String n, boolean isKey, FieldType type ){
+		this.name = n;
+		this.type = type;
+		this.cacheable = false;
+		this.key = isKey;
 	}
 
 	public int getId() {
@@ -171,5 +180,9 @@ public class Column {
 	@Override
 	public String toString() {
 		return "Column [id=" + id + ", name=" + name + ", type=" + type + "]";
+	}
+
+	public boolean isKey() {
+		return key;
 	}
 }

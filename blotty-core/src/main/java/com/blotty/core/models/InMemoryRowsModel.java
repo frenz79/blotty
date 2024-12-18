@@ -6,12 +6,13 @@ import java.util.List;
 import java.util.Map;
 
 import com.blotty.core.commons.exceptions.RowsModelException;
+import com.blotty.core.types.IGenericField;
 
 public class InMemoryRowsModel implements IRowsModel {
 
 	private final ColumnsModel columnsModel;
 	
-	private final Map<String,Row> rowsByKey = new HashMap<>();
+	private final Map<IGenericField,Row> rowsByKey = new HashMap<>();
 	private final List<Row> rows = new ArrayList<>();
 	
 	
@@ -21,9 +22,9 @@ public class InMemoryRowsModel implements IRowsModel {
 
 	@Override
 	public IRowsModel addRow( Row row ) throws RowsModelException {		
-		Row prev = this.rowsByKey.put(row.getKey(), row);
+		Row prev = this.rowsByKey.put(row.getFields()[ columnsModel.getKey().getId() ], row);
 		if ( prev!=null ) {
-			throw new RowsModelException(String.format("Duplicated key:%s", row.getKey()));
+			throw new RowsModelException(String.format("Duplicated key:%s", columnsModel.getKey()));
 		}
 		this.rows.add(row);
 		return this;
@@ -45,7 +46,7 @@ public class InMemoryRowsModel implements IRowsModel {
 	}
 
 	@Override
-	public Row getRow(String key) {
+	public Row getRow(IGenericField key) {
 		return rowsByKey.get(key);
 	}
 }

@@ -24,6 +24,7 @@ class SQLQueryParserTest {
 	@Test
 	void testSQLQuery() throws ColumnsModelException, FilterExpressionException, RowsTypeException {
 		ColumnsModel colsModel = new ColumnsModelBuilder()
+			.addKey("PK", FieldType.STRING_TYPE)
 			.add("COL_1", FieldType.STRING_TYPE)
 			.add("COL_2", FieldType.STRING_TYPE)
 			.add("COL_3", FieldType.STRING_TYPE)

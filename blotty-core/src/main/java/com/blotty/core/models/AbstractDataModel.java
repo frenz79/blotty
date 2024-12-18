@@ -61,7 +61,7 @@ public abstract class AbstractDataModel {
 			}
 		}
 		
-		ret.append("|KEY  |");
+		ret.append("|");
 		for ( Column c : columnsModel.getColumns() ) {
 			ret.append(c.getName());
 			for ( int i=c.getName().length(); i<colsSize; i++ ) {
@@ -79,7 +79,7 @@ public abstract class AbstractDataModel {
 		ret.append("\n");
 		
 		for ( Row r : rowsModel.getAllRows() ) {
-			ret.append("|").append(r.getKey()).append("|");
+			ret.append("|");
 			for ( IGenericField f : r.getFields() ) {
 				String str = f.toString();
 				ret.append(str);

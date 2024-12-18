@@ -23,6 +23,7 @@ public class SimpleCvsLoader {
 
 	public static void main( String args[] ) throws Exception {		
 		ColumnsModel colModel = new ColumnsModelBuilder()
+				.addKey("Index", FieldType.STRING_TYPE )
 				.add( "Organization Id", FieldType.STRING_TYPE )
 				.add( "Name", FieldType.STRING_TYPE )
 				.add( "Website", FieldType.STRING_TYPE )
@@ -40,19 +41,21 @@ public class SimpleCvsLoader {
 		Iterable<CSVRecord> records = CSVFormat.DEFAULT.parse(in);
 		int rowNumber = 0;
 		for (CSVRecord record : records) {
-			if ( rowNumber>0 ) {
-				rowBuilder.newRow(record.get(0))
-					.set(colModel.getColumn(0), record.get(1))
-					.set(colModel.getColumn(1), record.get(2))
-					.set(colModel.getColumn(2), record.get(3))
-					.set(colModel.getColumn(3), record.get(4))
-					.set(colModel.getColumn(4), record.get(5))
-					.set(colModel.getColumn(5), record.get(6))
-					.set(colModel.getColumn(6), record.get(7))
-					.set(colModel.getColumn(7), record.get(8))	
-				.addToModel();
+			if ( rowNumber==0 ) {
+				rowNumber++;
+				continue;
 			}
-			rowNumber++;
+			rowBuilder.newRow()
+				.set(colModel.getColumn(0), record.get(0))
+				.set(colModel.getColumn(1), record.get(1))
+				.set(colModel.getColumn(2), record.get(2))
+				.set(colModel.getColumn(3), record.get(3))
+				.set(colModel.getColumn(4), record.get(4))
+				.set(colModel.getColumn(5), record.get(5))
+				.set(colModel.getColumn(6), record.get(6))
+				.set(colModel.getColumn(7), record.get(7))
+				.set(colModel.getColumn(8), record.get(8))	
+			.addToModel();			
 		}		
 		
 		in.close();

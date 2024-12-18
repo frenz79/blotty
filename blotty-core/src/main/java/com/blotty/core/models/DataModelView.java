@@ -5,6 +5,7 @@ import com.blotty.core.commons.IListener;
 import com.blotty.core.commons.exceptions.RowsModelException;
 import com.blotty.core.modifiers.filters.FilterExpression;
 import com.blotty.core.modifiers.sorters.SorterConditionChain;
+import com.blotty.core.types.IGenericField;
 
 public class DataModelView extends AbstractDataModel implements IListener<RowEvent> {
 
@@ -83,7 +84,7 @@ public class DataModelView extends AbstractDataModel implements IListener<RowEve
 		return getRowsModel().getRow( position );
 	}
 	
-	public Row getRow( String key ) {
+	public Row getRow( IGenericField key ) {
 		return getRowsModel().getRow( key );
 	}
 }
