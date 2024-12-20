@@ -14,8 +14,7 @@ public class InMemoryRowsModel implements IRowsModel {
 	
 	private final Map<IGenericField,Row> rowsByKey = new HashMap<>();
 	private final List<Row> rows = new ArrayList<>();
-	
-	
+		
 	public InMemoryRowsModel(ColumnsModel columnsModel) {
 		this.columnsModel = columnsModel;
 	}

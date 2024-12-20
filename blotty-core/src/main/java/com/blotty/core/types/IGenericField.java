@@ -1,6 +1,8 @@
 package com.blotty.core.types;
 
-public interface IGenericField {
+import java.io.Serializable;
+
+public interface IGenericField extends Serializable {
 
 	public default boolean isNull() {
 		return false;

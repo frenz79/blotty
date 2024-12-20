@@ -10,12 +10,20 @@ public abstract class AbstractDataModel {
 
 	private final String id;
 	private final ColumnsModel columnsModel;
-	private final IRowsModel rowsModel;
+	private IRowsModel rowsModel;
 	
 	public AbstractDataModel( String id, ColumnsModel columnsModel ) {
 		this.id = id;
 		this.columnsModel = columnsModel;
-		this.rowsModel = new InMemoryRowsModel( columnsModel );
+		this.rowsModel = new InMemoryRowsModel(columnsModel);
+		/*
+		try {
+			this.rowsModel = new LOBRowsModel(columnsModel);
+		} catch (Exception e) {
+			this.rowsModel = new InMemoryRowsModel(columnsModel);
+			e.printStackTrace();
+		}
+		*/
 	}
 	
 	public AbstractDataModel( ColumnsModel columnsModel ) {

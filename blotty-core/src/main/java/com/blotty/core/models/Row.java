@@ -15,6 +15,10 @@ public class Row {
 		}
 	}
 
+	public Row( IGenericField[] fields ) {
+		this.fields = fields;
+	}
+	
 	public IGenericField[] getFields() {
 		return fields;
 	}
