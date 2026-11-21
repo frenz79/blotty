@@ -2,15 +2,16 @@ package com.blotty.core.models;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.blotty.core.commons.exceptions.ColumnsModelException;
 
 public class ColumnsModel {
 
-	private final LinkedHashMap<String,Column> columns = new LinkedHashMap<>();
-	private List<Column> columnsId = new ArrayList<>();
+	private Map<String,Column> columns = new HashMap<>(64);
+	private Column[] columnsId;
 	private Column key;
 	
 	private ColumnsModel(){
@@ -26,7 +27,7 @@ public class ColumnsModel {
 	}
 	
 	public Column getColumn(int id) {
-		return columnsId.get(id);
+		return columnsId[id];
 	}
 	
 	public Collection<Column> getColumns(){
@@ -40,6 +41,7 @@ public class ColumnsModel {
 	public static class Builder {
 		
 		private final ColumnsModel model;
+		private final List<Column> columnsId = new ArrayList<>();
 		
 		public Builder() {
 			this.model = new ColumnsModel();
@@ -55,7 +57,7 @@ public class ColumnsModel {
 			}
 			col.setId(model.columns.size());
 			model.columns.put(col.getName(), col);
-			model.columnsId.add(col.getId(), col);
+			columnsId.add(col.getId(), col);
 			
 			if ( col.isKey() ) {
 				if (model.key!=null) {
@@ -70,6 +72,7 @@ public class ColumnsModel {
 			if ( model.key==null ) {
 				throw new ColumnsModelException(String.format("No key defined"));
 			}
+			model.columnsId = columnsId.toArray(new Column[0]);			
 			return model;
 		}
 	}

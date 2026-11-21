@@ -48,6 +48,26 @@ public class InMemoryRowsModel extends AbstractRowsModel {
 	}
 
 	@Override
+	public AbstractRowsModel addRows( Row ...rows ) throws RowsModelException {
+		wlock.lock();
+		try {
+			for ( Row row : rows ) {
+				IGenericField key = getKey(row);
+
+
+				if ( this.rowsByKey.containsKey(key) ) {
+					throw new RowsModelException(String.format("Duplicated key:%s", key));
+				}
+				this.rowsByKey.put(key, row);
+				this.rows.add(row);
+			}
+		} finally {
+			wlock.unlock();
+		}
+		return this;
+	}
+
+	@Override
 	public int getRowsCount() {
 		rLock.lock();
 		try {
@@ -91,11 +111,11 @@ public class InMemoryRowsModel extends AbstractRowsModel {
 
 	@Override
 	public void sort(Comparator<Row> comparator) {
-	    wlock.lock();
-	    try {
-	        rows.sort(comparator);
-	    } finally {
-	        wlock.unlock();
-	    }
+		wlock.lock();
+		try {
+			rows.sort(comparator);
+		} finally {
+			wlock.unlock();
+		}
 	}
 }

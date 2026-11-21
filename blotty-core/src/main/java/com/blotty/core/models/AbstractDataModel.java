@@ -31,6 +31,11 @@ public abstract class AbstractDataModel {
 		rowsModel.addRow(r);
 		return this;
 	}
+	
+	public AbstractDataModel addRows(Row ...r) throws RowsModelException {
+		rowsModel.addRows(r);
+		return this;
+	}
 
 	public AbstractDataModel addRow(Row.Builder r) throws RowsModelException {
 		return addRow(r.build());

@@ -393,6 +393,29 @@ public class DataModelStressTest {
 		System.out.printf("[DYNAMIC VIEW STRESS] Righe nel genitore: %d | Righe filtrate e ordinate nella vista: %d%n",
 				model.getRowsCount(), view.getRowsCount());
 	}
+	
+	@Test
+	@Order(8)
+	@DisplayName("8. Benchmark Inserimento Batch Singolo Thread")
+	void testSingleThreadBatchInsertion() throws Exception {
+		int totalRecords = 50_000;
+		DataModel model = new DataModel(new InMemoryRowsModel(columnsModel));
+
+		long start = System.nanoTime();
+		Row[] rows = new Row[totalRecords];
+		
+		for (int i = 0; i < totalRecords; i++) {
+			rows[i] = createSampleRow(columnsModel, "ST_" + i, i);
+		}
+		
+		model.addRows(rows);
+		long elapsedNs = System.nanoTime() - start;
+		double elapsedMs = elapsedNs / 1_000_000.0;
+		double throughput = (totalRecords / (elapsedMs / 1000.0));
+
+		assertEquals(totalRecords, model.getRowsCount());
+		printBenchmarkResult("Inserimento Sequenziale Batch (1 thread)", totalRecords, 1, elapsedMs, throughput);
+	}
 
 	private static void printBenchmarkResult(String testName, int records, int threads, double elapsedMs, double throughput) {
 		System.out.println("-----------------------------------------------------------------------------------------");
@@ -409,10 +432,11 @@ public class DataModelStressTest {
 		DataModelStressTest suite = new DataModelStressTest();
 		suite.testSingleThreadInsertion();
 		suite.testMultiThreadedConcurrentInsertion();
+		suite.testSingleThreadBatchInsertion();
 		suite.testConcurrentDuplicateKeyCollisions();
 		suite.testFilteringPerformance();
 		suite.testSortingPerformanceAndCorrectness();
-		suite.testReadWriteConcurrencyStress();
+		suite.testReadWriteConcurrencyStress();				
 		suite.testDataModelViewDynamicUpdatesConcurrently();
 		System.out.println("=========================================================================================");
 		System.out.println("                         TUTTI GLI STRESS TEST COMPLETATI CON SUCCESSO!                  ");

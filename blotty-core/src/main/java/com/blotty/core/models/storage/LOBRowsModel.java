@@ -248,4 +248,10 @@ public class LOBRowsModel extends AbstractRowsModel {
 		// TODO Auto-generated method stub
 		
 	}
+
+	@Override
+	public AbstractRowsModel addRows(Row... row) throws RowsModelException {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

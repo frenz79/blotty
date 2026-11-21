@@ -43,6 +43,15 @@ public class DataModel extends AbstractDataModel {
 		return this;
 	}
 	
+	@Override
+	public AbstractDataModel addRows(Row ...rows) throws RowsModelException {
+		super.addRows(rows);
+		for (Row r : rows) {
+			fireDataModelChanged( new RowEvent(RowAction.ADD, r) );
+		}
+		return this;
+	}	
+	
 	private void fireDataModelChanged( RowEvent event ) {
 		for( IListener<RowEvent> l : this.rowsEventListeners.values() ) {
 			l.onEvent(event);

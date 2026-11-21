@@ -11,7 +11,8 @@ public abstract class AbstractRowsModel {
 	private final ColumnsModel columnsModel;
 	
 	public abstract AbstractRowsModel addRow(Row row) throws RowsModelException;
-
+	public abstract AbstractRowsModel addRows(Row ...row) throws RowsModelException;
+	
 	public abstract int getRowsCount();
 
 	public abstract Row getRow(int position);
