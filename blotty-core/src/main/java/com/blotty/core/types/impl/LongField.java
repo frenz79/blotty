@@ -18,14 +18,18 @@ public class LongField implements IGenericField {
 	}
 
 	public static LongField of(long v) {
-		switch((int)v) {
-		case 0: return ZERO;
-		case 1: return ONE;
-		case 10: return TEN;
-		case 100: return ONE_HUNDRED;
-		case 1000: return ONE_THOUSAND;
-		}
-		return new LongField( v );
+	    if (v == 0L) return ZERO;
+	    if (v == 1L) return ONE;
+	    if (v == 10L) return TEN;
+	    if (v == 100L) return ONE_HUNDRED;
+	    if (v == 1000L) return ONE_THOUSAND;
+	    return new LongField( v );
+	}
+
+	@Override
+	public int compareTo(IGenericField other) {
+	    if (other.isNull()) return 1;
+	    return Long.compare(this.value, ((LongField)other).value);
 	}
 	
 	LongField( long v ){
@@ -56,9 +60,8 @@ public class LongField implements IGenericField {
 		return String.valueOf(value);
 	}
 
-	@Override
-	public int compareTo(IGenericField other) {
-		return (int)(value-((LongField)other).value);
+	public long getValue() {
+		return value;
 	}
 }
 

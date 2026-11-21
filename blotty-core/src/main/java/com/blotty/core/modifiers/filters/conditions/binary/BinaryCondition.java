@@ -35,11 +35,10 @@ public class BinaryCondition implements IFilterCondition {
 	
 	@Override
 	public boolean apply( Row row ) {
-		IGenericField[] fields = row.getFields();
-		if ( right.isConst() ) {
-			return operator.apply( fields[left.getColumn().getId()], right.getConst() );
-		}
-		return operator.apply( left.getConst(), fields[right.getColumn().getId()] );
+	    IGenericField[] fields = row.getFields();
+	    IGenericField leftField = left.isConst() ? left.getConst() : fields[left.getColumn().getId()];
+	    IGenericField rightField = right.isConst() ? right.getConst() : fields[right.getColumn().getId()];
+	    return operator.apply( leftField, rightField );
 	}
 
 	public IBinaryOperator getOperator() {

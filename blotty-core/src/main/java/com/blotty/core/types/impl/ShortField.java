@@ -52,6 +52,11 @@ public class ShortField implements IGenericField {
 
 	@Override
 	public int compareTo(IGenericField other) {
-		return value-((ShortField)other).value;
+	    if (other.isNull()) return 1;
+	    return Short.compare(this.value, ((ShortField)other).value);
+	}
+
+	public short getValue() {
+		return value;
 	}
 }

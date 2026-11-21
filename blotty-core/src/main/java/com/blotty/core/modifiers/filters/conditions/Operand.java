@@ -3,6 +3,7 @@ package com.blotty.core.modifiers.filters.conditions;
 import com.blotty.core.commons.exceptions.RowsTypeException;
 import com.blotty.core.models.Column;
 import com.blotty.core.types.IGenericField;
+import com.blotty.core.types.impl.BooleanField;
 import com.blotty.core.types.impl.IntegerField;
 import com.blotty.core.types.impl.StringField;
 
@@ -27,6 +28,10 @@ public class Operand {
 	
 	public static Operand of( int c ) {
 		return new Operand(IntegerField.of(c), Type.CONST);
+	}
+	
+	public static Operand of( boolean c ) {
+		return new Operand(BooleanField.of(c), Type.CONST);
 	}
 	
 	private final Type type;

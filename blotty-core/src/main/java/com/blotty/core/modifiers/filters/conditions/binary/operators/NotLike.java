@@ -8,7 +8,7 @@ public class NotLike extends IBinaryOperator {
 
 	@Override
 	public boolean apply(IGenericField f1, IGenericField f2) {
-		return !((StringField)f2).contains((StringField)f1);
+	    if (f1.isNull() || f2.isNull()) return false;
+	    return !((StringField)f1).contains((StringField)f2);
 	}
-
 }

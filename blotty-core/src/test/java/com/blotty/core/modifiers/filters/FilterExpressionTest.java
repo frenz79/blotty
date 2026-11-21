@@ -10,7 +10,6 @@ import com.blotty.core.commons.exceptions.FilterExpressionException;
 import com.blotty.core.commons.exceptions.RowsTypeException;
 import com.blotty.core.models.Column;
 import com.blotty.core.models.ColumnsModel;
-import com.blotty.core.models.ColumnsModel.ColumnsModelBuilder;
 import com.blotty.core.models.Row;
 import com.blotty.core.modifiers.filters.conditions.Operand;
 import com.blotty.core.modifiers.filters.conditions.binary.BinaryCondition;
@@ -26,9 +25,9 @@ class FilterExpressionTest {
 
 	@Test
 	void testFilterOnKey() throws RowsTypeException, ColumnsModelException {		
-		ColumnsModel colModel = new ColumnsModelBuilder()
-			.addKey( "PK", FieldType.STRING_TYPE )
-			.add( "COL_1", FieldType.STRING_TYPE )
+		ColumnsModel colModel = ColumnsModel.newBuilder()
+			.add(Column.newBuilder("PK", true).type(FieldType.STRING_TYPE))
+			.add(Column.newBuilder("COL_1").type(FieldType.STRING_TYPE))
 			.build();
 		
 		Column col1 = colModel.getColumn("COL_1");
@@ -46,9 +45,9 @@ class FilterExpressionTest {
 	
 	@Test
 	void testEqual_strings() throws RowsTypeException, ColumnsModelException {		
-		ColumnsModel colModel = new ColumnsModelBuilder()
-			.addKey( "PK", FieldType.STRING_TYPE )
-			.add( "COL_1", FieldType.STRING_TYPE )
+		ColumnsModel colModel = ColumnsModel.newBuilder()
+			.add(Column.newBuilder("PK", true).type(FieldType.STRING_TYPE))
+			.add(Column.newBuilder("COL_1").type(FieldType.STRING_TYPE))
 			.build();
 		
 		Column col1 = colModel.getColumn("COL_1");
@@ -80,9 +79,9 @@ class FilterExpressionTest {
 	
 	@Test
 	void testIsNull_strings() throws RowsTypeException, ColumnsModelException {		
-		ColumnsModel colModel = new ColumnsModelBuilder()
-			.addKey( "PK", FieldType.STRING_TYPE )
-			.add( "COL_1", FieldType.STRING_TYPE )
+		ColumnsModel colModel = ColumnsModel.newBuilder()
+			.add(Column.newBuilder("PK", true).type(FieldType.STRING_TYPE))
+			.add(Column.newBuilder("COL_1").type(FieldType.STRING_TYPE))
 			.build();
 		
 		Column col1 = colModel.getColumn("COL_1");
@@ -110,10 +109,10 @@ class FilterExpressionTest {
 	
 	@Test
 	void testFilterConditionChain() throws ColumnsModelException, FilterExpressionException, RowsTypeException {
-		ColumnsModel colModel = new ColumnsModelBuilder()
-				.addKey( "PK", FieldType.STRING_TYPE )
-				.add( "COL_1", FieldType.STRING_TYPE )
-				.add( "COL_2", FieldType.STRING_TYPE )
+		ColumnsModel colModel = ColumnsModel.newBuilder()
+				.add(Column.newBuilder("PK", true).type(FieldType.STRING_TYPE))
+				.add(Column.newBuilder("COL_1").type(FieldType.STRING_TYPE))
+				.add(Column.newBuilder("COL_2").type(FieldType.STRING_TYPE))
 				.build();
 			
 		Column col1 = colModel.getColumn("COL_1");

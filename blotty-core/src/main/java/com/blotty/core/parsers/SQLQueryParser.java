@@ -19,6 +19,8 @@ import com.blotty.core.modifiers.filters.conditions.binary.operators.Like;
 import com.blotty.core.modifiers.filters.conditions.binary.operators.NotEqual;
 import com.blotty.core.modifiers.filters.conditions.unary.IUnaryOperator;
 import com.blotty.core.modifiers.filters.conditions.unary.UnaryCondition;
+import com.blotty.core.modifiers.filters.conditions.unary.operators.IsNotNull;
+import com.blotty.core.modifiers.filters.conditions.unary.operators.IsNull;
 
 public class SQLQueryParser {
 
@@ -45,114 +47,118 @@ public class SQLQueryParser {
 	}
 	
 	public FilterExpression parse( ColumnsModel colsModel, String query ) throws FilterExpressionException, RowsTypeException {
-		FilterExpressionBuilder builder = null;
-		
-		query = query.trim();
-		
-		// 0 : waiting for left operand
-		// 1 : waiting for operator
-		// 2 : waiting for right operand
-		// 3 : waiting for conjunction
-		int step = 0; 
-		
-		OperandType leftOperandType = null;
-		String leftOperand = null;
-		
-		OperandType rightOperandType = null;
-		String rightOperand = null;
-		
-		IFilterOperator operator = null;
-		
-		Conjunction conjunction = null;
-		
-		for ( int i=0; i<query.length(); i++ ) {
-			char ch = query.charAt(i);
-	
-			if ( ch==' ' ) {
-				continue;
-			}
+	    query = query.trim();
+	    if (query.isEmpty()) {
+	        throw new FilterExpressionException("Empty query");
+	    }
 
-			// step0 : retrieve left operand
-			// step2 : retrieve right operand (if exists)
-			if ( step==0 || step==2) {
-				OperandType operandType = null;
-				String operand = null;
-						
-				if (ch=='"') {	// Column name					
-					operandType = OperandType.COLUMN;
-					operand = readStringUntil('\"', i+1,query);
-					i += operand.length()+1;
-				} else if (ch=='\'') {	// Const Value	
-					operandType = OperandType.CONST;
-					operand = readStringUntil('\'', i+1,query);
-					i += operand.length()+1;
-				} 			
-				if ( operandType!=null ) {
-					if ( step==0 ) {
-						leftOperandType = operandType;
-						leftOperand = operand;
-					} else if ( step==2 ) {
-						rightOperandType = operandType;
-						rightOperand = operand;
-					} else {
-						throw new RuntimeException("Invalid Syntax!");
-					}
-					step++;
-					continue;				
-				}
-			}
-			
-			// step1 : retrieve the operator
-			if ( step==1 ) {
-				char nextCh = Character.toUpperCase(query.charAt(i+1));
-				operator = buildOperator( ch, nextCh );
-				
-				if ( operator==null ) {				
-					if ( ch=='I' && nextCh=='S' ) {
-						// unary op here!
-						// no need for step 2
-						step++; 
-					}
-				}
-				step++;
-			}
+	    FilterExpressionBuilder builder = null;
+	    Conjunction pendingConjunction = null;
 
-			// step3 : retrieve the conjunction (if exists)
-			if ( step==3 ) {
-				for ( int j=i; j<query.length(); j++ ) {
-					char chj=Character.toUpperCase(query.charAt(j));
-					char chjj=Character.toUpperCase(query.charAt(j+1));
-					
-					if ( chj=='A' && chjj=='N' ) {
-						conjunction = Conjunction.AND;
-						i = j+2;
-						break;
-					}
-					else if ( chj=='O' && chjj=='R' ) {
-						conjunction = Conjunction.OR;
-						i = j+1;
-						break;
-					}
-				}
-				
-				IFilterCondition filterCondition = buildFilterCondition(colsModel, leftOperand, leftOperandType, rightOperand, rightOperandType, operator);
-				if ( builder==null ) {
-					builder = new FilterExpressionBuilder().begin( filterCondition );
-				} else {
-					addConjunction( builder, filterCondition, conjunction );
-				}
-				
-				operator = null;
-				step = 0;
-			}
-		}
-		
-		IFilterCondition filterCondition = buildFilterCondition(colsModel, leftOperand, leftOperandType, rightOperand, rightOperandType, operator);
-		addConjunction( builder, filterCondition, conjunction );		
-		return builder.build();
+	    int step = 0; // 0: left, 1: operator, 2: right, 3: conjunction
+	    OperandType leftOperandType = null;
+	    String leftOperand = null;
+	    OperandType rightOperandType = null;
+	    String rightOperand = null;
+	    IFilterOperator operator = null;
+
+	    for ( int i = 0; i < query.length(); i++ ) {
+	        char ch = query.charAt(i);
+	        if ( ch == ' ' ) continue;
+
+	        if ( step == 0 || step == 2 ) {
+	            OperandType operandType = null;
+	            String operand = null;
+	            if ( ch == '"' ) {
+	                operandType = OperandType.COLUMN;
+	                operand = readStringUntil('"', i + 1, query);
+	                i += operand.length() + 1;
+	            } else if ( ch == '\'' ) {
+	                operandType = OperandType.CONST;
+	                operand = readStringUntil('\'', i + 1, query);
+	                i += operand.length() + 1;
+	            }
+
+	            if ( operandType != null ) {
+	                if ( step == 0 ) {
+	                    leftOperandType = operandType;
+	                    leftOperand = operand;
+	                } else {
+	                    rightOperandType = operandType;
+	                    rightOperand = operand;
+	                }
+	                step++;
+	                continue;
+	            }
+	        }
+
+	        if ( step == 1 ) {
+	            char nextCh = (i + 1 < query.length()) ? Character.toUpperCase(query.charAt(i + 1)) : ' ';
+	            operator = buildOperator( ch, nextCh );
+	            if ( operator == null && ch == 'I' && nextCh == 'S' ) {
+	                // Gestione IS NULL / IS NOT NULL
+	                String remainder = query.substring(i).toUpperCase();
+	                if ( remainder.startsWith("IS NOT NULL") ) {
+	                    operator = new IsNotNull();
+	                    i += "IS NOT NULL".length() - 1;
+	                } else if ( remainder.startsWith("IS NULL") ) {
+	                    operator = new IsNull();
+	                    i += "IS NULL".length() - 1;
+	                }
+	                step = 3; // Operatore unario, salta step 2
+	                continue;
+	            }
+	            step++;
+	            continue;
+	        }
+
+	        if ( step == 3 ) {
+	            // Salviamo la condizione corrente
+	            IFilterCondition filterCondition = buildFilterCondition(colsModel, leftOperand, leftOperandType, rightOperand, rightOperandType, operator);
+	            if ( builder == null ) {
+	                builder = new FilterExpressionBuilder().begin( filterCondition );
+	            } else {
+	                addConjunction( builder, filterCondition, pendingConjunction );
+	            }
+
+	            // Ricerca congiunzione successiva
+	            pendingConjunction = null;
+	            for ( int j = i; j < query.length(); j++ ) {
+	                char chj = Character.toUpperCase(query.charAt(j));
+	                char chjj = (j + 1 < query.length()) ? Character.toUpperCase(query.charAt(j + 1)) : ' ';
+	                if ( chj == 'A' && chjj == 'N' ) {
+	                    pendingConjunction = Conjunction.AND;
+	                    i = j + 2;
+	                    break;
+	                } else if ( chj == 'O' && chjj == 'R' ) {
+	                    pendingConjunction = Conjunction.OR;
+	                    i = j + 1;
+	                    break;
+	                }
+	            }
+
+	            // Reset per la prossima clausola
+	            leftOperand = null;
+	            leftOperandType = null;
+	            rightOperand = null;
+	            rightOperandType = null;
+	            operator = null;
+	            step = 0;
+	        }
+	    }
+
+	    // Aggiunta dell'ultima clausola
+	    IFilterCondition lastCondition = buildFilterCondition(colsModel, leftOperand, leftOperandType, rightOperand, rightOperandType, operator);
+	    if ( builder == null ) {
+	        builder = new FilterExpressionBuilder().begin( lastCondition );
+	    } else {
+	        addConjunction( builder, lastCondition, pendingConjunction );
+	    }
+
+	    return builder.build();
 	}
 	
-	private FilterExpressionBuilder addConjunction( FilterExpressionBuilder builder, IFilterCondition filterCondition, Conjunction conjunction ) throws FilterExpressionException {
+	private static FilterExpressionBuilder addConjunction( FilterExpressionBuilder builder, IFilterCondition filterCondition, Conjunction conjunction ) throws FilterExpressionException {
 		switch ( conjunction ) {
 		case AND: return builder.and(filterCondition);
 		case OR: return builder.or(filterCondition);		
@@ -160,7 +166,7 @@ public class SQLQueryParser {
 		return builder;
 	}
 	
-	private IFilterOperator buildOperator( char ch1, char ch2 ) {			
+	private static IFilterOperator buildOperator( char ch1, char ch2 ) {			
 		if ( ch1=='!' && ch2=='=' ) {
 			return new NotEqual();
 		}				
@@ -180,16 +186,16 @@ public class SQLQueryParser {
 	}
 	
 	private IFilterCondition buildFilterCondition ( 
-			ColumnsModel colsModel,
-			String leftOperand,
-			OperandType leftOperandType,
-			String rightOperand,			
-			OperandType rightOperandType,
-			IFilterOperator operator ) throws RowsTypeException {
-		if ( rightOperand==null ) {
-			return new UnaryCondition(null, (IUnaryOperator)operator);
-		}
-		return buildBinaryCondition(colsModel, leftOperand, leftOperandType, rightOperand, rightOperandType, operator);
+	        ColumnsModel colsModel,
+	        String leftOperand,
+	        OperandType leftOperandType,
+	        String rightOperand,			
+	        OperandType rightOperandType,
+	        IFilterOperator operator ) throws RowsTypeException {
+	    if ( rightOperand == null && operator instanceof IUnaryOperator ) {
+	        return new UnaryCondition(Operand.of(colsModel.getColumn(leftOperand)), (IUnaryOperator)operator);
+	    }
+	    return buildBinaryCondition(colsModel, leftOperand, leftOperandType, rightOperand, rightOperandType, operator);
 	}
 	
 	private IFilterCondition buildBinaryCondition( 

@@ -4,19 +4,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
 
 import com.blotty.core.commons.exceptions.ColumnsModelException;
-import com.blotty.core.types.FieldType;
 
 public class ColumnsModel {
 
 	private final LinkedHashMap<String,Column> columns = new LinkedHashMap<>();
 	private List<Column> columnsId = new ArrayList<>();
-	
 	private Column key;
-	private boolean hasAutoKey = false;
-	private AtomicLong autoKeyValue = new AtomicLong(0);
 	
 	private ColumnsModel(){
 		
@@ -38,15 +33,23 @@ public class ColumnsModel {
 		return columns.values();
 	}
 	
-	public static class ColumnsModelBuilder {
+	public static Builder newBuilder() {
+		return new Builder();
+	}
+	
+	public static class Builder {
 		
 		private final ColumnsModel model;
 		
-		public ColumnsModelBuilder() {
+		public Builder() {
 			this.model = new ColumnsModel();
 		}
 		
-		public ColumnsModelBuilder add( Column col ) throws ColumnsModelException {
+		public Builder add( Column.Builder col ) throws ColumnsModelException {
+			return add(col.build());
+		}
+		
+		public Builder add( Column col ) throws ColumnsModelException {
 			if ( model.columns.containsKey(col.getName())) {
 				throw new ColumnsModelException(String.format("Duplicated column name:%s", col.getName()));
 			}
@@ -59,23 +62,10 @@ public class ColumnsModel {
 					throw new ColumnsModelException(String.format("More than one columns defined as key"));
 				}
 				model.key = col;
-				model.hasAutoKey = col.isAutoKey();
 			}
 			return this;
 		}
-		
-		public ColumnsModelBuilder addAutoKey( String colName ) throws ColumnsModelException {
-			return add(new Column(colName, true, true, FieldType.LONG_TYPE));
-		}
-		
-		public ColumnsModelBuilder addKey( String colName, FieldType type ) throws ColumnsModelException {
-			return add(new Column(colName, true, type));
-		}
-		
-		public ColumnsModelBuilder add( String colName, FieldType type ) throws ColumnsModelException {
-			return add(new Column(colName, type));
-		}
-		
+				
 		public ColumnsModel build() throws ColumnsModelException{
 			if ( model.key==null ) {
 				throw new ColumnsModelException(String.format("No key defined"));
@@ -86,13 +76,5 @@ public class ColumnsModel {
 
 	public Column getKey() {
 		return key;
-	}
-
-	public boolean hasAutoKey() {
-		return hasAutoKey;
-	}
-
-	public long getAutoKeyValue() {
-		return autoKeyValue.incrementAndGet();
 	}
 }

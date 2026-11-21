@@ -1,0 +1,101 @@
+package com.blotty.core.models.storage;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
+
+import com.blotty.core.commons.IConsumer;
+import com.blotty.core.commons.exceptions.RowsModelException;
+import com.blotty.core.models.AbstractRowsModel;
+import com.blotty.core.models.ColumnsModel;
+import com.blotty.core.models.Row;
+import com.blotty.core.types.IGenericField;
+
+public class InMemoryRowsModel extends AbstractRowsModel {
+
+	private final Map<IGenericField,Row> rowsByKey = new HashMap<>();
+	private final List<Row> rows = new ArrayList<>();
+
+	private final ReadLock rLock;
+	private final WriteLock wlock;
+
+	public InMemoryRowsModel(ColumnsModel columnsModel) {
+		super( columnsModel );
+		ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+		this.rLock = lock.readLock();
+		this.wlock = lock.writeLock();
+	}
+
+	@Override
+	public AbstractRowsModel addRow( Row row ) throws RowsModelException {
+		IGenericField key = getKey(row);
+		wlock.lock();
+		try {
+			if ( this.rowsByKey.containsKey(key) ) {
+				throw new RowsModelException(String.format("Duplicated key:%s", key));
+			}
+			this.rowsByKey.put(key, row);
+			this.rows.add(row);
+		} finally {
+			wlock.unlock();
+		}
+		return this;
+	}
+
+	@Override
+	public int getRowsCount() {
+		rLock.lock();
+		try {
+			return rows.size();
+		} finally {
+			rLock.unlock();
+		}
+	}
+
+	@Override
+	public void stream( IConsumer<Row> c ) throws RowsModelException {
+		rLock.lock();
+		try {
+			for (Row row : rows) {
+				if (!c.stream(row)) break;
+			}
+		} finally {
+			rLock.unlock();
+		}
+	}
+
+	@Override
+	public Row getRow(int position) {
+		rLock.lock();
+		try {
+			return rows.get(position);
+		} finally {
+			rLock.unlock();
+		}
+	}
+
+	@Override
+	public Row getRow(IGenericField key) {
+		rLock.lock();
+		try {
+			return rowsByKey.get(key);
+		} finally {
+			rLock.unlock();
+		}
+	}
+
+	@Override
+	public void sort(Comparator<Row> comparator) {
+	    wlock.lock();
+	    try {
+	        rows.sort(comparator);
+	    } finally {
+	        wlock.unlock();
+	    }
+	}
+}

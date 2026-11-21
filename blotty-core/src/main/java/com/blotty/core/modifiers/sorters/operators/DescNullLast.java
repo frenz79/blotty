@@ -6,13 +6,10 @@ public class DescNullLast implements ISorterOperator {
 
 	@Override
 	public int compare(IGenericField o1, IGenericField o2) {
-		if ( o1.isNull() ) {
-			return 1;
-		}
-		if ( o2.isNull() ) {
-			return 1;
-		}
-		return o2.compareTo(o1);
+	    if ( o1.isNull() && o2.isNull() ) return 0;
+	    if ( o1.isNull() ) return 1;
+	    if ( o2.isNull() ) return -1;
+	    return o2.compareTo(o1);
 	}
 
 	@Override

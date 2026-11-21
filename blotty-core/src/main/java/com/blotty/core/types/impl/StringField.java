@@ -51,7 +51,7 @@ public class StringField implements IGenericField {
 
 	// TODO: Optimize me!!!
 	public boolean contains(StringField other) {
-		return other.toString().contains(this.toString());
-	}
-	
+	    if (other == null) return false;
+	    return this.toString().contains(other.toString());
+	}	
 }

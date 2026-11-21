@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.Test;
 
 import com.blotty.core.commons.IConsumer;
-import com.blotty.core.models.ColumnsModel.ColumnsModelBuilder;
+import com.blotty.core.models.storage.InMemoryRowsModel;
 import com.blotty.core.modifiers.filters.FilterExpression;
 import com.blotty.core.modifiers.filters.FilterExpressionBuilder;
 import com.blotty.core.modifiers.filters.conditions.Operand;
@@ -20,16 +20,14 @@ class DataModelTest {
 
 	@Test
 	void testAddAndStreamRows() throws Exception {
-		ColumnsModel colModel = new ColumnsModelBuilder()
-			// Adding a column providing the Column instance
-			.addKey("PK", FieldType.STRING_TYPE)
-			.add( new Column("COL_1", FieldType.STRING_TYPE) )
-			// ..or just giving the name and the type
-			.add( "COL_2", FieldType.STRING_TYPE )
-			.build();
-		
+		ColumnsModel colModel = ColumnsModel.newBuilder()
+			.add(Column.newBuilder("PK", true).type(FieldType.STRING_TYPE))
+			.add(Column.newBuilder("COL_1").type(FieldType.STRING_TYPE))
+			.add(Column.newBuilder("COL_2").type(FieldType.STRING_TYPE)
+		).build();
+				
 		// Adding rows using addRow from model
-		DataModel dataModel = (DataModel) new DataModel( colModel )
+		DataModel dataModel = (DataModel) new DataModel( new InMemoryRowsModel(colModel) )
 			.addRow( new Row(colModel)
 				.set(colModel.getKey(), "KEY_1")
 				.set(colModel.getColumn("COL_1"), "V1_1")
@@ -48,15 +46,12 @@ class DataModelTest {
 		;
 		
 		// Adding rows using the RowBuilder
-		dataModel.getRowBuilder()
-			.newRow()
-				.set(colModel.getKey(), "KEY_4")
-				.set("COL_1", "V4_1")
-				.addToModel()
-			.newRow()
-				.set(colModel.getKey(), "KEY_5")
-				.set("COL_1", "V5_1")
-				.addToModel();
+		dataModel.addRow(Row.newBuilder(colModel)
+			.set("PK", "KEY_4")
+			.set("COL_1", "V4_1"));
+		dataModel.addRow(Row.newBuilder(colModel)
+			.set("PK", "KEY_5")
+			.set("COL_1", "V5_1"));
 		
 		assertEquals(5, dataModel.getRowsCount());
 		
@@ -89,20 +84,18 @@ class DataModelTest {
 
 	@Test
 	void testCreateView() throws Exception {
-		ColumnsModel colModel = new ColumnsModelBuilder()
-			.addKey("PK", FieldType.STRING_TYPE)
-			.add( "COL_1", FieldType.STRING_TYPE )
-			.add( "COL_2", FieldType.STRING_TYPE )
-			.build();
+		ColumnsModel colModel = ColumnsModel.newBuilder()
+			.add(Column.newBuilder("PK", true).type(FieldType.STRING_TYPE))
+			.add(Column.newBuilder("COL_1").type(FieldType.STRING_TYPE))
+			.add(Column.newBuilder("COL_2").type(FieldType.STRING_TYPE)
+		).build();
 			
-		DataModel dataModel = new DataModel( colModel )
-			.getRowBuilder()
-			.newRow().set(colModel.getKey(), "K1").set("COL_1", "1").addToModel()
-			.newRow().set(colModel.getKey(), "K2").set("COL_1", "2").addToModel()
-			.newRow().set(colModel.getKey(), "K3").set("COL_1", "3").addToModel()
-			.newRow().set(colModel.getKey(), "K4").set("COL_1", "4").addToModel()
-			.newRow().set(colModel.getKey(), "K5").set("COL_1", "5").addToModel()
-			.getDataModel();
+		DataModel dataModel = (DataModel) new DataModel( new InMemoryRowsModel(colModel) )
+			.addRow(Row.newBuilder(colModel).set("PK", "K1").set("COL_1", "1"))
+			.addRow(Row.newBuilder(colModel).set("PK", "K2").set("COL_1", "2"))
+			.addRow(Row.newBuilder(colModel).set("PK", "K3").set("COL_1", "3"))
+			.addRow(Row.newBuilder(colModel).set("PK", "K4").set("COL_1", "4"))
+			.addRow(Row.newBuilder(colModel).set("PK", "K5").set("COL_1", "5"));
 		
 		FilterExpression filter = new FilterExpressionBuilder()
 			.begin(	BinaryCondition.Equal(Operand.of(colModel.getColumn("COL_1")), Operand.of("2")))

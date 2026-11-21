@@ -11,7 +11,17 @@ public class BooleanField implements IGenericField {
 	public static final BooleanField FALSE = new BooleanField( false );
 	
 	public static BooleanField of(String v) {
-		return (v.equalsIgnoreCase("yes") || v.equalsIgnoreCase("y") || v.equalsIgnoreCase("ok"))?TRUE:FALSE;
+	    if (v == null) return FALSE;
+	    String s = v.trim();
+	    return (s.equalsIgnoreCase("true") || s.equalsIgnoreCase("yes") 
+	            || s.equalsIgnoreCase("y") || s.equalsIgnoreCase("ok") 
+	            || s.equals("1")) ? TRUE : FALSE;
+	}
+
+	@Override
+	public int compareTo(IGenericField other) {
+	    if (other.isNull()) return 1;
+	    return Boolean.compare(this.value, ((BooleanField)other).value);
 	}
 	
 	public static BooleanField of(int b) {
@@ -50,8 +60,8 @@ public class BooleanField implements IGenericField {
 		return String.valueOf(value);
 	}
 
-	@Override
-	public int compareTo(IGenericField other) {
-		return (value==((BooleanField)other).value)?0:1;
+	public boolean getValue() {
+		return value;
 	}
+
 }

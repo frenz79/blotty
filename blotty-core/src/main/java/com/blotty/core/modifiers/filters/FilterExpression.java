@@ -12,55 +12,42 @@ public class FilterExpression {
 	}
 	
 	public FilterExpression( IFilterCondition ...conditions ) {
-		this.conditionsChain = new FilterConditionChain( conditions[0] );
-			
-		FilterConditionChain chainRef = this.conditionsChain;
-		for ( int i=1; i<conditions.length; i++ ) {
-			chainRef = addConditionToChain( chainRef.getNextCondition(), conditions[i] );
-		}
+	    if (conditions == null || conditions.length == 0) {
+	        throw new IllegalArgumentException("Conditions cannot be null or empty");
+	    }
+	    this.conditionsChain = new FilterConditionChain( conditions[0] );
+	    FilterConditionChain current = this.conditionsChain;
+	    for ( int i = 1; i < conditions.length; i++ ) {
+	        FilterConditionChain next = new FilterConditionChain( conditions[i] );
+	        current.setNextCondition( next );
+	        current = next;
+	    }
+	}
+
+	public boolean apply( Row row ) {
+	    if ( conditionsChain == null ) return true;
+	    boolean result = conditionsChain.getCondition().apply( row );
+	    FilterConditionChain current = conditionsChain;
+	    while ( current.getNextCondition() != null ) {
+	        FilterConditionConjunction conj = current.getConjunction();
+	        current = current.getNextCondition();
+	        // Short-circuit: se con AND il risultato è già false, o con OR è già true
+	        if ( conj == FilterConditionConjunction.AND && !result ) {
+	            continue; // Salta il calcolo di nextVal
+	        }
+	        if ( conj == FilterConditionConjunction.OR && result ) {
+	            return true; // Risultato già definitivamente true
+	        }
+	        boolean nextVal = current.getCondition().apply( row );
+	        result = (conj == FilterConditionConjunction.AND) ? (result && nextVal) : (result || nextVal);
+	    }
+	    return result;
 	}
 	
 	public FilterExpression( FilterConditionChain chain ) {
 		this.conditionsChain = chain;
 	}
-		
-	private FilterConditionChain addConditionToChain(FilterConditionChain nextCondition, IFilterCondition filterCondition) {
-		nextCondition = new FilterConditionChain( filterCondition ); 
-		return nextCondition;
-	}
-
-	public boolean apply( Row row ) {		
-		// Just 1 condition
-		if ( conditionsChain.getNextCondition()==null ) {
-			IFilterCondition condition = conditionsChain.getCondition();
-			return condition.apply( row );
-		}
-		return applyChain( conditionsChain, row );
-	}
 	
-	private boolean applyChain( FilterConditionChain chainRef, Row row ) {
-		if (chainRef==null) {
-			return true;
-		}
-		
-		boolean conditionResult = chainRef.getCondition().apply( row ); 
-		
-		// This is false...
-		if ( !conditionResult ) {
-			if (FilterConditionConjunction.AND.equals(chainRef.getConjunction())) {
-				return false;
-			}
-			// Evaluate next one
-			return applyChain( chainRef.getNextCondition(), row );
-		}
-		// ..else true
-		if (FilterConditionConjunction.OR.equals(chainRef.getConjunction())) {
-			return true;
-		}
-		// Evaluate next one
-		return applyChain( chainRef.getNextCondition(), row );
-	}
-
 	@Override
 	public String toString() {
 		return "FilterExpression [conditionsChain=" + conditionsChain + "]";

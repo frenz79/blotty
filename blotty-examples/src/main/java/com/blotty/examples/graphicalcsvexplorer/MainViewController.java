@@ -14,10 +14,10 @@ import com.blotty.core.commons.exceptions.RowsModelException;
 import com.blotty.core.commons.exceptions.RowsTypeException;
 import com.blotty.core.models.Column;
 import com.blotty.core.models.ColumnsModel;
-import com.blotty.core.models.ColumnsModel.ColumnsModelBuilder;
 import com.blotty.core.models.DataModel;
 import com.blotty.core.models.DataModelView;
-import com.blotty.core.models.RowBuilder;
+import com.blotty.core.models.Row;
+import com.blotty.core.models.storage.InMemoryRowsModel;
 import com.blotty.core.modifiers.filters.FilterExpressionBuilder;
 import com.blotty.core.modifiers.filters.conditions.Operand;
 import com.blotty.core.modifiers.filters.conditions.binary.BinaryCondition;
@@ -39,29 +39,29 @@ public class MainViewController {
 	public void loadCsv(File selectedFile) throws ColumnsModelException, IOException, RowsTypeException, RowsModelException {
 		Reader in = new FileReader(selectedFile);
 		ColumnsModel colModel = null;
-		RowBuilder rowBuilder = null;
 		
 		Iterable<CSVRecord> records = CSVFormat.DEFAULT.parse(in);
 		int recordNumber = 0;
 		for (CSVRecord record : records) {
 			if ( recordNumber==0 ) {
-				ColumnsModelBuilder colModelBuilder = new ColumnsModelBuilder();
-				colModelBuilder.addAutoKey("AUTO_KEY");
+				ColumnsModel.Builder colModelBuilder = ColumnsModel.newBuilder();
+				colModelBuilder.add(Column.newBuilder("AUTO_KEY", true).type(FieldType.STRING_TYPE));
 				
 				// Header : col=0 is the key
 				for ( int i=0; i<record.size(); i++ ) {
-					colModelBuilder.add( new Column(record.get(i), FieldType.STRING_TYPE));
+					colModelBuilder.add(Column.newBuilder(record.get(i)).type(FieldType.STRING_TYPE));
 				}
 				
 				colModel = colModelBuilder.build();
-				dataModel = new DataModel( colModel );
-				rowBuilder = dataModel.getRowBuilder();
+				dataModel = new DataModel( new InMemoryRowsModel(colModel) );
 				view.setTableColumns( colModel );
 			} else {
-				rowBuilder.newRow()
-					.set( record.values() )
-					.addToModel();
-				
+				Row row = new Row(colModel);
+				row.set(colModel.getKey(), String.valueOf(recordNumber));
+				for ( int i=0; i<record.size(); i++ ) {
+					row.set(colModel.getColumn(i + 1), record.get(i));
+				}
+				dataModel.addRow(row);
 			}
 			recordNumber++;
 		}		

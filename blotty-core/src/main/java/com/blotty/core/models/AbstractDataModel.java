@@ -1,6 +1,7 @@
 package com.blotty.core.models;
 
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import com.blotty.core.commons.IConsumer;
 import com.blotty.core.commons.exceptions.RowsModelException;
@@ -10,24 +11,20 @@ public abstract class AbstractDataModel {
 
 	private final String id;
 	private final ColumnsModel columnsModel;
-	private IRowsModel rowsModel;
+	private final AbstractRowsModel rowsModel;
 	
-	public AbstractDataModel( String id, ColumnsModel columnsModel ) {
+	public AbstractDataModel( String id, AbstractRowsModel rowsModel ) {
 		this.id = id;
-		this.columnsModel = columnsModel;
-		this.rowsModel = new InMemoryRowsModel(columnsModel);
-		/*
-		try {
-			this.rowsModel = new LOBRowsModel(columnsModel);
-		} catch (Exception e) {
-			this.rowsModel = new InMemoryRowsModel(columnsModel);
-			e.printStackTrace();
-		}
-		*/
+		this.columnsModel = rowsModel.getColumnsModel();
+		this.rowsModel = rowsModel;
 	}
 	
-	public AbstractDataModel( ColumnsModel columnsModel ) {
-		this(UUID.randomUUID().toString(), columnsModel);
+	public AbstractDataModel( AbstractRowsModel rowsModel ) {
+		this(UUID.randomUUID().toString(), rowsModel);
+	}
+	
+	public Row getRow(int i) {
+		return rowsModel.getRow(i);
 	}
 	
 	public AbstractDataModel addRow(Row r) throws RowsModelException {
@@ -35,19 +32,19 @@ public abstract class AbstractDataModel {
 		return this;
 	}
 
+	public AbstractDataModel addRow(Row.Builder r) throws RowsModelException {
+		return addRow(r.build());
+	}
+	
 	public int getRowsCount() {
 		return rowsModel.getRowsCount();
 	}
 	
 	public void stream( IConsumer<Row> c ) throws RowsModelException {
-		for ( Row r : rowsModel.getAllRows() ) {
-			if (!c.stream(r)) {
-				break;
-			}
-		}
+		rowsModel.stream(c);
 	}
 	
-	protected IRowsModel getRowsModel() {
+	protected AbstractRowsModel getRowsModel() {
 		return rowsModel;
 	}
 
@@ -59,20 +56,20 @@ public abstract class AbstractDataModel {
 		return id;
 	}
 	
-	public String dumpToString() {
+	public String dumpToString() throws RowsModelException {
 		StringBuilder ret = new StringBuilder("Model name:").append(getId()).append("\n");
 		
-		int colsSize = 0;
+		AtomicInteger colsSize = new AtomicInteger();
 		for ( Column c : columnsModel.getColumns() ) {
-			if ( c.getName().length()>colsSize ) {
-				colsSize = c.getName().length();
+			if ( c.getName().length()>colsSize.get() ) {
+				colsSize.set( c.getName().length() );
 			}
 		}
 		
 		ret.append("|");
 		for ( Column c : columnsModel.getColumns() ) {
 			ret.append(c.getName());
-			for ( int i=c.getName().length(); i<colsSize; i++ ) {
+			for ( int i=c.getName().length(); i<colsSize.get(); i++ ) {
 				ret.append(" ");
 			}
 			ret.append("|");
@@ -80,24 +77,28 @@ public abstract class AbstractDataModel {
 		
 		ret.append("\n");
 		
-		for ( int i=0; i<colsSize*columnsModel.getColumnsCount()+columnsModel.getColumnsCount()+1; i++ ) {
+		for ( int i=0; i<colsSize.get()*columnsModel.getColumnsCount()+columnsModel.getColumnsCount()+1; i++ ) {
 			ret.append("-");
 		}
 		
 		ret.append("\n");
-		
-		for ( Row r : rowsModel.getAllRows() ) {
-			ret.append("|");
-			for ( IGenericField f : r.getFields() ) {
-				String str = f.toString();
-				ret.append(str);
-				for ( int i=str.length(); i<colsSize; i++ ) {
-					ret.append(" ");
-				}
+		rowsModel.stream(new IConsumer<Row>() {
+			
+			@Override
+			public boolean stream(Row r) throws RowsModelException {
 				ret.append("|");
+				for ( IGenericField f : r.getFields() ) {
+					String str = f.toString();
+					ret.append(str);
+					for ( int i=str.length(); i<colsSize.get(); i++ ) {
+						ret.append(" ");
+					}
+					ret.append("|");
+				}
+				ret.append("\n");
+				return true;
 			}
-			ret.append("\n");
-		}
+		});
 		return ret.toString();
 	}
 }

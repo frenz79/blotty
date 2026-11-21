@@ -18,13 +18,18 @@ public class NullField implements IGenericField {
 	
 	@Override
 	public boolean equals( Object other ) {
-		return false;
+	    return other instanceof NullField;
+	}
+	@Override
+	public int hashCode() {
+	    return 0;
 	}
 	
 	@Override
 	public int compareTo(IGenericField other) {
-		return -1;
-	}
+	    if (other == null || other.isNull()) return 0;
+	    return -1;
+	}	  
 
 	@Override
 	public String toString() {

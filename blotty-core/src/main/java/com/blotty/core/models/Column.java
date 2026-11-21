@@ -16,42 +16,20 @@ import com.blotty.core.types.impl.NullField;
 import com.blotty.core.types.impl.ShortField;
 import com.blotty.core.types.impl.StringField;
 
-public class Column {
-
-	private static enum KEY {
-		KEY,
-		KEY_AUTO,
-		NOT_KEY
-	}
+public final class Column {
 	
 	private int id = -1;
 	private final String name;
-	private final FieldType type;
-	private final boolean cacheable;
-	private KEY keyType;
-
-	private final Map<String,Object> properties = new HashMap<>();
-	private final Map<String,StringField> stringFieldsCache = new ConcurrentHashMap<>();
-
-	public Column( String n, FieldType type ){
-		this.name = n;
-		this.type = type;
-		this.cacheable = false;
-		this.keyType = KEY.NOT_KEY;
-	}
+	private FieldType type;
+	private boolean cacheable;
+	private final boolean isKey;
 	
-	public Column( String n, boolean isKey, FieldType type ){
+	private Map<String,Object> properties;
+	private final Map<String,StringField> stringFieldsCache = new ConcurrentHashMap<>();
+	
+	public Column( String n, boolean isKey ){
 		this.name = n;
-		this.type = type;
-		this.cacheable = false;
-		this.keyType = (isKey)?KEY.KEY:KEY.NOT_KEY;
-	}
-
-	public Column( String n, boolean isKey, boolean autoKey, FieldType type ){
-		this.name = n;
-		this.type = type;
-		this.cacheable = false;
-		this.keyType = (isKey)?((autoKey)?KEY.KEY_AUTO:KEY.KEY):KEY.NOT_KEY;
+		this.isKey = isKey;
 	}
 	
 	public int getId() {
@@ -81,11 +59,11 @@ public class Column {
 	public FieldType getType() {
 		return type;
 	}
-
+	
 	private StringField from( String str ) {
-		return (isCacheable())
-				? stringFieldsCache.compute( str, (k, v) -> (v == null) ? StringField.of(str) : v)
-				: StringField.of(str);
+	    return (isCacheable())
+	        ? stringFieldsCache.computeIfAbsent(str, StringField::of)
+	        : StringField.of(str);
 	}
 	
 	public IGenericField fieldOf(String v) throws RowsTypeException {
@@ -196,10 +174,65 @@ public class Column {
 	}
 
 	public boolean isKey() {
-		return !this.keyType.equals(KEY.NOT_KEY);
+		return isKey;
 	}
 	
-	public boolean isAutoKey() {
-		return this.keyType.equals(KEY.KEY_AUTO);
+	public Map<String, Object> getProperties() {
+		return properties;
+	}
+
+	public Map<String, StringField> getStringFieldsCache() {
+		return stringFieldsCache;
+	}
+
+	public void setType(FieldType type) {
+		this.type = type;
+	}
+
+	public void setCacheable(boolean cacheable) {
+		this.cacheable = cacheable;
+	}
+		
+	public static Builder newBuilder(String colName, boolean isKey) {
+		return new Builder(colName, isKey);
+	}
+	
+	public static Builder newBuilder(String colName) {
+		return new Builder(colName, false);
+	}
+	
+	public static class Builder {
+		private final Column col;
+		
+		public Builder(String colName, boolean isKey ) {
+			this.col = new Column(colName, isKey);
+		}
+		
+		public Builder cacheable() {
+			this.col.setCacheable(true);
+			return this;
+		}
+		
+		public Builder type(FieldType t) {
+			this.col.setType(t);
+			return this;
+		}
+		
+		public Builder id(int id) {
+			this.col.setId(id);
+			return this;
+		}
+		
+		public Builder withProp(String prop, Object v) {
+			if (this.col.properties==null) {
+				this.col.properties = new HashMap<>();
+			}
+			this.col.properties.put(prop, v);
+			return this;
+		}
+		
+		public Column build() {
+			return col;
+		}
 	}
 }

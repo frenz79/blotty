@@ -13,18 +13,14 @@ public class DataModel extends AbstractDataModel {
 	
 	private Map<String,IListener<RowEvent>> rowsEventListeners = new ConcurrentHashMap<>();
 	
-	public DataModel( ColumnsModel columnsModel ) {
-		super(columnsModel);
+	public DataModel( AbstractRowsModel rowsModel ) {
+		super(rowsModel);
 	}
 	
-	public DataModel( String id, ColumnsModel columnsModel ) {
-		super(id, columnsModel);
+	public DataModel( String id, AbstractRowsModel rowsModel ) {
+		super(id, rowsModel);
 	}
-	
-	public RowBuilder getRowBuilder() {
-		return new RowBuilder( this, getColumnsModel() );
-	}
-	
+		
 	public DataModelView createView( String viewId, FilterExpression filter ) throws RowsModelException {
 		DataModelView view = new DataModelView( viewId, filter, this );
 		return view;

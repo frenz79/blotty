@@ -8,8 +8,8 @@ import org.junit.jupiter.api.Test;
 import com.blotty.core.commons.exceptions.ColumnsModelException;
 import com.blotty.core.commons.exceptions.FilterExpressionException;
 import com.blotty.core.commons.exceptions.RowsTypeException;
+import com.blotty.core.models.Column;
 import com.blotty.core.models.ColumnsModel;
-import com.blotty.core.models.ColumnsModel.ColumnsModelBuilder;
 import com.blotty.core.modifiers.filters.FilterExpression;
 import com.blotty.core.modifiers.filters.conditions.binary.BinaryCondition;
 import com.blotty.core.modifiers.filters.conditions.binary.operators.Equal;
@@ -23,12 +23,12 @@ class SQLQueryParserTest {
 
 	@Test
 	void testSQLQuery() throws ColumnsModelException, FilterExpressionException, RowsTypeException {
-		ColumnsModel colsModel = new ColumnsModelBuilder()
-			.addKey("PK", FieldType.STRING_TYPE)
-			.add("COL_1", FieldType.STRING_TYPE)
-			.add("COL_2", FieldType.STRING_TYPE)
-			.add("COL_3", FieldType.STRING_TYPE)
-		.build();
+		ColumnsModel colsModel = ColumnsModel.newBuilder()
+				.add(Column.newBuilder("PK", true).type(FieldType.STRING_TYPE))
+				.add(Column.newBuilder("COL_1").type(FieldType.STRING_TYPE))
+				.add(Column.newBuilder("COL_2").type(FieldType.STRING_TYPE))
+				.add(Column.newBuilder("COL_3").type(FieldType.STRING_TYPE)
+			).build();		
 		
 		FilterExpression parser = new SQLQueryParser().parse(
 			colsModel, " \"COL_1\" = 'XXXX' AND \"COL_2\" > '40' OR \"COL_3\" < \"COL_2\" ");

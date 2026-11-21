@@ -1,8 +1,8 @@
 package com.blotty.core.modifiers.sorters;
 
-import com.blotty.core.models.IRowsModel;
+import com.blotty.core.models.AbstractRowsModel;
 
 public interface ISorterCondition {
 
-	public boolean apply( IRowsModel rows );
+	public boolean apply( AbstractRowsModel rows );
 }

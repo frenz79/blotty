@@ -1,4 +1,4 @@
-package com.blotty.core.models;
+package com.blotty.core.models.storage;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -10,18 +10,21 @@ import java.nio.BufferOverflowException;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.blotty.core.commons.IConsumer;
 import com.blotty.core.commons.exceptions.RowsModelException;
-import com.blotty.core.models.LOBRowsModel.StorageManager.StorageEntry;
+import com.blotty.core.models.AbstractRowsModel;
+import com.blotty.core.models.ColumnsModel;
+import com.blotty.core.models.Row;
+import com.blotty.core.models.storage.LOBRowsModel.StorageManager.StorageEntry;
 import com.blotty.core.types.IGenericField;
 
-public class LOBRowsModel implements IRowsModel {
-
-	private final ColumnsModel columnsModel;
+public class LOBRowsModel extends AbstractRowsModel {
 
 	private final Map<IGenericField,RowDump> rowsByKey = new HashMap<>();
 	private final List<RowDump> rows = new ArrayList<>();
@@ -40,7 +43,7 @@ public class LOBRowsModel implements IRowsModel {
 	}
 	
 	public LOBRowsModel(ColumnsModel columnsModel) throws IOException {
-		this.columnsModel = columnsModel;
+		super( columnsModel );
 	}
 	
 	private static byte[] temporaryBuff = new byte[ 1024 * 1024 * 8]; // 8Kb
@@ -91,10 +94,10 @@ public class LOBRowsModel implements IRowsModel {
 	private Map<IGenericField,StorageEntry> storedEntries = new HashMap<>();
 	
 	@Override
-	public IRowsModel addRow( Row row ) throws RowsModelException {	
-		IGenericField rowKey = row.getFields()[columnsModel.getKey().getId()];
+	public AbstractRowsModel addRow( Row row ) throws RowsModelException {	
+		IGenericField key = getKey(row);
 		
-		RowDump rowDump = storageManagerLUT.get(rowKey);
+		RowDump rowDump = storageManagerLUT.get(key);
 		if ( rowDump==null ) {
 			try {
 				rowDump = new RowDump(row, currentStorage);
@@ -112,12 +115,12 @@ public class LOBRowsModel implements IRowsModel {
 				e.printStackTrace();
 				return this;
 			}	
-			storageManagerLUT.put(rowKey, rowDump);
+			storageManagerLUT.put(key, rowDump);
 		}
 			
-		RowDump prev = this.rowsByKey.put(rowKey, rowDump);
+		RowDump prev = this.rowsByKey.put(key, rowDump);
 		if ( prev!=null ) {
-			throw new RowsModelException(String.format("Duplicated key:%s", columnsModel.getKey()));
+			throw new RowsModelException(String.format("Duplicated key"));
 		}
 		this.rows.add(rowDump);
 		
@@ -130,7 +133,8 @@ public class LOBRowsModel implements IRowsModel {
 	}
 
 	@Override
-	public List<Row> getAllRows() {
+	public void stream(IConsumer<Row> c) {
+		//TODO
 		int i = 0;
 		
 		List<Row> loadedRows = new ArrayList<>();
@@ -141,6 +145,7 @@ public class LOBRowsModel implements IRowsModel {
 				if ( i==100_000 ) {
 					break;
 				}
+
 				i++;
 				
 			} catch (Exception e) {
@@ -148,7 +153,6 @@ public class LOBRowsModel implements IRowsModel {
 				e.printStackTrace();
 			}
 		}
-		return loadedRows;
 	}
 
 	@Override
@@ -236,5 +240,12 @@ public class LOBRowsModel implements IRowsModel {
 		public StorageEntry getStorage( int id ) throws IOException {
 			return storage.get(id);
 		}
+	}
+
+
+	@Override
+	public void sort(Comparator<Row> c) throws RowsModelException {
+		// TODO Auto-generated method stub
+		
 	}
 }

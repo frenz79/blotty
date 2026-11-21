@@ -1,5 +1,6 @@
 package com.blotty.core.models;
 
+import com.blotty.core.commons.exceptions.RowsModelException;
 import com.blotty.core.commons.exceptions.RowsTypeException;
 import com.blotty.core.types.IGenericField;
 import com.blotty.core.types.impl.NullField;
@@ -69,5 +70,45 @@ public class Row {
 	public Row clear( Column c ) {
 		this.fields[c.getId()] = NullField.NULL;
 		return this;
+	}
+	
+	public static Builder newBuilder(ColumnsModel colModel) {
+		return new Builder(colModel);
+	}
+	
+	public static class Builder {
+		private final Row row;
+		private final ColumnsModel colModel;
+		
+		public Builder(ColumnsModel colModel) {
+			this.row = new Row(colModel);
+			this.colModel = colModel;
+		}
+		
+		public Builder set(String cName, IGenericField v) throws RowsTypeException {
+			this.row.set(colModel.getColumn(cName), v);
+			return this;
+		}
+		
+		public Builder set(String cName, String v) throws RowsTypeException {
+			this.row.set(colModel.getColumn(cName), v);
+			return this;
+		}
+		
+		public Builder setValues(String ...values) throws RowsTypeException, RowsModelException {
+			int len = colModel.getColumnsCount();
+			
+			if (len!=values.length) {
+				throw new RowsModelException("Invalid arguments, expected %d got %d".formatted(len, values.length));
+			}
+			for (int i=0; i<len; i++) {
+				this.row.set(colModel.getColumn(i), values[i]);
+			}			
+			return this;
+		}
+		
+		public Row build() {
+			return row;
+		}		
 	}
 }

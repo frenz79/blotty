@@ -54,7 +54,12 @@ public class DoubleField implements IGenericField {
 
 	@Override
 	public int compareTo(IGenericField other) {
-		return (int)(value-((DoubleField)other).value);
+	    if (other.isNull()) return 1;
+	    return Double.compare(this.value, ((DoubleField)other).value);
+	}
+
+	public double getValue() {
+		return value;
 	}
 }
 

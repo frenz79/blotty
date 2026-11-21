@@ -54,7 +54,8 @@ public class FloatField implements IGenericField {
 
 	@Override
 	public int compareTo(IGenericField other) {
-		return (int)(value-((FloatField)other).value);
+	    if (other.isNull()) return 1;
+	    return Float.compare(this.value, ((FloatField)other).value);
 	}
 }
 

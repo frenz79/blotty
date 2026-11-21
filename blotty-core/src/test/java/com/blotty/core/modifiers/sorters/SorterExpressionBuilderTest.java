@@ -8,10 +8,12 @@ import com.blotty.core.commons.exceptions.ColumnsModelException;
 import com.blotty.core.commons.exceptions.FilterExpressionException;
 import com.blotty.core.commons.exceptions.RowsModelException;
 import com.blotty.core.commons.exceptions.RowsTypeException;
+import com.blotty.core.models.Column;
 import com.blotty.core.models.ColumnsModel;
-import com.blotty.core.models.ColumnsModel.ColumnsModelBuilder;
 import com.blotty.core.models.DataModel;
 import com.blotty.core.models.DataModelView;
+import com.blotty.core.models.Row;
+import com.blotty.core.models.storage.InMemoryRowsModel;
 import com.blotty.core.parsers.SQLQueryParser;
 import com.blotty.core.types.FieldType;
 import com.blotty.core.types.impl.IntegerField;
@@ -21,37 +23,21 @@ class SorterExpressionBuilderTest {
 
 	@Test
 	void test() throws ColumnsModelException, RowsModelException, RowsTypeException, FilterExpressionException {
-		ColumnsModel colModel = new ColumnsModelBuilder()
-				.addKey( "PK", FieldType.STRING_TYPE )
-				.add( "COL_1", FieldType.STRING_TYPE )
-				.add( "COL_2", FieldType.STRING_TYPE )
-				.add( "COL_3", FieldType.INTEGER_TYPE )		
-				.build();
+		ColumnsModel colModel = ColumnsModel.newBuilder()
+			.add(Column.newBuilder("PK", true).type(FieldType.STRING_TYPE))
+			.add(Column.newBuilder("COL_1").type(FieldType.STRING_TYPE))
+			.add(Column.newBuilder("COL_2").type(FieldType.STRING_TYPE))
+			.add(Column.newBuilder("COL_3").type(FieldType.INTEGER_TYPE)
+		).build();	
+		
+		DataModel dataModel = new DataModel( new InMemoryRowsModel(colModel) );
 
-		DataModel dataModel = new DataModel( colModel );
-
-		dataModel.getRowBuilder()
-		.newRow()
-			.set(colModel.getKey(), "K1")
-			.set(colModel.getColumn("COL_1"), "A").set(colModel.getColumn("COL_2"), "A").set(colModel.getColumn("COL_3"), IntegerField.of(1) )
-			.addToModel()
-		.newRow()
-			.set(colModel.getKey(), "K2")
-			.set(colModel.getColumn("COL_1"), "A").set(colModel.getColumn("COL_2"), "B").set(colModel.getColumn("COL_3"), IntegerField.of(2) )
-			.addToModel()
-		.newRow()
-			.set(colModel.getKey(), "K3")
-			.set(colModel.getColumn("COL_1"), "A").set(colModel.getColumn("COL_2"), "C").set(colModel.getColumn("COL_3"), IntegerField.of(3) )
-			.addToModel()
-		.newRow()
-			.set(colModel.getKey(), "K4")
-			.set(colModel.getColumn("COL_1"), "B").set(colModel.getColumn("COL_2"), "C").set(colModel.getColumn("COL_3"), IntegerField.of(3) )
-			.addToModel()
-		.newRow()
-			.set(colModel.getKey(), "K5")
-			.set(colModel.getColumn("COL_1"), "B").set(colModel.getColumn("COL_2"), "C").set(colModel.getColumn("COL_3"), NullField.NULL )
-			.addToModel()
-		;		
+		dataModel
+			.addRow(new Row(colModel).set(colModel.getKey(), "K1").set(colModel.getColumn("COL_1"), "A").set(colModel.getColumn("COL_2"), "A").set(colModel.getColumn("COL_3"), IntegerField.of(1)))
+			.addRow(new Row(colModel).set(colModel.getKey(), "K2").set(colModel.getColumn("COL_1"), "A").set(colModel.getColumn("COL_2"), "B").set(colModel.getColumn("COL_3"), IntegerField.of(2)))
+			.addRow(new Row(colModel).set(colModel.getKey(), "K3").set(colModel.getColumn("COL_1"), "A").set(colModel.getColumn("COL_2"), "C").set(colModel.getColumn("COL_3"), IntegerField.of(3)))
+			.addRow(new Row(colModel).set(colModel.getKey(), "K4").set(colModel.getColumn("COL_1"), "B").set(colModel.getColumn("COL_2"), "C").set(colModel.getColumn("COL_3"), IntegerField.of(3)))
+			.addRow(new Row(colModel).set(colModel.getKey(), "K5").set(colModel.getColumn("COL_1"), "B").set(colModel.getColumn("COL_2"), "C").set(colModel.getColumn("COL_3"), NullField.NULL));		
 
 		DataModelView sqlFilteredView = dataModel.createView("TEST", 
 				new SQLQueryParser().parse(colModel, " \"COL_1\" = 'A' OR \"COL_2\" = 'B' OR \"COL_2\" = 'C' ")

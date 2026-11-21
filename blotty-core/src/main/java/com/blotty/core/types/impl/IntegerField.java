@@ -58,6 +58,11 @@ public class IntegerField implements IGenericField {
 
 	@Override
 	public int compareTo(IGenericField other) {
-		return value-((IntegerField)other).value;
+	    if (other.isNull()) return 1;
+	    return Integer.compare(this.value, ((IntegerField)other).value);
+	}
+
+	public int getValue() {
+		return value;
 	}
 }

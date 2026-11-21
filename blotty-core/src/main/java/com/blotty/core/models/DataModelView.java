@@ -3,6 +3,7 @@ package com.blotty.core.models;
 import com.blotty.core.commons.IConsumer;
 import com.blotty.core.commons.IListener;
 import com.blotty.core.commons.exceptions.RowsModelException;
+import com.blotty.core.models.storage.InMemoryRowsModel;
 import com.blotty.core.modifiers.filters.FilterExpression;
 import com.blotty.core.modifiers.sorters.SorterConditionChain;
 import com.blotty.core.types.IGenericField;
@@ -22,7 +23,7 @@ public class DataModelView extends AbstractDataModel implements IListener<RowEve
 	}
 	
 	public DataModelView(String id, FilterExpression filter, SorterConditionChain sorter, DataModel parentDataModel) throws RowsModelException {
-		super(id, parentDataModel.getColumnsModel());
+		super(id, new InMemoryRowsModel(parentDataModel.getColumnsModel()));
 		this.filter = filter;
 		this.sorter = sorter;
 		this.parentDataModel = parentDataModel;
@@ -53,15 +54,20 @@ public class DataModelView extends AbstractDataModel implements IListener<RowEve
 			Row row = event.getRow();
 			switch( event.getAction() ) {
 			case ADD:
-				if ( filter==null || filter.apply(row) ) {
-					addRow( row );
+				if (filter == null || filter.apply(row)) {
+					addRow(row);
+					if (sorter != null) {
+						getRowsModel().sort(sorter);
+					}
 				}
 				break;
 			case DEL:
-				// TODO: code me
+				// IGenericField key = getColumnsModel().getKey() != null ? getColumnsModel().getKey().fieldOf(row) : null;
+				// Se implementi deleteRow() nello storage:
+				// getRowsModel().deleteRow(key);
 				break;
 			case UPD:
-				// NOP
+				// Gestione re-filtering o update
 				break;
 			default:
 				break;
@@ -75,9 +81,13 @@ public class DataModelView extends AbstractDataModel implements IListener<RowEve
 		return parentDataModel;
 	}
 	
-	public void sort( SorterConditionChain sorter ) {
+	public void sort(SorterConditionChain sorter) {
 		this.sorter = sorter;
-		this.sorter.apply( getRowsModel() );
+		try {
+			getRowsModel().sort(this.sorter);
+		} catch (RowsModelException e) {
+			throw new RuntimeException("Error during sorting", e);
+		}
 	}
 	
 	public Row getRow( int position ) {
