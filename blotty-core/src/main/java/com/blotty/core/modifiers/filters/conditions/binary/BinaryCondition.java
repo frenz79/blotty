@@ -1,5 +1,6 @@
 package com.blotty.core.modifiers.filters.conditions.binary;
 
+import com.blotty.core.commons.exceptions.FilterExpressionException;
 import com.blotty.core.models.Row;
 import com.blotty.core.modifiers.filters.IFilterCondition;
 import com.blotty.core.modifiers.filters.conditions.Operand;
@@ -34,8 +35,11 @@ public class BinaryCondition implements IFilterCondition {
 	}
 	
 	@Override
-	public boolean apply( Row row ) {
+	public boolean apply( Row row ) throws FilterExpressionException {
 	    IGenericField[] fields = row.getFields();
+	    if (left.isConst() && right.isConst()) {
+	    	throw new FilterExpressionException("Both operand cannot be constants");
+	    }
 	    IGenericField leftField = left.isConst() ? left.getConst() : fields[left.getColumn().getId()];
 	    IGenericField rightField = right.isConst() ? right.getConst() : fields[right.getColumn().getId()];
 	    return operator.apply( leftField, rightField );

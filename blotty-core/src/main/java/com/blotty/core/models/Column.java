@@ -27,6 +27,8 @@ public final class Column {
 	private Map<String,Object> properties;
 	private final Map<String,StringField> stringFieldsCache = new ConcurrentHashMap<>();
 	
+	private SearchIndex searchIndex;
+	
 	public Column( String n, boolean isKey ){
 		this.name = n;
 		this.isKey = isKey;
@@ -234,5 +236,13 @@ public final class Column {
 		public Column build() {
 			return col;
 		}
+	}
+
+	public SearchIndex getSearchIndex() {
+		return searchIndex;
+	}
+
+	public void setSearchIndex(SearchIndex searchIndex) {
+		this.searchIndex = searchIndex;
 	}
 }

@@ -452,7 +452,7 @@ public class DataModelStressTest {
 
 		assertEquals(view.getRowsCount(), sqlView.getRowsCount(), "I risultati del filtro programmatico e del filtro SQL devono coincidere");
 
-		printBenchmarkResult("Filtering Programmatico su 50k", view.getRowsCount(), 1, filterElapsedMs, (totalRecords / (filterElapsedMs / 1000.0)));
+		printBenchmarkResult("Filtering Programmatico con indici su 50k", view.getRowsCount(), 1, filterElapsedMs, (totalRecords / (filterElapsedMs / 1000.0)));
 		printBenchmarkResult("SQL Query Parsing & View su 50k", sqlView.getRowsCount(), 1, sqlElapsedMs, (totalRecords / (sqlElapsedMs / 1000.0)));
 	}
 	

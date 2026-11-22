@@ -3,6 +3,7 @@ package com.blotty.core.models;
 import java.util.Comparator;
 
 import com.blotty.core.commons.IConsumer;
+import com.blotty.core.commons.exceptions.FilterExpressionException;
 import com.blotty.core.commons.exceptions.RowsModelException;
 import com.blotty.core.types.IGenericField;
 
@@ -13,7 +14,7 @@ public abstract class AbstractRowsModel {
 	public abstract AbstractRowsModel updRow(Row row) throws RowsModelException;
 	public abstract AbstractRowsModel addRow(Row row) throws RowsModelException;
 	public abstract AbstractRowsModel addRows(Row ...row) throws RowsModelException;
-	public abstract void stream(IConsumer<Row> c) throws RowsModelException;
+	public abstract void stream(IConsumer<Row> c) throws RowsModelException, FilterExpressionException;
 	public abstract void sort(Comparator<Row> c) throws RowsModelException;
 	public abstract int getRowsCount();
 	public abstract Row getRow(int position);

@@ -10,6 +10,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
 import com.blotty.core.commons.IConsumer;
+import com.blotty.core.commons.exceptions.FilterExpressionException;
 import com.blotty.core.commons.exceptions.RowsModelException;
 import com.blotty.core.models.AbstractRowsModel;
 import com.blotty.core.models.ColumnsModel;
@@ -92,7 +93,7 @@ public class InMemoryRowsModel extends AbstractRowsModel {
 	}
 
 	@Override
-	public void stream( IConsumer<Row> c ) throws RowsModelException {
+	public void stream( IConsumer<Row> c ) throws RowsModelException, FilterExpressionException {
 		rLock.lock();
 		try {
 			for (Row row : rows) {

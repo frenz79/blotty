@@ -9,6 +9,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
 import com.blotty.core.commons.IConsumer;
+import com.blotty.core.commons.exceptions.FilterExpressionException;
 import com.blotty.core.commons.exceptions.RowsModelException;
 import com.blotty.core.types.IGenericField;
 
@@ -27,7 +28,7 @@ public class SearchIndex {
 		this.wlock = lock.writeLock();
 	}
 	
-	public void build(AbstractRowsModel model) throws RowsModelException {
+	public void build(AbstractRowsModel model) throws RowsModelException, FilterExpressionException {
 		wlock.lock();
 		try {
 			model.stream( new IConsumer<Row>() {			
@@ -65,7 +66,7 @@ public class SearchIndex {
 		return column;
 	}
 
-	public void stream(IGenericField searchVal, IConsumer<Row> iConsumer) throws RowsModelException {
+	public void stream(IGenericField searchVal, IConsumer<Row> iConsumer) throws RowsModelException, FilterExpressionException {
 		rLock.lock();
 			try {
 			List<Row> rows = rowsByIndex.get(searchVal);

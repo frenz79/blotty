@@ -24,7 +24,7 @@ import com.blotty.core.types.impl.NullField;
 class FilterExpressionTest {
 
 	@Test
-	void testFilterOnKey() throws RowsTypeException, ColumnsModelException {		
+	void testFilterOnKey() throws RowsTypeException, ColumnsModelException, FilterExpressionException {		
 		ColumnsModel colModel = ColumnsModel.newBuilder()
 			.add(Column.newBuilder("PK", true).type(FieldType.STRING_TYPE))
 			.add(Column.newBuilder("COL_1").type(FieldType.STRING_TYPE))
@@ -44,7 +44,7 @@ class FilterExpressionTest {
 	}
 	
 	@Test
-	void testEqual_strings() throws RowsTypeException, ColumnsModelException {		
+	void testEqual_strings() throws RowsTypeException, ColumnsModelException, FilterExpressionException {		
 		ColumnsModel colModel = ColumnsModel.newBuilder()
 			.add(Column.newBuilder("PK", true).type(FieldType.STRING_TYPE))
 			.add(Column.newBuilder("COL_1").type(FieldType.STRING_TYPE))
@@ -78,7 +78,7 @@ class FilterExpressionTest {
 	}
 	
 	@Test
-	void testIsNull_strings() throws RowsTypeException, ColumnsModelException {		
+	void testIsNull_strings() throws RowsTypeException, ColumnsModelException, FilterExpressionException {		
 		ColumnsModel colModel = ColumnsModel.newBuilder()
 			.add(Column.newBuilder("PK", true).type(FieldType.STRING_TYPE))
 			.add(Column.newBuilder("COL_1").type(FieldType.STRING_TYPE))

@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.blotty.core.commons.exceptions.ColumnsModelException;
+import com.blotty.core.commons.exceptions.FilterExpressionException;
 import com.blotty.core.commons.exceptions.RowsTypeException;
 import com.blotty.core.models.Column;
 import com.blotty.core.models.ColumnsModel;
@@ -36,7 +37,7 @@ class BinaryConditionTest {
 	}
 
 	@Test
-	void testColumnVsColumnComparison() throws RowsTypeException {
+	void testColumnVsColumnComparison() throws RowsTypeException, FilterExpressionException {
 		// Tests the fix for the ClassCastException when comparing two columns
 		BinaryCondition condEqual = BinaryCondition.Equal(Operand.of(colA), Operand.of(colB));
 		BinaryCondition condLess = BinaryCondition.LesserThan(Operand.of(colA), Operand.of(colB));
@@ -60,7 +61,7 @@ class BinaryConditionTest {
 	}
 
 	@Test
-	void testColumnVsConstAndConstVsColumn() throws RowsTypeException {
+	void testColumnVsConstAndConstVsColumn() throws RowsTypeException, FilterExpressionException {
 		BinaryCondition colVsConst = BinaryCondition.GreaterThanEqual(Operand.of(colA), Operand.of("10", colA));
 		BinaryCondition constVsCol = BinaryCondition.LesserThanEqual(Operand.of("10", colA), Operand.of(colA));
 
@@ -78,7 +79,7 @@ class BinaryConditionTest {
 	}
 
 	@Test
-	void testLikeAndNotLikeWithNullHandling() throws RowsTypeException {
+	void testLikeAndNotLikeWithNullHandling() throws RowsTypeException, FilterExpressionException {
 		BinaryCondition like = BinaryCondition.Like(Operand.of(colText), Operand.of("World"));
 		BinaryCondition notLike = BinaryCondition.NotLike(Operand.of(colText), Operand.of("World"));
 
@@ -96,7 +97,7 @@ class BinaryConditionTest {
 	}
 
 	@Test
-	void testAllComparisonOperators() throws RowsTypeException {
+	void testAllComparisonOperators() throws RowsTypeException, FilterExpressionException {
 		BinaryCondition eq = BinaryCondition.Equal(Operand.of(colA), Operand.of(10));
 		BinaryCondition ne = BinaryCondition.NotEqual(Operand.of(colA), Operand.of(10));
 		BinaryCondition gt = BinaryCondition.GreaterThan(Operand.of(colA), Operand.of(10));

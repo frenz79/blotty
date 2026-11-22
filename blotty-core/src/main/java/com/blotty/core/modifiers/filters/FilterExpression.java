@@ -1,5 +1,6 @@
 package com.blotty.core.modifiers.filters;
 
+import com.blotty.core.commons.exceptions.FilterExpressionException;
 import com.blotty.core.models.Row;
 import com.blotty.core.modifiers.filters.FilterConditionChain.FilterConditionConjunction;
 
@@ -24,7 +25,7 @@ public class FilterExpression {
 	    }
 	}
 
-	public boolean apply( Row row ) {
+	public boolean apply( Row row ) throws FilterExpressionException {
 	    if ( conditionsChain == null ) return true;
 	    boolean result = conditionsChain.getCondition().apply( row );
 	    FilterConditionChain current = conditionsChain;

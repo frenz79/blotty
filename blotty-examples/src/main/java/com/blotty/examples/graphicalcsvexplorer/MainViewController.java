@@ -94,7 +94,7 @@ public class MainViewController {
 		view.setTableData( sortedView );
 	}
 
-	public void applyFilter(String colName, String operator, String value) throws RowsModelException {	
+	public void applyFilter(String colName, String operator, String value) throws RowsModelException, FilterExpressionException {	
 		FilterExpressionBuilder filterBuilder = new FilterExpressionBuilder();
 		
 		if ("=".equals(operator)) {

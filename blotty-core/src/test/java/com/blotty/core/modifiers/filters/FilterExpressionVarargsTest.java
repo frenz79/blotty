@@ -10,6 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.blotty.core.commons.exceptions.ColumnsModelException;
+import com.blotty.core.commons.exceptions.FilterExpressionException;
 import com.blotty.core.commons.exceptions.RowsTypeException;
 import com.blotty.core.models.Column;
 import com.blotty.core.models.ColumnsModel;
@@ -64,7 +65,7 @@ class FilterExpressionVarargsTest {
 	}
 
 	@Test
-	void testVarargsApply() throws RowsTypeException {
+	void testVarargsApply() throws RowsTypeException, FilterExpressionException {
 		IFilterCondition cond1 = BinaryCondition.Equal(Operand.of(c1), Operand.of("A"));
 		IFilterCondition cond2 = BinaryCondition.Equal(Operand.of(c2), Operand.of("B"));
 		FilterExpression expr = new FilterExpression(cond1, cond2);

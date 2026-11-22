@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.blotty.core.commons.IListener;
+import com.blotty.core.commons.exceptions.FilterExpressionException;
 import com.blotty.core.commons.exceptions.RowsModelException;
 import com.blotty.core.models.RowEvent.RowAction;
 import com.blotty.core.modifiers.filters.FilterExpression;
@@ -21,17 +22,17 @@ public class DataModel extends AbstractDataModel {
 		super(id, rowsModel);
 	}
 		
-	public DataModelView createView( String viewId, FilterExpression filter ) throws RowsModelException {
+	public DataModelView createView( String viewId, FilterExpression filter ) throws RowsModelException, FilterExpressionException {
 		DataModelView view = new DataModelView( viewId, filter, this );
 		return view;
 	}
 
-	public DataModelView createView( String viewId, SorterConditionChain sorter ) throws RowsModelException {
+	public DataModelView createView( String viewId, SorterConditionChain sorter ) throws RowsModelException, FilterExpressionException {
 		DataModelView view = new DataModelView( viewId, sorter, this );
 		return view;
 	}
 	
-	public DataModelView createView( String viewId, FilterExpression filter, SorterConditionChain sorter ) throws RowsModelException {
+	public DataModelView createView( String viewId, FilterExpression filter, SorterConditionChain sorter ) throws RowsModelException, FilterExpressionException {
 		DataModelView view = new DataModelView( viewId, filter, sorter, this );
 		return view;
 	}

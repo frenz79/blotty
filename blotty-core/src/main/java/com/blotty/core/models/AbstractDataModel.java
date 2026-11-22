@@ -6,6 +6,7 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.blotty.core.commons.IConsumer;
+import com.blotty.core.commons.exceptions.FilterExpressionException;
 import com.blotty.core.commons.exceptions.RowsModelException;
 import com.blotty.core.types.IGenericField;
 
@@ -57,7 +58,7 @@ public abstract class AbstractDataModel {
 		return rowsModel.getRowsCount();
 	}
 	
-	public void stream( IConsumer<Row> c ) throws RowsModelException {
+	public void stream( IConsumer<Row> c ) throws RowsModelException, FilterExpressionException {
 		rowsModel.stream(c);
 	}
 	
@@ -73,8 +74,9 @@ public abstract class AbstractDataModel {
 		return id;
 	}
 	
-	public void addIndex(SearchIndex i) throws RowsModelException {
+	public void addIndex(SearchIndex i) throws RowsModelException, FilterExpressionException {
 		this.indexes.add(i);
+		i.getColumn().setSearchIndex(i);
 		i.build(rowsModel);
 	}
 	
@@ -94,7 +96,7 @@ public abstract class AbstractDataModel {
 		return !indexes.isEmpty();
 	}
 	
-	public String dumpToString() throws RowsModelException {
+	public String dumpToString() throws RowsModelException, FilterExpressionException {
 		StringBuilder ret = new StringBuilder("Model name:").append(getId()).append("\n");
 		
 		AtomicInteger colsSize = new AtomicInteger();
