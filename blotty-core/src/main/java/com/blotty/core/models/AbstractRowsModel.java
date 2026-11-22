@@ -10,13 +10,13 @@ public abstract class AbstractRowsModel {
 
 	private final ColumnsModel columnsModel;
 	
+	public abstract AbstractRowsModel updRow(Row row) throws RowsModelException;
 	public abstract AbstractRowsModel addRow(Row row) throws RowsModelException;
 	public abstract AbstractRowsModel addRows(Row ...row) throws RowsModelException;
-	
+	public abstract void stream(IConsumer<Row> c) throws RowsModelException;
+	public abstract void sort(Comparator<Row> c) throws RowsModelException;
 	public abstract int getRowsCount();
-
 	public abstract Row getRow(int position);
-
 	public abstract Row getRow(IGenericField key);
 
 	public AbstractRowsModel(ColumnsModel columnsModel) {
@@ -30,10 +30,5 @@ public abstract class AbstractRowsModel {
 	
 	public IGenericField getKey( Row row ) {
 		return row.getFields()[ columnsModel.getKey().getId() ];
-	}
-
-	public abstract void stream(IConsumer<Row> c) throws RowsModelException;
-
-	public abstract void sort(Comparator<Row> c) throws RowsModelException;
-	
+	}	
 }

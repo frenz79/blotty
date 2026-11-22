@@ -5,6 +5,9 @@ import com.blotty.core.commons.IListener;
 import com.blotty.core.commons.exceptions.RowsModelException;
 import com.blotty.core.models.storage.InMemoryRowsModel;
 import com.blotty.core.modifiers.filters.FilterExpression;
+import com.blotty.core.modifiers.filters.IFilterCondition;
+import com.blotty.core.modifiers.filters.conditions.Operand;
+import com.blotty.core.modifiers.filters.conditions.binary.BinaryCondition;
 import com.blotty.core.modifiers.sorters.SorterConditionChain;
 import com.blotty.core.types.IGenericField;
 
@@ -37,6 +40,43 @@ public class DataModelView extends AbstractDataModel implements IListener<RowEve
 	}
 	
 	private void populate() throws RowsModelException {
+		// If there's an index...use it
+		if (parentDataModel.hasIndexes()) {
+			
+			IFilterCondition cond = filter.getConditionsChain().getCondition();
+			if ( cond instanceof BinaryCondition ) {
+				Operand lCond = ((BinaryCondition)cond).getLeft();
+				Operand rCond = ((BinaryCondition)cond).getRight();
+				Column  searchCol = null;
+				
+				IGenericField searchVal = null;
+				if (lCond.isConst()) {
+					searchVal = lCond.getConst();
+					searchCol = (!rCond.isConst())?rCond.getColumn():null;
+				} else if (rCond.isConst()) {
+					searchVal = rCond.getConst();
+					searchCol = (!lCond.isConst())?lCond.getColumn():null;
+				}
+				
+				if (searchVal!=null && searchCol!=null) {
+					for (SearchIndex idx : parentDataModel.getIndexes()) {
+						Column col = idx.getColumn();
+						if (col.getId()==searchCol.getId()) {
+							idx.stream(searchVal, new IConsumer<Row>() {
+								@Override
+								public boolean stream(Row row) throws RowsModelException {
+									addRow( row );
+									return true;
+								}			
+							});
+							return;
+						} 
+					}
+				}
+			}
+		}
+		
+		// Otherwise fullscan
 		parentDataModel.stream( new IConsumer<Row>() {
 			@Override
 			public boolean stream(Row row) throws RowsModelException {
@@ -61,14 +101,19 @@ public class DataModelView extends AbstractDataModel implements IListener<RowEve
 					}
 				}
 				break;
+			case UPD:
+				if (filter == null || filter.apply(row)) {
+					updRow(row);
+					if (sorter != null) {
+						getRowsModel().sort(sorter);
+					}
+				}				
+				break;
 			case DEL:
 				// IGenericField key = getColumnsModel().getKey() != null ? getColumnsModel().getKey().fieldOf(row) : null;
 				// Se implementi deleteRow() nello storage:
 				// getRowsModel().deleteRow(key);
-				break;
-			case UPD:
-				// Gestione re-filtering o update
-				break;
+				break;			
 			default:
 				break;
 			}

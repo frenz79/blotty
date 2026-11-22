@@ -72,6 +72,10 @@ public class Row {
 		return this;
 	}
 	
+	public void upd(Row row) {
+		System.arraycopy(row.fields, 0, this.fields, 0, this.fields.length);
+	}
+	
 	public static Builder newBuilder(ColumnsModel colModel) {
 		return new Builder(colModel);
 	}

@@ -27,6 +27,7 @@ import com.blotty.core.models.ColumnsModel;
 import com.blotty.core.models.DataModel;
 import com.blotty.core.models.DataModelView;
 import com.blotty.core.models.Row;
+import com.blotty.core.models.SearchIndex;
 import com.blotty.core.models.storage.InMemoryRowsModel;
 import com.blotty.core.modifiers.filters.FilterExpression;
 import com.blotty.core.modifiers.filters.FilterExpressionBuilder;
@@ -417,6 +418,44 @@ public class DataModelStressTest {
 		printBenchmarkResult("Inserimento Sequenziale Batch (1 thread)", totalRecords, 1, elapsedMs, throughput);
 	}
 
+	@Test
+	@Order(9)
+	@DisplayName("9. Benchmark Filtering & SQL Query Parsing su Large Dataset using Index")
+	void testFilteringPerformanceWithIndex() throws Exception {
+		int totalRecords = 50_000;
+		DataModel model = new DataModel(new InMemoryRowsModel(columnsModel));
+		for (int i = 0; i < totalRecords; i++) {
+			model.addRow(createSampleRow(columnsModel, "ROW_" + i, i));
+		}
+
+		model.addIndex( new SearchIndex(columnsModel.getColumn("DEPARTMENT")));
+		
+		// Filtro programmato: Engineering AND Age >= 40
+		FilterExpression filter = new FilterExpressionBuilder()
+				.begin(BinaryCondition.Equal(Operand.of(columnsModel.getColumn("DEPARTMENT")), Operand.of("Engineering")))
+				.and(BinaryCondition.GreaterThanEqual(Operand.of(columnsModel.getColumn("AGE")), Operand.of(40)))
+				.build();
+
+		long startFilter = System.nanoTime();
+		DataModelView view = model.createView("EngSeniors", filter);
+		long filterElapsedMs = (System.nanoTime() - startFilter) / 1_000_000;
+
+		assertTrue(view.getRowsCount() > 0);
+		assertTrue(view.getRowsCount() < totalRecords);
+
+		// Filtro SQL Parsing
+		long startSql = System.nanoTime();
+		SQLQueryParser parser = new SQLQueryParser();
+		FilterExpression sqlFilter = parser.parse(columnsModel, " \"DEPARTMENT\" = 'Engineering' AND \"AGE\" >= '40' ");
+		DataModelView sqlView = model.createView("EngSeniorsSQL", sqlFilter);
+		long sqlElapsedMs = (System.nanoTime() - startSql) / 1_000_000;
+
+		assertEquals(view.getRowsCount(), sqlView.getRowsCount(), "I risultati del filtro programmatico e del filtro SQL devono coincidere");
+
+		printBenchmarkResult("Filtering Programmatico su 50k", view.getRowsCount(), 1, filterElapsedMs, (totalRecords / (filterElapsedMs / 1000.0)));
+		printBenchmarkResult("SQL Query Parsing & View su 50k", sqlView.getRowsCount(), 1, sqlElapsedMs, (totalRecords / (sqlElapsedMs / 1000.0)));
+	}
+	
 	private static void printBenchmarkResult(String testName, int records, int threads, double elapsedMs, double throughput) {
 		System.out.println("-----------------------------------------------------------------------------------------");
 		System.out.printf("%-42s | Record: %-7d | Thread: %-2d | Tempo: %8.2f ms | %10.0f ops/s%n",
@@ -435,6 +474,7 @@ public class DataModelStressTest {
 		suite.testSingleThreadBatchInsertion();
 		suite.testConcurrentDuplicateKeyCollisions();
 		suite.testFilteringPerformance();
+		suite.testFilteringPerformanceWithIndex();
 		suite.testSortingPerformanceAndCorrectness();
 		suite.testReadWriteConcurrencyStress();				
 		suite.testDataModelViewDynamicUpdatesConcurrently();

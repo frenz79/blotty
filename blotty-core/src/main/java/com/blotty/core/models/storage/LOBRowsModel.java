@@ -254,4 +254,10 @@ public class LOBRowsModel extends AbstractRowsModel {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	@Override
+	public AbstractRowsModel updRow(Row row) throws RowsModelException {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

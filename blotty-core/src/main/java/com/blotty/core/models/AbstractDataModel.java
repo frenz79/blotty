@@ -1,5 +1,7 @@
 package com.blotty.core.models;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -12,11 +14,13 @@ public abstract class AbstractDataModel {
 	private final String id;
 	private final ColumnsModel columnsModel;
 	private final AbstractRowsModel rowsModel;
+	private final List<SearchIndex> indexes;
 	
 	public AbstractDataModel( String id, AbstractRowsModel rowsModel ) {
 		this.id = id;
 		this.columnsModel = rowsModel.getColumnsModel();
 		this.rowsModel = rowsModel;
+		this.indexes = new ArrayList<>();
 	}
 	
 	public AbstractDataModel( AbstractRowsModel rowsModel ) {
@@ -27,13 +31,21 @@ public abstract class AbstractDataModel {
 		return rowsModel.getRow(i);
 	}
 	
+	public AbstractDataModel updRow(Row r) throws RowsModelException {
+		rowsModel.updRow(r);
+		updateIndexes(r);
+		return this;
+	}
+	
 	public AbstractDataModel addRow(Row r) throws RowsModelException {
 		rowsModel.addRow(r);
+		updateIndexes(r);
 		return this;
 	}
 	
 	public AbstractDataModel addRows(Row ...r) throws RowsModelException {
 		rowsModel.addRows(r);
+		updateIndexes(r);
 		return this;
 	}
 
@@ -59,6 +71,27 @@ public abstract class AbstractDataModel {
 	
 	public String getId() {
 		return id;
+	}
+	
+	public void addIndex(SearchIndex i) throws RowsModelException {
+		this.indexes.add(i);
+		i.build(rowsModel);
+	}
+	
+	private void updateIndexes(Row ...rows) {
+		for ( Row r : rows ) {
+			for ( SearchIndex idx : indexes ) {
+				idx.update(r);
+			}
+		}
+	}
+	
+	public List<SearchIndex> getIndexes() {
+		return indexes;
+	}
+	
+	public boolean hasIndexes() {
+		return !indexes.isEmpty();
 	}
 	
 	public String dumpToString() throws RowsModelException {

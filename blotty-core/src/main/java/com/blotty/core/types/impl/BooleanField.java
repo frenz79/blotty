@@ -63,5 +63,4 @@ public class BooleanField implements IGenericField {
 	public boolean getValue() {
 		return value;
 	}
-
 }
