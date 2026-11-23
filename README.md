@@ -1,100 +1,344 @@
 
-# blotty
-A library for importing, filtering and sorting data from static or streaming sources.
-Mapped data is stored in an in memory tabular object called **DataModel** structured according its own **ColumnModel** descriptor.
-Applying any filter generates a derived model called **DataModelView** .
-When a row changes in the parent model, all linked views are notified (different kind of events are dispactched: INS, UPD or DEL).
+# Blotty
 
-## Import and search csv data
-Example taken from  "**SimpleCvsLoader**"
+**Blotty** is a lightweight in-memory tabular data engine designed for importing, filtering, sorting and viewing data from static or streaming sources.
 
- 1. **ColumnModel** descriptor creation:
-```
-	ColumnsModel colModel = new ColumnsModelBuilder()
-		.add( "Organization Id", FieldType.STRING_TYPE )
-		.add( "Name", FieldType.STRING_TYPE )
-		.add( "Website", FieldType.STRING_TYPE )
-		.add( "Country", FieldType.STRING_TYPE )
-		.add( "Description", FieldType.STRING_TYPE )
-		.add( "Founded", FieldType.STRING_TYPE )
-		.add( "Industry", FieldType.STRING_TYPE )
-		.add( "Number of employees", FieldType.INTEGER_TYPE )				
-		.build();	
-```
- 2. **DataModel** creation with RowBuilder helper used for easy row creation and insertion:
-```
-    DataModel dataModel = new DataModel( colModel );   
-    RowBuilder rowBuilder = dataModel.getRowBuilder();
-```
-3. Than line by line, we read the csv record putting data into our model
-  ```
-		Reader in = new FileReader("src/main/resources/organizations-10000.csv");
-		Iterable<CSVRecord> records = CSVFormat.DEFAULT.parse(in);
-		int rowNumber = 0;
-		for (CSVRecord record : records) {
-			if ( rowNumber>0 ) {
-				rowBuilder.newRow(record.get(0))
-				.set(colModel.getColumn(0), record.get(1))
-				.set(colModel.getColumn(1), record.get(2))
-				.set(colModel.getColumn(2), record.get(3))
-				.set(colModel.getColumn(3), record.get(4))
-				.set(colModel.getColumn(4), record.get(5))
-				.set(colModel.getColumn(5), record.get(6))
-				.set(colModel.getColumn(6), record.get(7))
-				.set(colModel.getColumn(7), record.get(8))
-				.addToModel();
-			}
-			rowNumber++;
-		}		
-		in.close();
-		System.out.println("Model size:"+dataModel.getRowsCount());
+Data is stored inside a **DataModel**, whose structure is defined by a **ColumnsModel** schema. A `DataModel` may generate one or more derived **DataModelView** instances through filtering and sorting operations.
+
+Views are automatically synchronized with their parent model. Whenever rows are added, updated or removed, change notifications are propagated to all dependent views.
+
+## Main Features
+
+- Strongly typed columns (`String`, `Integer`, `Long`, `Float`, `Double`, `Boolean`)
+- Primary key support
+- In-memory storage
+- Incremental view updates
+- SQL-like filtering language
+- Programmatic filter construction API
+- Multi-column sorting
+- Support for `AND`, `OR`, `NOT` and nested expressions
+- Extensible indexing infrastructure
+- Zero-dependency core module
+
+---
+
+# Creating a DataModel
+
+## Define the schema
+
+```java
+ColumnsModel columns = ColumnsModel.newBuilder()
+    .add(
+        Column.newBuilder("ID", true)
+            .type(FieldType.STRING_TYPE))
+    .add(
+        Column.newBuilder("NAME")
+            .type(FieldType.STRING_TYPE))
+    .add(
+        Column.newBuilder("COUNTRY")
+            .type(FieldType.STRING_TYPE))
+    .add(
+        Column.newBuilder("EMPLOYEES")
+            .type(FieldType.INTEGER_TYPE))
+    .build();
 ```
 
-4. Searching data is done using a **FilterExpression** object and chaining all conditions: 
-  ```
-		FilterExpression filter = new FilterExpressionBuilder()
-			.begin( BinaryCondition.Equal(Operand.of(colModel.getColumn("Country")), Operand.of("Italy"))) 
-			.and( BinaryCondition.GreaterThanEqual(Operand.of(colModel.getColumn("Number of employees")), Operand.of(5000))) 
-			.and( BinaryCondition.Like(Operand.of(colModel.getColumn("Industry")), Operand.of("Engineering")))
-			.build();
+The schema defines:
+
+- Column names
+- Column types
+- The primary key column
+
+---
+
+## Create a DataModel
+
+```java
+DataModel model =
+    new DataModel(
+        new InMemoryRowsModel(columns));
 ```
 
-5. We create a **view** on our model applying the previous filter:
-```
-		DataModelView view = dataModel.createView("ItalianOrganizations", filter);
-```
-...and finally pretty print view content:
-```
-		System.out.println(view.dumpToString());
-```
-That's the final output:
-```
-    Model name:ItalianOrganizations
-    |Organization Id    |Name        |Website            |Country   |Description              |Founded  |Industry                             |Number of employees|
-    ---------------------------------------------------------------------------------------------------------------------------------------------------------------
-    |83Ce9d2f643Db95    |Mays PLC    |https://crosby.com/|Italy     |Switchable 24/7 model    |1977     |Mechanical or Industrial Engineering |5800               |
-    |8a14ebD20eA8D7A    |Watson LLC  |http://noble.com/  |Italy     |Secured modular attitude |2000     |Computer Software / Engineering      |8775               |
-```
-Filters can be created using a simpler **SQL** like **syntax** too, like following:
-```
-DataModelView sqlFilteredView = dataModel.createView("ItalianOrganizations_1", 
-	new SQLQueryParser().parse(colModel, 
-		  " \"Country\" = 'Italy' 
-		AND \"Number of employees\" >= '5000' 
-		AND \"Industry\" LIKE 'Engineering' "));
+---
+
+## Add rows
+
+```java
+model.addRow(
+    Row.newBuilder(columns)
+        .set("ID", "ORG001")
+        .set("NAME", "Acme Ltd")
+        .set("COUNTRY", "Italy")
+        .set("EMPLOYEES", "5000")
+        .build()
+);
 ```
 
-6. **Sorting** the view it easy enough, just chain all needed sorting expressions this way:
-```
-		sqlFilteredView.sort(
-			new SorterExpressionBuilder(colModel)
-				.DescNullLast("Number of employees") 
-				.AscNullLast("Industry")
-				.build()	
-		);
+Multiple rows can be inserted using:
+
+```java
+model.addRows(row1, row2, row3);
 ```
 
-## A simple UI
-In the examples there's a simple UI made using Swing and using blotty lib as backend for filtering and sorting logic:
+---
+
+# Filtering Data
+
+## Programmatic API
+
+Filters can be built directly using the AST-based condition model.
+
+```java
+FilterExpression filter =
+    new FilterExpression(
+
+        new AndCondition(
+
+            BinaryCondition.Equal(
+                Operand.of(columns.getColumn("COUNTRY")),
+                Operand.of("Italy")),
+
+            BinaryCondition.GreaterThanEqual(
+                Operand.of(columns.getColumn("EMPLOYEES")),
+                Operand.of(5000))
+        )
+    );
+```
+
+Logical conditions can be freely combined:
+
+```java
+FilterExpression filter =
+    new FilterExpression(
+
+        new OrCondition(
+
+            BinaryCondition.Equal(
+                Operand.of(columns.getColumn("COUNTRY")),
+                Operand.of("Italy")),
+
+            new AndCondition(
+
+                BinaryCondition.Equal(
+                    Operand.of(columns.getColumn("COUNTRY")),
+                    Operand.of("France")),
+
+                BinaryCondition.GreaterThan(
+                    Operand.of(columns.getColumn("EMPLOYEES")),
+                    Operand.of(5000))
+            )
+        )
+    );
+```
+
+---
+
+## SQL-like Syntax
+
+Blotty ships with a SQL-inspired query parser.
+
+```java
+FilterExpression filter =
+    new SQLQueryParser().parse(
+        columns,
+
+        "\"COUNTRY\" = 'Italy' "
+      + "AND \"EMPLOYEES\" >= 5000");
+```
+
+### Supported Operators
+
+```sql
+=
+!=
+>
+>=
+<
+<=
+LIKE
+IS NULL
+IS NOT NULL
+```
+
+### Supported Logical Operators
+
+```sql
+AND
+OR
+NOT
+```
+
+### Nested Expressions
+
+```sql
+(
+    "COUNTRY" = 'Italy'
+    OR
+    "COUNTRY" = 'France'
+)
+AND
+"EMPLOYEES" > 5000
+```
+
+### Column-to-Column Comparisons
+
+```sql
+"FROM_QTY" < "TO_QTY"
+```
+
+### Numeric Literals
+
+```sql
+"AGE" > 18
+"PRICE" >= 123.45
+"DELTA" > -10
+```
+
+### Boolean Literals
+
+```sql
+"ACTIVE" = true
+"ACTIVE" != false
+```
+
+---
+
+# Creating Views
+
+A filtered view can be created from any model.
+
+```java
+DataModelView view =
+    model.createView(
+        "ItalianOrganizations",
+        filter);
+```
+
+Views contain only rows matching the associated filter.
+
+Any change occurring in the parent model is automatically propagated to all dependent views.
+
+---
+
+# Sorting
+
+Sort expressions can be chained.
+
+```java
+SorterConditionChain sorter =
+
+    new SorterExpressionBuilder(columns)
+
+        .DescNullLast("EMPLOYEES")
+
+        .AscNullLast("NAME")
+
+        .build();
+```
+
+Apply the sorter:
+
+```java
+view.sort(sorter);
+```
+
+### Supported Sorting Modes
+
+```java
+AscNullFirst
+AscNullLast
+DescNullFirst
+DescNullLast
+```
+
+### Example
+
+```java
+view.sort(
+
+    new SorterExpressionBuilder(columns)
+
+        .DescNullLast("EMPLOYEES")
+
+        .AscNullLast("COUNTRY")
+
+        .build()
+);
+```
+
+---
+
+# Full Query Example
+
+```java
+DataModelView view =
+    model.createView(
+
+        "EuropeanOrganizations",
+
+        new SQLQueryParser().parse(
+            columns,
+
+            "(\"COUNTRY\" = 'Italy' "
+          + "OR "
+          + "\"COUNTRY\" = 'France') "
+
+          + "AND "
+
+          + "\"EMPLOYEES\" >= 5000"
+        )
+    );
+```
+
+---
+
+# Indexes
+
+Blotty supports pluggable indexing strategies to reduce the amount of data scanned during filtering.
+
+Example:
+
+```java
+model.addIndex(
+    new HashIndex(
+        columns.getColumn("COUNTRY")));
+```
+
+Indexes are automatically updated when rows are inserted or modified.
+
+When available, a `DataModelView` may leverage indexes to reduce the candidate set before evaluating the full filter expression.
+
+---
+
+# Debugging
+
+Any model or view can be dumped as a formatted table.
+
+```java
+System.out.println(
+    view.dumpToString());
+```
+
+Example output:
+
+```text
+Model name:EuropeanOrganizations
+
+|ID    |NAME      |COUNTRY |EMPLOYEES|
+--------------------------------------
+|ORG01 |Acme Ltd  |Italy   |5000     |
+|ORG02 |Beta Spa  |France  |7500     |
+```
+
+---
+
+# Swing Demo
+
+The examples module includes a simple Swing-based data explorer showcasing:
+
+- CSV loading
+- Filtering
+- Sorting
+- Live view updates
 
 ![CSVExplorer](https://github.com/user-attachments/assets/905f0184-00fc-41b5-ad80-f83e2bf22fc7)
