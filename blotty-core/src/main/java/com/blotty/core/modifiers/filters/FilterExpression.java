@@ -6,7 +6,7 @@ import com.blotty.core.modifiers.filters.FilterConditionChain.FilterConditionCon
 
 public class FilterExpression {
 	
-	private final FilterConditionChain conditionsChain;
+	private final IFilterCondition root;
 	
 	public FilterExpression( IFilterCondition condition ) {
 		this.conditionsChain = new FilterConditionChain( condition );
@@ -24,7 +24,11 @@ public class FilterExpression {
 	        current = next;
 	    }
 	}
-
+	
+	public boolean apply(Row row) throws FilterExpressionException {
+    	return root.apply(row);
+	}
+/*
 	public boolean apply( Row row ) throws FilterExpressionException {
 	    if ( conditionsChain == null ) return true;
 	    boolean result = conditionsChain.getCondition().apply( row );
@@ -44,6 +48,7 @@ public class FilterExpression {
 	    }
 	    return result;
 	}
+*/
 	
 	public FilterExpression( FilterConditionChain chain ) {
 		this.conditionsChain = chain;
