@@ -342,3 +342,10 @@ The examples module includes a simple Swing-based data explorer showcasing:
 - Live view updates
 
 ![CSVExplorer](https://github.com/user-attachments/assets/905f0184-00fc-41b5-ad80-f83e2bf22fc7)
+
+# License
+
+Copyright (c) 2026 Francesco Bianchi
+
+Licensed under the Apache License, Version 2.0.
+See the `LICENSE` file for details.
