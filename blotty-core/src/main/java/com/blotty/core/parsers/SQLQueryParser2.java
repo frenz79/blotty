@@ -167,6 +167,42 @@ public class SQLQueryParser2 {
                 continue;
             }
 
+            if (Character.isDigit(c) || c == '-') {
+                int start = i;            
+                boolean dotFound = false;            
+                i++;
+            
+                while (i < query.length()) {            
+                    char n = query.charAt(i);            
+                    if (Character.isDigit(n)) {
+                        i++;
+                        continue;
+                    }
+            
+                    if (n == '.') {            
+                        if (dotFound) {
+                            break;
+                        }            
+                        dotFound = true;
+                        i++;
+                        continue;
+                    }            
+                    break;
+                }
+            
+                String value = query.substring(start, i);
+            
+                result.add(
+                    new Token(
+                        dotFound
+                            ? TokenType.DOUBLE
+                            : TokenType.INTEGER,
+                        value
+                    )
+                );            
+                continue;
+            }
+
             String rem = query.substring(i).toUpperCase();
 
             if (rem.startsWith("IS NOT NULL")) {
@@ -221,7 +257,36 @@ public class SQLQueryParser2 {
                 i += 3;
                 continue;
             }
+            if (rem.startsWith("TRUE")) {
+                result.add(
+                    new Token(
+                        TokenType.BOOLEAN,
+                        "true"));
+            
+                i += 4;
+                continue;
+            }
+            
+            if (rem.startsWith("FALSE")) {          
+                result.add(
+                    new Token(
+                        TokenType.BOOLEAN,
+                        "false"));
+            
+                i += 5;
+                continue;
+            }
 
+            if (rem.startsWith("NULL")) {
+                result.add(
+                    new Token(
+                        TokenType.NULL,
+                        "NULL"));
+            
+                i += 4;
+                continue;
+            }
+            
             if (rem.startsWith(">=")) {
                 result.add(
                         new Token(
