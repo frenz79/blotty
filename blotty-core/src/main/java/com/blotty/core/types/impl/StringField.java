@@ -50,9 +50,39 @@ public class StringField implements IGenericField {
 		return Arrays.compare(value, ((StringField)other).value);
 	}
 
-	// TODO: Optimize me!!!
 	public boolean contains(StringField other) {
-	    if (other == null) return false;
-	    return this.toString().contains(other.toString());
-	}	
+	    if (other == null) {
+	        return false;
+	    }
+	
+	    byte[] haystack = value;
+	    byte[] needle = other.value;
+	
+	    int n = needle.length;
+	    int h = haystack.length;
+	
+	    if (n == 0) {
+	        return true;
+	    }
+	    if (n > h) {
+	        return false;
+	    }
+	
+	    byte first = needle[0];
+	
+	    outer:
+	    for (int i = 0; i <= h - n; i++) {
+	       if (haystack[i] != first) {
+	            continue;
+	        }	
+	        for (int j = 1; j < n; j++) {
+	            if (haystack[i + j] != needle[j]) {
+	                continue outer;
+	            }
+	        }	
+	        return true;
+	    }	
+	    return false;
+	}
+	
 }
