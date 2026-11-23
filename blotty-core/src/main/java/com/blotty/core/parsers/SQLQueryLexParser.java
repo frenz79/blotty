@@ -73,10 +73,12 @@ public class SQLQueryLexParser {
     }
 
     private IFilterCondition parseNot() throws FilterExpressionException, RowsTypeException {
-        if (match(TokenType.NOT)) {
+        if (match(TokenType.NOT)) {        
+            if (peek().type() == TokenType.EOF) {
+                throw error("Expected expression after NOT");
+            }        
             return new NotCondition(parsePrimary());
         }
-        return parsePrimary();
     }
 
     private IFilterCondition parsePrimary() throws FilterExpressionException, RowsTypeException {
@@ -105,6 +107,11 @@ public class SQLQueryLexParser {
 
         Token operatorToken = expectOperator();
         Token rightToken = consume();
+        
+        if (rightToken.type() != TokenType.COLUMN && rightToken.type() != TokenType.LITERAL) {
+            throw error("Expected COLUMN or LITERAL but found " + rightToken.type());
+        }
+        
         Operand left = Operand.of(leftColumn);
         Operand right;
 
@@ -112,9 +119,15 @@ public class SQLQueryLexParser {
             case COLUMN:
                 right = Operand.of(getColumn(rightToken.value()));
                 break;            
-            case LITERAL:
-                right = Operand.of(rightToken.value(),leftColumn);
-                break;            
+            case LITERAL:            
+                if ("NULL".equalsIgnoreCase(rightToken.value())) {
+                    throw error(
+                        "Use IS NULL or IS NOT NULL instead of "
+                        + operatorToken.value()
+                        + " NULL");
+                }            
+                right = Operand.of(rightToken.value(), leftColumn);            
+                break;        
             default:
                 throw error("Expected COLUMN or LITERAL, found "+ rightToken.type());
         }      
@@ -538,20 +551,17 @@ public class SQLQueryLexParser {
         return false;
     }
 
-    private Token expect(TokenType type)
-            throws FilterExpressionException {
-
-        Token token = consume();
-
-        if (token.type() != type) {
-
+    private Token expect(TokenType type) throws FilterExpressionException {
+        Token token = consume();   
+        if (token.type() != type) {    
             throw error(
-                    "Expected "
-                    + type
-                    + " but found "
-                    + token.type());
-        }
-
+                "Parse error. Expected "
+                + type
+                + " but found "
+                + token.type()
+                + " at token position "
+                + (pos - 1));
+        }    
         return token;
     }
 
