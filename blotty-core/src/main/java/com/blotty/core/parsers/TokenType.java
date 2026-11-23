@@ -20,10 +20,7 @@ enum TokenType {
     LPAREN,
     RPAREN,
 
-    INTEGER,
-    LONG,
-    DOUBLE,
-    BOOLEAN,
+    LITERAL,
     
     EOF
 }
