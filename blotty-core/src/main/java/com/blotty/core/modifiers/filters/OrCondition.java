@@ -12,10 +12,16 @@ public class OrCondition implements IFilterCondition {
     }
 
     @Override
-    public boolean apply(Row row)
-            throws FilterExpressionException {
-
+    public boolean apply(Row row) throws FilterExpressionException {
         return left.apply(row)
             || right.apply(row);
+    }
+
+    public IFilterCondition getLeft() {
+        return left;
+    }
+
+    public IFilterCondition getRight() {
+        return right;
     }
 }
