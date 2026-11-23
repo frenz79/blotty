@@ -1,4 +1,6 @@
-private enum TokenType {
+package com.blotty.core.parsers;
+
+public enum TokenType {
 
     COLUMN,
 

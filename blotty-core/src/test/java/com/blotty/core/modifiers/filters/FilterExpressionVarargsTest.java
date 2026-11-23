@@ -3,7 +3,6 @@ package com.blotty.core.modifiers.filters;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -15,6 +14,7 @@ import com.blotty.core.commons.exceptions.RowsTypeException;
 import com.blotty.core.models.Column;
 import com.blotty.core.models.ColumnsModel;
 import com.blotty.core.models.Row;
+import com.blotty.core.modifiers.filters.conditions.IFilterCondition;
 import com.blotty.core.modifiers.filters.conditions.Operand;
 import com.blotty.core.modifiers.filters.conditions.binary.BinaryCondition;
 import com.blotty.core.types.FieldType;
@@ -46,29 +46,23 @@ class FilterExpressionVarargsTest {
 		IFilterCondition cond2 = BinaryCondition.Equal(Operand.of(c2), Operand.of("B"));
 		IFilterCondition cond3 = BinaryCondition.Equal(Operand.of(c3), Operand.of("C"));
 
-		FilterExpression expr = new FilterExpression(cond1, cond2, cond3);
+		FilterExpression expr = FilterExpression.newBuilder().begin(cond1).and(cond2).and(cond3).build();
 
-		assertNotNull(expr.getConditionsChain());
-		assertEquals(cond1, expr.getConditionsChain().getCondition());
+		assertNotNull(expr.getRoot());
+		assertEquals(cond1, expr.getRoot().children().get(0));
 
-		assertNotNull(expr.getConditionsChain().getNextCondition());
-		assertEquals(cond2, expr.getConditionsChain().getNextCondition().getCondition());
+		assertNotNull(expr.getRoot());
+		assertEquals(cond1, expr.getRoot().children().get(1));
 
-		assertNotNull(expr.getConditionsChain().getNextCondition().getNextCondition());
-		assertEquals(cond3, expr.getConditionsChain().getNextCondition().getNextCondition().getCondition());
-	}
-
-	@Test
-	void testVarargsConstructorValidation() {
-		assertThrows(IllegalArgumentException.class, () -> new FilterExpression((IFilterCondition[]) null));
-		assertThrows(IllegalArgumentException.class, () -> new FilterExpression(new IFilterCondition[0]));
+		assertNotNull(expr.getRoot());
+		assertEquals(cond1, expr.getRoot().children().get(2));
 	}
 
 	@Test
 	void testVarargsApply() throws RowsTypeException, FilterExpressionException {
 		IFilterCondition cond1 = BinaryCondition.Equal(Operand.of(c1), Operand.of("A"));
 		IFilterCondition cond2 = BinaryCondition.Equal(Operand.of(c2), Operand.of("B"));
-		FilterExpression expr = new FilterExpression(cond1, cond2);
+		FilterExpression expr = FilterExpression.newBuilder().begin(cond1).and(cond2).build();
 
 		Row match = new Row(colModel).set(colModel.getKey(), "K1").set(c1, "A").set(c2, "B").set(c3, "C");
 		Row mismatch1 = new Row(colModel).set(colModel.getKey(), "K2").set(c1, "X").set(c2, "B").set(c3, "C");

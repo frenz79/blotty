@@ -1,5 +1,7 @@
 package com.blotty.core.modifiers.filters;
 
+import com.blotty.core.modifiers.filters.conditions.IFilterCondition;
+
 public class FilterConditionChain {
 
 	public static enum FilterConditionConjunction {

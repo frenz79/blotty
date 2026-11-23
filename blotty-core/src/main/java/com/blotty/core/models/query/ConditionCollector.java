@@ -1,0 +1,36 @@
+package com.blotty.core.models.query;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import com.blotty.core.modifiers.filters.conditions.AndCondition;
+import com.blotty.core.modifiers.filters.conditions.IFilterCondition;
+import com.blotty.core.modifiers.filters.conditions.NotCondition;
+import com.blotty.core.modifiers.filters.conditions.OrCondition;
+
+public class ConditionCollector {
+
+	public List<IFilterCondition> collect( IFilterCondition root ){
+		List<IFilterCondition> ret = new ArrayList<>();
+		visit(root, ret);
+		return ret;
+	}
+	
+	private void visit(IFilterCondition node, List<IFilterCondition> result ) {
+		if (node instanceof AndCondition and) {
+			visit(and.getLeft(), result);
+			visit(and.getRight(), result);
+			return;
+		}
+		if (node instanceof OrCondition or) {
+			visit(or.getLeft(), result);
+			visit(or.getRight(), result);
+			return;
+		}
+		if (node instanceof NotCondition not) {
+			visit(not.getCondition(), result);
+			return;
+		}
+		result.add(node);
+	}
+}

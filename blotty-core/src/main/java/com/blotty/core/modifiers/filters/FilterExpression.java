@@ -1,65 +1,105 @@
 package com.blotty.core.modifiers.filters;
 
+import java.awt.IllegalComponentStateException;
+
 import com.blotty.core.commons.exceptions.FilterExpressionException;
 import com.blotty.core.models.Row;
-import com.blotty.core.modifiers.filters.FilterConditionChain.FilterConditionConjunction;
+import com.blotty.core.modifiers.filters.conditions.AndCondition;
+import com.blotty.core.modifiers.filters.conditions.IFilterCondition;
+import com.blotty.core.modifiers.filters.conditions.NotCondition;
+import com.blotty.core.modifiers.filters.conditions.OrCondition;
 
 public class FilterExpression {
 	
-	private final IFilterCondition root;
+	private IFilterCondition root;
 	
-	public FilterExpression( IFilterCondition condition ) {
-		this.conditionsChain = new FilterConditionChain( condition );
-	}
-	
-	public FilterExpression( IFilterCondition ...conditions ) {
-	    if (conditions == null || conditions.length == 0) {
-	        throw new IllegalArgumentException("Conditions cannot be null or empty");
-	    }
-	    this.conditionsChain = new FilterConditionChain( conditions[0] );
-	    FilterConditionChain current = this.conditionsChain;
-	    for ( int i = 1; i < conditions.length; i++ ) {
-	        FilterConditionChain next = new FilterConditionChain( conditions[i] );
-	        current.setNextCondition( next );
-	        current = next;
-	    }
+	public FilterExpression( IFilterCondition root ) {
+		this.root = root;
 	}
 	
 	public boolean apply(Row row) throws FilterExpressionException {
     	return root.apply(row);
 	}
-/*
-	public boolean apply( Row row ) throws FilterExpressionException {
-	    if ( conditionsChain == null ) return true;
-	    boolean result = conditionsChain.getCondition().apply( row );
-	    FilterConditionChain current = conditionsChain;
-	    while ( current.getNextCondition() != null ) {
-	        FilterConditionConjunction conj = current.getConjunction();
-	        current = current.getNextCondition();
-	        // Short-circuit: se con AND il risultato è già false, o con OR è già true
-	        if ( conj == FilterConditionConjunction.AND && !result ) {
-	            continue; // Salta il calcolo di nextVal
-	        }
-	        if ( conj == FilterConditionConjunction.OR && result ) {
-	            return true; // Risultato già definitivamente true
-	        }
-	        boolean nextVal = current.getCondition().apply( row );
-	        result = (conj == FilterConditionConjunction.AND) ? (result && nextVal) : (result || nextVal);
-	    }
-	    return result;
-	}
-*/
-	
-	public FilterExpression( FilterConditionChain chain ) {
-		this.conditionsChain = chain;
-	}
 	
 	@Override
 	public String toString() {
-		return "FilterExpression [conditionsChain=" + conditionsChain + "]";
+		return "FilterExpression [root=" + root + "]";
 	}
 
-	public FilterConditionChain getConditionsChain() {
-		return conditionsChain;
+	public IFilterCondition getRoot() {
+		return root;
+	}
+	
+	public static Builder newBuilder() {
+		return new Builder();
+	}
+	
+	public static class Builder {
+		private IFilterCondition root;
+		private IFilterCondition currentAndGroup;
+		
+		public Builder begin( IFilterCondition c ) {
+			this.root = c;
+			this.currentAndGroup = c;
+			return this;
+		}
+		
+		public Builder beginNot( IFilterCondition c ) {
+			return begin(new NotCondition(c));
+		}
+		
+		public Builder and( IFilterCondition c ) {
+			checkInit();
+			this.currentAndGroup = new AndCondition(currentAndGroup, c);
+			replaceCurrentTerm(currentAndGroup);
+			return this;
+		}
+		
+		public Builder andNot( IFilterCondition c ) {
+			return and(new NotCondition(c));
+		}
+		
+		public Builder or( IFilterCondition c ) {
+			checkInit();
+			this.currentAndGroup = new OrCondition(currentAndGroup, c);
+			replaceCurrentTerm(currentAndGroup);
+			return this;
+		}
+		
+		public Builder orNot( IFilterCondition c ) {
+			return or(new NotCondition(c));
+		}
+		
+		public FilterExpression build( ) {
+			checkInit();
+			return new FilterExpression(root);
+		}
+			
+		private void checkInit() {
+			if (root==null) 
+				throw new IllegalComponentStateException("begin() must be called first");
+		}
+		
+		private void replaceCurrentTerm( IFilterCondition c) {
+			if (root==currentAndGroup) {
+				root = c;
+				return;
+			}
+			root = replaceRightMostTerm(root, c);
+		}
+		
+		private IFilterCondition replaceRightMostTerm( IFilterCondition node, IFilterCondition repl ) {
+			if ( !(node instanceof OrCondition)) {
+				return repl;
+			}
+			OrCondition or = (OrCondition)node;
+			return new OrCondition(
+				or.getLeft(),
+				replaceRightMostTerm(
+					or.getRight(),
+					repl
+				)
+			);
+		}
 	}
 } 

@@ -27,10 +27,10 @@ import com.blotty.core.models.ColumnsModel;
 import com.blotty.core.models.DataModel;
 import com.blotty.core.models.DataModelView;
 import com.blotty.core.models.Row;
-import com.blotty.core.models.SearchIndex;
+import com.blotty.core.models.indexes.HashIndex;
+import com.blotty.core.models.query.QueryDefinition;
 import com.blotty.core.models.storage.InMemoryRowsModel;
 import com.blotty.core.modifiers.filters.FilterExpression;
-import com.blotty.core.modifiers.filters.FilterExpressionBuilder;
 import com.blotty.core.modifiers.filters.conditions.Operand;
 import com.blotty.core.modifiers.filters.conditions.binary.BinaryCondition;
 import com.blotty.core.modifiers.sorters.SorterConditionChain;
@@ -197,13 +197,13 @@ public class DataModelStressTest {
 		}
 
 		// Filtro programmato: Engineering AND Age >= 40
-		FilterExpression filter = new FilterExpressionBuilder()
+		FilterExpression filter = FilterExpression.newBuilder()
 				.begin(BinaryCondition.Equal(Operand.of(columnsModel.getColumn("DEPARTMENT")), Operand.of("Engineering")))
 				.and(BinaryCondition.GreaterThanEqual(Operand.of(columnsModel.getColumn("AGE")), Operand.of(40)))
 				.build();
 
 		long startFilter = System.nanoTime();
-		DataModelView view = model.createView("EngSeniors", filter);
+		DataModelView view = model.createView("EngSeniors", new QueryDefinition(filter, null));
 		long filterElapsedMs = (System.nanoTime() - startFilter) / 1_000_000;
 
 		assertTrue(view.getRowsCount() > 0);
@@ -212,7 +212,7 @@ public class DataModelStressTest {
 		// Filtro SQL Parsing
 		long startSql = System.nanoTime();
 		SQLQueryParser parser = new SQLQueryParser();
-		FilterExpression sqlFilter = parser.parse(columnsModel, " \"DEPARTMENT\" = 'Engineering' AND \"AGE\" >= '40' ");
+		QueryDefinition sqlFilter = parser.parse(columnsModel, " \"DEPARTMENT\" = 'Engineering' AND \"AGE\" >= '40' ");
 		DataModelView sqlView = model.createView("EngSeniorsSQL", sqlFilter);
 		long sqlElapsedMs = (System.nanoTime() - startSql) / 1_000_000;
 
@@ -232,8 +232,6 @@ public class DataModelStressTest {
 			model.addRow(createSampleRow(columnsModel, "S_" + i, i));
 		}
 
-		DataModelView view = model.createView("SortView", (FilterExpression) null);
-
 		// Multi-column sorting: DEPARTMENT AscNullLast, poi AGE DescNullLast
 		SorterConditionChain sorter = new SorterExpressionBuilder(columnsModel)
 				.AscNullLast("DEPARTMENT")
@@ -241,7 +239,8 @@ public class DataModelStressTest {
 				.build();
 
 		long startSort = System.nanoTime();
-		view.sort(sorter);
+		DataModelView view = model.createView("SortView", new QueryDefinition(null, sorter));
+		
 		long sortElapsedMs = (System.nanoTime() - startSort) / 1_000_000;
 
 		assertEquals(totalRecords, view.getRowsCount());
@@ -347,7 +346,7 @@ public class DataModelStressTest {
 		DataModel model = new DataModel(new InMemoryRowsModel(columnsModel));
 
 		// Vista con filtro (Solo Active=true) e ordinata per AGE
-		FilterExpression filter = new FilterExpressionBuilder()
+		FilterExpression filter = FilterExpression.newBuilder()
 				.begin(BinaryCondition.Equal(Operand.of(columnsModel.getColumn("ACTIVE")), Operand.of(true)))
 				.build();
 
@@ -355,7 +354,7 @@ public class DataModelStressTest {
 				.AscNullLast("AGE")
 				.build();
 
-		DataModelView view = model.createView("DynamicView", filter, sorter);
+		DataModelView view = model.createView("DynamicView", new QueryDefinition(filter, sorter));
 
 		int numWriters = 4;
 		int rowsPerWriter = 1000;
@@ -428,16 +427,16 @@ public class DataModelStressTest {
 			model.addRow(createSampleRow(columnsModel, "ROW_" + i, i));
 		}
 
-		model.addIndex( new SearchIndex(columnsModel.getColumn("DEPARTMENT")));
+		model.addIndex( new HashIndex(columnsModel.getColumn("DEPARTMENT")));
 		
 		// Filtro programmato: Engineering AND Age >= 40
-		FilterExpression filter = new FilterExpressionBuilder()
+		FilterExpression filter = FilterExpression.newBuilder()
 				.begin(BinaryCondition.Equal(Operand.of(columnsModel.getColumn("DEPARTMENT")), Operand.of("Engineering")))
 				.and(BinaryCondition.GreaterThanEqual(Operand.of(columnsModel.getColumn("AGE")), Operand.of(40)))
 				.build();
 
 		long startFilter = System.nanoTime();
-		DataModelView view = model.createView("EngSeniors", filter);
+		DataModelView view = model.createView("EngSeniors", new QueryDefinition(filter, null));
 		long filterElapsedMs = (System.nanoTime() - startFilter) / 1_000_000;
 
 		assertTrue(view.getRowsCount() > 0);
@@ -446,7 +445,7 @@ public class DataModelStressTest {
 		// Filtro SQL Parsing
 		long startSql = System.nanoTime();
 		SQLQueryParser parser = new SQLQueryParser();
-		FilterExpression sqlFilter = parser.parse(columnsModel, " \"DEPARTMENT\" = 'Engineering' AND \"AGE\" >= '40' ");
+		QueryDefinition sqlFilter = parser.parse(columnsModel, " \"DEPARTMENT\" = 'Engineering' AND \"AGE\" >= '40' ");
 		DataModelView sqlView = model.createView("EngSeniorsSQL", sqlFilter);
 		long sqlElapsedMs = (System.nanoTime() - startSql) / 1_000_000;
 

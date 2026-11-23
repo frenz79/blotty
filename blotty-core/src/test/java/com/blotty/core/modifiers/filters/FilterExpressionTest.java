@@ -124,7 +124,7 @@ class FilterExpressionTest {
 		Row row4 = new Row(colModel).set(colModel.getKey(), "KEY_4").set(col1, "YYY").set(col2, "ZZZ");
 		Row row5 = new Row(colModel).set(colModel.getKey(), "KEY_5").set(col1, "XXX").set(col2, "ZZZ");
 		
-		FilterExpression exprBuilder1 = new FilterExpressionBuilder()
+		FilterExpression exprBuilder1 = FilterExpression.newBuilder()
 			.begin(	new BinaryCondition(Operand.of(col1), new Equal(), Operand.of("XXX")))
 			.and( new BinaryCondition(Operand.of(col2), new Equal(), Operand.of("ZZZ")))
 		.build();
@@ -135,7 +135,7 @@ class FilterExpressionTest {
 		assertFalse( exprBuilder1.apply( row4 ) );	
 		assertTrue ( exprBuilder1.apply( row5 ) );	
 		
-		FilterExpression exprBuilder2 = new FilterExpressionBuilder()
+		FilterExpression exprBuilder2 = FilterExpression.newBuilder()
 			.begin(	new BinaryCondition(Operand.of(col1), new Equal(), Operand.of("XXX")))
 			.or( new BinaryCondition(Operand.of(col2), new Equal(), Operand.of("ZZZ")))
 		.build();
@@ -146,7 +146,7 @@ class FilterExpressionTest {
 		assertTrue ( exprBuilder2.apply( row4 ) );	
 		assertTrue ( exprBuilder2.apply( row5 ) );
 		
-		FilterExpression exprBuilder3 = new FilterExpressionBuilder()
+		FilterExpression exprBuilder3 = FilterExpression.newBuilder()
 			.begin(	new BinaryCondition(Operand.of(col1), new Equal(), Operand.of("XXX")))
 			.or ( new BinaryCondition(Operand.of(col1), new Equal(), Operand.of("YYY")))
 			.and( new BinaryCondition(Operand.of(col2), new Equal(), Operand.of("ZZZ")))

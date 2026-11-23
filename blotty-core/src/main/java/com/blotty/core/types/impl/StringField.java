@@ -1,5 +1,6 @@
 package com.blotty.core.types.impl;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 import com.blotty.core.types.FieldType;

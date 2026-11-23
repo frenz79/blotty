@@ -1,54 +1,657 @@
 package com.blotty.core.parsers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.jupiter.api.Test;
+import java.util.stream.Stream;
 
-import com.blotty.core.commons.exceptions.ColumnsModelException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+
 import com.blotty.core.commons.exceptions.FilterExpressionException;
-import com.blotty.core.commons.exceptions.RowsTypeException;
 import com.blotty.core.models.Column;
 import com.blotty.core.models.ColumnsModel;
+import com.blotty.core.models.Row;
+import com.blotty.core.models.query.QueryDefinition;
 import com.blotty.core.modifiers.filters.FilterExpression;
+import com.blotty.core.modifiers.filters.conditions.AndCondition;
+import com.blotty.core.modifiers.filters.conditions.NotCondition;
+import com.blotty.core.modifiers.filters.conditions.OrCondition;
 import com.blotty.core.modifiers.filters.conditions.binary.BinaryCondition;
-import com.blotty.core.modifiers.filters.conditions.binary.operators.Equal;
-import com.blotty.core.modifiers.filters.conditions.binary.operators.GreaterThan;
-import com.blotty.core.modifiers.filters.conditions.binary.operators.LesserThan;
+import com.blotty.core.modifiers.filters.conditions.unary.UnaryCondition;
 import com.blotty.core.types.FieldType;
-import com.blotty.core.types.impl.IntegerField;
-import com.blotty.core.types.impl.StringField;
 
 class SQLQueryParserTest {
 
-	@Test
-	void testSQLQuery() throws ColumnsModelException, FilterExpressionException, RowsTypeException {
-		ColumnsModel colsModel = ColumnsModel.newBuilder()
-				.add(Column.newBuilder("PK", true).type(FieldType.STRING_TYPE))
-				.add(Column.newBuilder("COL_1").type(FieldType.STRING_TYPE))
-				.add(Column.newBuilder("COL_2").type(FieldType.STRING_TYPE))
-				.add(Column.newBuilder("COL_3").type(FieldType.STRING_TYPE)
-			).build();		
-		
-		FilterExpression parser = new SQLQueryParser().parse(
-			colsModel, " \"COL_1\" = 'XXXX' AND \"COL_2\" > '40' OR \"COL_3\" < \"COL_2\" ");
-		
-		System.out.println("Query: "+parser);
-		
-		assertTrue( parser.getConditionsChain().getCondition() instanceof BinaryCondition );
-		
-		assertEquals("COL_1", ((BinaryCondition)parser.getConditionsChain().getCondition()).getLeft().getColumn().getName() );
-		assertEquals(Equal.class.getSimpleName(), ((BinaryCondition)parser.getConditionsChain().getCondition()).getOperator().toString() );
-		assertEquals(StringField.of("XXXX").toString(), ((BinaryCondition)parser.getConditionsChain().getCondition()).getRight().getOperand().toString() );
-		
-		assertEquals("COL_2", ((BinaryCondition)parser.getConditionsChain().getNextCondition().getCondition()).getLeft().getColumn().getName() );
-		assertEquals(GreaterThan.class.getSimpleName(), ((BinaryCondition)parser.getConditionsChain().getNextCondition().getCondition()).getOperator().toString() );
-		assertEquals(IntegerField.of(40).toString(), ((BinaryCondition)parser.getConditionsChain().getNextCondition().getCondition()).getRight().getOperand().toString() );
+    private SQLQueryParser parser;
+    private ColumnsModel columns;
 
-		assertEquals("COL_3", ((BinaryCondition)parser.getConditionsChain().getNextCondition().getNextCondition().getCondition()).getLeft().getColumn().getName() );
-		assertEquals(LesserThan.class.getSimpleName(), ((BinaryCondition)parser.getConditionsChain().getNextCondition().getNextCondition().getCondition()).getOperator().toString() );
-		assertEquals("COL_2", ((BinaryCondition)parser.getConditionsChain().getNextCondition().getNextCondition().getCondition()).getRight().getColumn().getName() );
+    static Stream<Arguments> operatorsProvider() {
+        return Stream.of(
+            Arguments.of(
+                "\"AGE\" = 18",
+                row(18),
+                true),
+    
+            Arguments.of(
+                "\"AGE\" = 18",
+                row(20),
+                false),
+    
+            Arguments.of(
+                "\"AGE\" != 18",
+                row(20),
+                true),
+    
+            Arguments.of(
+                "\"AGE\" != 18",
+                row(18),
+                false),
+    
+            Arguments.of(
+                "\"AGE\" > 18",
+                row(20),
+                true),
+    
+            Arguments.of(
+                "\"AGE\" > 18",
+                row(18),
+                false),
+    
+            Arguments.of(
+                "\"AGE\" >= 18",
+                row(18),
+                true),
+    
+            Arguments.of(
+                "\"AGE\" >= 18",
+                row(17),
+                false),
+    
+            Arguments.of(
+                "\"AGE\" < 18",
+                row(10),
+                true),
+    
+            Arguments.of(
+                "\"AGE\" < 18",
+                row(18),
+                false),
+    
+            Arguments.of(
+                "\"AGE\" <= 18",
+                row(18),
+                true),
+    
+            Arguments.of(
+                "\"AGE\" <= 18",
+                row(19),
+                false)
+        );
+    }
+    
+    @BeforeEach
+    void setup() throws Exception {
 
-	}
+        columns =
+            ColumnsModel.newBuilder()
+                .add(
+                    Column.newBuilder("ID", true)
+                        .type(FieldType.INTEGER_TYPE))
+                .add(
+                    Column.newBuilder("NAME")
+                        .type(FieldType.STRING_TYPE))
+                .add(
+                    Column.newBuilder("AGE")
+                        .type(FieldType.INTEGER_TYPE))
+                .add(
+                    Column.newBuilder("ACTIVE")
+                        .type(FieldType.BOOLEAN_TYPE))
+                .build();
+
+        parser = new SQLQueryParser();
+    }
+
+    @Test
+    void shouldParseEqual() throws Exception {
+
+        QueryDefinition expr =
+            parser.parse(
+                columns,
+                "\"NAME\" = 'PIPPO'");
+
+        assertNotNull(expr);
+        assertInstanceOf(
+            BinaryCondition.class,
+            expr.getFilter().getRoot());
+    }
+
+    @Test
+    void shouldParseGreaterThan() throws Exception {
+    	QueryDefinition expr =
+            parser.parse(
+                columns,
+                "\"AGE\" > 18");
+
+        assertNotNull(expr);
+        assertInstanceOf(
+            BinaryCondition.class,
+            expr.getFilter().getRoot());
+    }
+
+    @Test
+    void shouldParseLike() throws Exception {
+    	QueryDefinition expr =
+            parser.parse(
+                columns,
+                "\"NAME\" LIKE 'PIP'");
+
+        assertInstanceOf(
+            BinaryCondition.class,
+            expr.getFilter().getRoot());
+    }
+
+    @Test
+    void shouldParseIsNull() throws Exception {
+    	QueryDefinition expr =
+            parser.parse(
+                columns,
+                "\"NAME\" IS NULL");
+
+        assertInstanceOf(
+            UnaryCondition.class,
+            expr.getFilter().getRoot());
+    }
+
+    @Test
+    void shouldParseIsNotNull() throws Exception {
+
+    	QueryDefinition expr =
+            parser.parse(
+                columns,
+                "\"NAME\" IS NOT NULL");
+
+        assertInstanceOf(
+            UnaryCondition.class,
+            expr.getFilter().getRoot());
+    }
+
+    @Test
+    void shouldParseNot() throws Exception {
+
+    	QueryDefinition expr =
+            parser.parse(
+                columns,
+                "NOT \"ACTIVE\" = true");
+
+        assertInstanceOf(
+            NotCondition.class,
+            expr.getFilter().getRoot());
+    }
+
+    @Test
+    void shouldParseAnd() throws Exception {
+
+    	QueryDefinition expr =
+            parser.parse(
+                columns,
+                "\"AGE\" > 18 AND \"ACTIVE\" = true");
+
+        assertInstanceOf(
+            AndCondition.class,
+            expr.getFilter().getRoot());
+    }
+
+    @Test
+    void shouldParseOr() throws Exception {
+
+    	QueryDefinition expr =
+            parser.parse(
+                columns,
+                "\"AGE\" > 18 OR \"ACTIVE\" = true");
+
+        assertInstanceOf(
+            OrCondition.class,
+            expr.getFilter().getRoot());
+    }
+
+    @Test
+    void shouldApplyAndBeforeOr() throws Exception {
+
+    	QueryDefinition expr =
+            parser.parse(
+                columns,
+                "\"AGE\" > 18 "
+                    + "OR "
+                    + "\"ACTIVE\" = true "
+                    + "AND "
+                    + "\"NAME\" = 'PIPPO'");
+
+        assertInstanceOf(
+            OrCondition.class,
+            expr.getFilter().getRoot());
+
+        OrCondition root =
+            (OrCondition) expr.getFilter().getRoot();
+
+        assertInstanceOf(
+            AndCondition.class,
+            root.getRight());
+    }
+
+    @Test
+    void shouldRespectParenthesis() throws Exception {
+
+    	QueryDefinition expr =
+            parser.parse(
+                columns,
+                "(\"AGE\" > 18 OR \"ACTIVE\" = true)"
+                    + " AND "
+                    + "\"NAME\" = 'PIPPO'");
+
+        assertInstanceOf(
+            AndCondition.class,
+            expr.getFilter().getRoot());
+
+        AndCondition root =
+            (AndCondition) expr.getFilter().getRoot();
+
+        assertInstanceOf(
+            OrCondition.class,
+            root.getLeft());
+    }
+
+    @Test
+    void shouldEvaluateSimpleExpression() throws Exception {
+
+        Row row =
+            Row.newBuilder(columns)
+                .set("ID", "1")
+                .set("NAME", "PIPPO")
+                .set("AGE", "50")
+                .set("ACTIVE", "true")
+                .build();
+
+        QueryDefinition expr =
+            parser.parse(
+                columns,
+                "\"NAME\"='PIPPO' AND \"AGE\">18");
+
+        assertTrue(expr.getFilter().apply(row));
+    }
+
+    @Test
+    void shouldEvaluateComplexExpression() throws Exception {
+
+    	QueryDefinition expr =
+            parser.parse(
+                columns,
+                "(\"NAME\"='PIPPO' OR \"NAME\"='PLUTO') "
+                    + "AND "
+                    + "\"AGE\">18 "
+                    + "AND "
+                    + "NOT \"ACTIVE\" = false");
+
+        Row matchingRow =
+            Row.newBuilder(columns)
+                .set("ID", "1")
+                .set("NAME", "PIPPO")
+                .set("AGE", "50")
+                .set("ACTIVE", "true")
+                .build();
+
+        Row nonMatchingRow =
+            Row.newBuilder(columns)
+                .set("ID", "2")
+                .set("NAME", "TOPOLINO")
+                .set("AGE", "50")
+                .set("ACTIVE", "true")
+                .build();
+
+        assertTrue(expr.getFilter().apply(matchingRow));
+        assertFalse(expr.getFilter().apply(nonMatchingRow));
+    }
+
+    @Test
+    void shouldSupportNegativeNumbers() throws Exception {
+
+    	QueryDefinition expr =
+            parser.parse(
+                columns,
+                "\"AGE\" > -10");
+
+        Row row =
+            Row.newBuilder(columns)
+                .set("ID", "1")
+                .set("NAME", "PIPPO")
+                .set("AGE", "50")
+                .set("ACTIVE", "true")
+                .build();
+
+        assertTrue(expr.getFilter().apply(row));
+    }
+
+    @Test
+    void shouldSupportColumnToColumnComparison() throws Exception {
+
+        ColumnsModel cols =
+            ColumnsModel.newBuilder()
+                .add(
+                    Column.newBuilder("ID", true)
+                        .type(FieldType.INTEGER_TYPE))
+                .add(
+                    Column.newBuilder("FROM_QTY")
+                        .type(FieldType.INTEGER_TYPE))
+                .add(
+                    Column.newBuilder("TO_QTY")
+                        .type(FieldType.INTEGER_TYPE))
+                .build();
+
+        QueryDefinition expr =
+            parser.parse(
+                cols,
+                "\"FROM_QTY\" < \"TO_QTY\"");
+
+        Row row =
+            Row.newBuilder(cols)
+                .set("ID", "1")
+                .set("FROM_QTY", "10")
+                .set("TO_QTY", "20")
+                .build();
+
+        assertTrue(expr.getFilter().apply(row));
+    }
+
+    @Test
+    void shouldFailOnUnknownColumn() {
+
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> parser.parse(
+                columns,
+                "\"UNKNOWN\"='ABC'"));
+    }
+
+    @Test
+    void shouldFailOnMissingSingleQuote() {
+
+        assertThrows(
+            FilterExpressionException.class,
+            () -> parser.parse(
+                columns,
+                "\"NAME\"='PIPPO"));
+    }
+
+    @Test
+    void shouldFailOnMissingClosingParenthesis() {
+
+        assertThrows(
+            FilterExpressionException.class,
+            () -> parser.parse(
+                columns,
+                "(\"NAME\"='PIPPO'"));
+    }
+
+    @Test
+    void shouldFailOnInvalidCondition() {
+
+        assertThrows(
+            FilterExpressionException.class,
+            () -> parser.parse(
+                columns,
+                "\"NAME\" AND \"AGE\""));
+    }
+
+    @Test
+    void shouldFailOnNotWithoutExpression() {
+
+        assertThrows(
+            FilterExpressionException.class,
+            () -> parser.parse(
+                columns,
+                "NOT"));
+    }
+
+    @ParameterizedTest
+    @MethodSource("operatorsProvider")
+    void shouldEvaluateAllBinaryOperators(
+            String query,
+            Row row,
+            boolean expected)
+            throws Exception {
+    
+        QueryDefinition expr =
+            parser.parse(
+                columns,
+                query);
+    
+        assertEquals(
+            expected,
+            expr.getFilter().apply(row));
+    }
+
+    private static Row row(int age) {
+        try {    
+            ColumnsModel cols =
+                ColumnsModel.newBuilder()
+                    .add(
+                        Column.newBuilder("ID", true)
+                            .type(FieldType.INTEGER_TYPE))
+                    .add(
+                        Column.newBuilder("NAME")
+                            .type(FieldType.STRING_TYPE))
+                    .add(
+                        Column.newBuilder("AGE")
+                            .type(FieldType.INTEGER_TYPE))
+                    .add(
+                        Column.newBuilder("ACTIVE")
+                            .type(FieldType.BOOLEAN_TYPE))
+                    .build();
+    
+            return Row.newBuilder(cols)
+                    .set("ID", "1")
+                    .set("NAME", "PIPPO")
+                    .set("AGE", String.valueOf(age))
+                    .set("ACTIVE", "true")
+                    .build();
+    
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    @Test
+    void shouldEvaluateLike() throws Exception {
+    
+        QueryDefinition expr =
+            parser.parse(
+                columns,
+                "\"NAME\" LIKE 'IPP'");
+    
+        Row row =
+            Row.newBuilder(columns)
+                .set("ID", "1")
+                .set("NAME", "PIPPO")
+                .set("AGE", "10")
+                .set("ACTIVE", "true")
+                .build();
+    
+        assertTrue(expr.getFilter().apply(row));
+    }
+
+    @Test
+    void shouldEvaluateLikeNegative() throws Exception {
+    
+        QueryDefinition expr =
+            parser.parse(
+                columns,
+                "\"NAME\" LIKE 'XYZ'");
+    
+        Row row =
+            Row.newBuilder(columns)
+                .set("ID", "1")
+                .set("NAME", "PIPPO")
+                .set("AGE", "10")
+                .set("ACTIVE", "true")
+                .build();
+    
+        assertFalse(expr.getFilter().apply(row));
+    }
+
+    @Test
+    void shouldEvaluateNot() throws Exception {
+    
+        QueryDefinition expr =
+            parser.parse(
+                columns,
+                "NOT \"ACTIVE\" = false");
+    
+        Row row =
+            Row.newBuilder(columns)
+                .set("ID", "1")
+                .set("NAME", "PIPPO")
+                .set("AGE", "10")
+                .set("ACTIVE", "true")
+                .build();
+    
+        assertTrue(expr.getFilter().apply(row));
+    }
+
+    @Test
+    void shouldRespectParenthesisDuringEvaluation()
+            throws Exception {
+    
+        QueryDefinition expr =
+            parser.parse(
+                columns,
+                "(\"NAME\"='PIPPO' OR \"NAME\"='PLUTO') "
+                + "AND "
+                + "\"AGE\" > 18");
+    
+        Row row =
+            Row.newBuilder(columns)
+                .set("ID", "1")
+                .set("NAME", "PLUTO")
+                .set("AGE", "20")
+                .set("ACTIVE", "true")
+                .build();
+    
+        assertTrue(expr.getFilter().apply(row));
+    }
+
+    @Test
+    void shouldEvaluateIsNull() throws Exception {
+    
+        Row row =
+            Row.newBuilder(columns)
+                .set("ID", "1")
+                .set("AGE", "10")
+                .set("ACTIVE", "true")
+                .build();
+    
+        QueryDefinition expr =
+            parser.parse(
+                columns,
+                "\"NAME\" IS NULL");
+    
+        assertTrue(expr.getFilter().apply(row));
+    }
+
+    @Test
+    void shouldEvaluateIsNotNull() throws Exception {
+    
+        Row row =
+            Row.newBuilder(columns)
+                .set("ID", "1")
+                .set("NAME", "PIPPO")
+                .set("AGE", "10")
+                .set("ACTIVE", "true")
+                .build();
+    
+        QueryDefinition expr =
+            parser.parse(
+                columns,
+                "\"NAME\" IS NOT NULL");
+    
+        assertTrue(expr.getFilter().apply(row));
+    }
+
+    @Test
+    void shouldEvaluateBooleanLiteral()
+            throws Exception {
+    
+        QueryDefinition expr =
+            parser.parse(
+                columns,
+                "\"ACTIVE\" = true");
+    
+        Row row =
+            Row.newBuilder(columns)
+                .set("ID", "1")
+                .set("NAME", "PIPPO")
+                .set("AGE", "10")
+                .set("ACTIVE", "true")
+                .build();
+    
+        assertTrue(expr.getFilter().apply(row));
+    }
+
+    @Test
+    void shouldApplyComplexPrecedence()
+            throws Exception {
+    
+        QueryDefinition expr =
+            parser.parse(
+                columns,
+                "\"NAME\"='PIPPO' "
+                + "OR "
+                + "(\"AGE\" > 18 "
+                + "AND "
+                + "\"ACTIVE\" = true)");
+    
+        Row row =
+            Row.newBuilder(columns)
+                .set("ID", "1")
+                .set("NAME", "TOPOLINO")
+                .set("AGE", "20")
+                .set("ACTIVE", "true")
+                .build();
+    
+        assertTrue(expr.getFilter().apply(row));
+    }
+
+    @Test
+    void shouldRejectEqualsNull() {
+    
+        assertThrows(
+            FilterExpressionException.class,
+            () -> parser.parse(
+                columns,
+                "\"NAME\" = NULL"));
+    }
+
+    
+    @Test
+    void shouldHandleOperatorPrecedence() throws Exception {
+    
+        QueryDefinition expr =
+            parser.parse(
+                columns,
+                "\"AGE\" > 18 OR \"AGE\" < 10 AND \"ACTIVE\" = true");
+    
+        OrCondition root =
+            (OrCondition) expr.getFilter().getRoot();
+    
+        assertInstanceOf(
+            AndCondition.class,
+            root.getRight());
+    }
 
 }

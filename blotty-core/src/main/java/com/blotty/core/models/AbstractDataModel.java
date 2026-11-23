@@ -8,6 +8,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import com.blotty.core.commons.IConsumer;
 import com.blotty.core.commons.exceptions.FilterExpressionException;
 import com.blotty.core.commons.exceptions.RowsModelException;
+import com.blotty.core.models.indexes.HashIndex;
 import com.blotty.core.types.IGenericField;
 
 public abstract class AbstractDataModel {
@@ -15,7 +16,7 @@ public abstract class AbstractDataModel {
 	private final String id;
 	private final ColumnsModel columnsModel;
 	private final AbstractRowsModel rowsModel;
-	private final List<SearchIndex> indexes;
+	private final List<HashIndex> indexes;
 	
 	public AbstractDataModel( String id, AbstractRowsModel rowsModel ) {
 		this.id = id;
@@ -74,7 +75,7 @@ public abstract class AbstractDataModel {
 		return id;
 	}
 	
-	public void addIndex(SearchIndex i) throws RowsModelException, FilterExpressionException {
+	public void addIndex(HashIndex i) throws RowsModelException, FilterExpressionException {
 		this.indexes.add(i);
 		i.getColumn().setSearchIndex(i);
 		i.build(rowsModel);
@@ -82,13 +83,13 @@ public abstract class AbstractDataModel {
 	
 	private void updateIndexes(Row ...rows) {
 		for ( Row r : rows ) {
-			for ( SearchIndex idx : indexes ) {
+			for ( HashIndex idx : indexes ) {
 				idx.update(r);
 			}
 		}
 	}
 	
-	public List<SearchIndex> getIndexes() {
+	public List<HashIndex> getIndexes() {
 		return indexes;
 	}
 	

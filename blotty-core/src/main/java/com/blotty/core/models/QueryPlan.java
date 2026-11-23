@@ -1,4 +1,0 @@
-class QueryPlan {
-
-    RowSet candidateRows;
-} 

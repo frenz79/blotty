@@ -8,9 +8,9 @@ import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.Test;
 
 import com.blotty.core.commons.IConsumer;
+import com.blotty.core.models.query.QueryDefinition;
 import com.blotty.core.models.storage.InMemoryRowsModel;
 import com.blotty.core.modifiers.filters.FilterExpression;
-import com.blotty.core.modifiers.filters.FilterExpressionBuilder;
 import com.blotty.core.modifiers.filters.conditions.Operand;
 import com.blotty.core.modifiers.filters.conditions.binary.BinaryCondition;
 import com.blotty.core.types.FieldType;
@@ -97,12 +97,12 @@ class DataModelTest {
 			.addRow(Row.newBuilder(colModel).set("PK", "K4").set("COL_1", "4"))
 			.addRow(Row.newBuilder(colModel).set("PK", "K5").set("COL_1", "5"));
 		
-		FilterExpression filter = new FilterExpressionBuilder()
+		FilterExpression filter = FilterExpression.newBuilder()
 			.begin(	BinaryCondition.Equal(Operand.of(colModel.getColumn("COL_1")), Operand.of("2")))
 			.or( BinaryCondition.Equal(Operand.of(colModel.getColumn("COL_1")), Operand.of("3")))
 			.build();
 		
-		DataModelView view = dataModel.createView("2_or_3", filter);
+		DataModelView view = dataModel.createView("2_or_3", new QueryDefinition( filter, null ));
 		
 		assertEquals(5, dataModel.getRowsCount() );
 		assertEquals(2, view.getRowsCount() );

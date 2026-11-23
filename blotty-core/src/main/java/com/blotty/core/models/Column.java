@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.blotty.core.commons.exceptions.RowsTypeException;
+import com.blotty.core.models.indexes.HashIndex;
 import com.blotty.core.types.FieldType;
 import com.blotty.core.types.IGenericField;
 import com.blotty.core.types.impl.BooleanField;
@@ -27,7 +28,7 @@ public final class Column {
 	private Map<String,Object> properties;
 	private final Map<String,StringField> stringFieldsCache = new ConcurrentHashMap<>();
 	
-	private SearchIndex searchIndex;
+	private HashIndex searchIndex;
 	
 	public Column( String n, boolean isKey ){
 		this.name = n;
@@ -238,11 +239,11 @@ public final class Column {
 		}
 	}
 
-	public SearchIndex getSearchIndex() {
+	public HashIndex getSearchIndex() {
 		return searchIndex;
 	}
 
-	public void setSearchIndex(SearchIndex searchIndex) {
+	public void setSearchIndex(HashIndex searchIndex) {
 		this.searchIndex = searchIndex;
 	}
 }

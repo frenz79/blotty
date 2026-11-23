@@ -4,8 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 
+import com.blotty.core.models.query.QueryDefinition;
 import com.blotty.core.models.storage.InMemoryRowsModel;
-import com.blotty.core.modifiers.filters.FilterExpressionBuilder;
+import com.blotty.core.modifiers.filters.FilterExpression;
 import com.blotty.core.modifiers.filters.conditions.Operand;
 import com.blotty.core.modifiers.filters.conditions.binary.BinaryCondition;
 import com.blotty.core.modifiers.sorters.SorterExpressionBuilder;
@@ -27,7 +28,8 @@ class DataModelViewTest {
 
 		// View sorted AscNullLast on VAL
 		DataModelView view = dataModel.createView("V1",
-				new SorterExpressionBuilder(colModel).AscNullLast("VAL").build());
+				new QueryDefinition(null,
+				new SorterExpressionBuilder(colModel).AscNullLast("VAL").build()));
 
 		assertEquals(2, view.getRowsCount());
 		assertEquals(IntegerField.of(10), view.getRow(0).getFields()[colModel.getColumn("VAL").getId()]);
@@ -58,10 +60,11 @@ class DataModelViewTest {
 	
 		// Filter score >= 80, sorted DescNullLast
 		DataModelView view = dataModel.createView("HighScores",
-				new FilterExpressionBuilder().begin(
+				new QueryDefinition(
+				FilterExpression.newBuilder().begin(
 						BinaryCondition.GreaterThanEqual(Operand.of(colModel.getColumn("SCORE")), Operand.of(80))
 				).build(),
-				new SorterExpressionBuilder(colModel).DescNullLast("SCORE").build());
+				new SorterExpressionBuilder(colModel).DescNullLast("SCORE").build()));
 
 		assertEquals(2, view.getRowsCount());
 		assertEquals("Bob", view.getRow(0).getFields()[colModel.getColumn("NAME").getId()].toString());
