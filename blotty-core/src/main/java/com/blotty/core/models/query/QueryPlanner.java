@@ -1,6 +1,5 @@
 package com.blotty.core.models.query;
 
-import java.util.Collection;
 import java.util.List;
 
 import com.blotty.core.commons.IConsumer;
@@ -17,42 +16,41 @@ public class QueryPlanner {
 
 	public QueryPlan plan( QueryDefinition queryDef, AbstractDataModel model ) throws RowsModelException, FilterExpressionException {
 		if (!queryDef.hasFilter()) {
-			return useAllRows(model);
+			return useAllRows(model, null);
 		}
-
-		List<IFilterCondition> conditions = new ConditionCollector()
-			.collect( queryDef.getFilter().getRoot() );
-
-		AbstractIndex bestIndex = null;
-		IFilterCondition bestCond = null;
-		long bestCardinality = Long.MAX_VALUE;
-
-		for ( IFilterCondition cond : conditions ) {
-			for (AbstractIndex index : model.getIndexes() ) {
-				if (!index.supports(cond)) {
-					continue;
-				}
-				long cardinality = index.estimatedCardinality(cond);
-				if (cardinality < bestCardinality) {
-					bestCardinality = cardinality;
-					bestCond = cond;
-					bestIndex = index;
+		
+		if (model.hasIndexes()) {
+			List<IFilterCondition> conditions = new ConditionCollector()
+				.collect( queryDef.getFilter().getRoot() );
+	
+			AbstractIndex bestIndex = null;
+			IFilterCondition bestCond = null;
+			long bestCardinality = Long.MAX_VALUE;
+	
+			for ( IFilterCondition cond : conditions ) {
+				for (AbstractIndex index : model.getIndexes() ) {
+					if (!index.supports(cond)) {
+						continue;
+					}
+					long cardinality = index.estimatedCardinality(cond);
+					if (cardinality < bestCardinality) {
+						bestCardinality = cardinality;
+						bestCond = cond;
+						bestIndex = index;
+					}
 				}
 			}
-		}
-
-		if (bestIndex == null) {
-			return useAllRows(model);
+			
+			if (bestIndex != null) {
+				IFilterCondition residual = removeCondition(	queryDef.getFilter().getRoot(), bestCond );
+				return new QueryPlan(
+					bestIndex.lookup(bestCond),
+					residual
+				);
+			}			
 		}
 		
-		IFilterCondition residual = removeCondition(
-			queryDef.getFilter().getRoot(), bestCond
-		);
-		
-		return new QueryPlan(
-			bestIndex.lookup(bestCond),
-			residual
-		);
+		return useAllRows(model, queryDef.getFilter().getRoot());
 	}
 	
 	private IFilterCondition removeCondition(IFilterCondition root, IFilterCondition condition) {
@@ -73,8 +71,8 @@ public class QueryPlanner {
 		return new AndCondition(l, r);
 	}
 
-	private QueryPlan useAllRows(AbstractDataModel model) throws RowsModelException, FilterExpressionException {
-		QueryPlan ret = new QueryPlan();
+	private QueryPlan useAllRows(AbstractDataModel model, IFilterCondition residual) throws RowsModelException, FilterExpressionException {
+		QueryPlan ret = new QueryPlan(residual);
 		RowSet rows = ret.getCandidateRows();
 
 		// TODO: add a clone method for faster replication

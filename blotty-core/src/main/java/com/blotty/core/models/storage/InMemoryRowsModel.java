@@ -33,15 +33,31 @@ public class InMemoryRowsModel extends AbstractRowsModel {
 	}
 
 	@Override
-	public AbstractRowsModel updRow(Row row) throws RowsModelException {
+	public AbstractRowsModel delRow(Row row) throws RowsModelException {
 		IGenericField key = getKey(row);
+		wlock.lock();
+		try {
+			if ( this.rowsByKey.containsKey(key) ) {
+				throw new RowsModelException(String.format("Duplicated key:%s", key));
+			}
+			this.rowsByKey.remove(key);
+			this.rows.remove(row);
+		} finally {
+			wlock.unlock();
+		}
+		return this;
+	}
+	
+	@Override
+	public AbstractRowsModel updRow(Row oldRow, Row newRow) throws RowsModelException {
+		IGenericField key = getKey(oldRow);
 		wlock.lock();
 		try {
 			Row modelRow = rowsByKey.get(key);
 			if (modelRow==null) {
 				throw new RowsModelException(String.format("Cannot find row with key:%s", key));
 			}
-			modelRow.upd(row);
+			modelRow.upd(newRow);
 		} finally {
 			wlock.unlock();
 		}

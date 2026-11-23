@@ -1,19 +1,15 @@
 package com.blotty.core.models.indexes;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
 import com.blotty.core.commons.IConsumer;
 import com.blotty.core.commons.exceptions.FilterExpressionException;
 import com.blotty.core.commons.exceptions.RowsModelException;
-import com.blotty.core.models.AbstractRowsModel;
 import com.blotty.core.models.Column;
 import com.blotty.core.models.Row;
 import com.blotty.core.modifiers.filters.conditions.IFilterCondition;
@@ -23,50 +19,10 @@ import com.blotty.core.types.IGenericField;
 
 public class HashIndex extends AbstractIndex {
 
-	private final Map<IGenericField,Set<Row>> index = new ConcurrentHashMap<>();
-	
-	private final ReadLock rLock;
-	private final WriteLock wlock;
-	
+	private final Map<IGenericField,Set<Row>> index = new HashMap<>();
+		
 	public HashIndex( Column column ) {
 		super(column);
-		ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
-		this.rLock = lock.readLock();
-		this.wlock = lock.writeLock();
-	}
-	
-	public void build(AbstractRowsModel model) throws RowsModelException, FilterExpressionException {
-		wlock.lock();
-		try {
-			model.stream( new IConsumer<Row>() {			
-				@Override
-				public boolean stream(Row r) throws RowsModelException {
-					add(r);
-					return true;
-				}
-			});
-		} finally {
-			wlock.unlock();
-		}
-	}
-	
-	public void update(Row r) {
-		add(r);
-	}
-	
-	private void add(Row r) {
-		wlock.lock();
-		try {
-			IGenericField colVal = r.getFields()[getColumn().getId()];				
-			index.compute(colVal, (k,v) ->{
-				if (v==null) {
-					return new HashSet<>();
-				}
-				return v;
-			}).add(r);
-		} finally {
-			wlock.unlock();
-		}
 	}
 
 	public void stream(IGenericField searchVal, IConsumer<Row> iConsumer) throws RowsModelException, FilterExpressionException {
@@ -103,5 +59,28 @@ public class HashIndex extends AbstractIndex {
 		BinaryCondition bc = (BinaryCondition)c;
 		Collection<Row> rows = index.get(bc.getRight().getConst());
 		return rows==null?List.of():rows;
+	}
+
+	@Override
+	protected void _insert(IGenericField key, Row r) {
+		index.compute(key, (k,v) ->{
+			if (v==null) {
+				return new HashSet<>();
+			}
+			return v;
+		}).add(r);
+	}
+
+	@Override
+	protected void _delete(IGenericField key, Row r) {
+		Set<Row> rows = index.get(key);
+		if (rows==null || rows.isEmpty()) {
+			index.remove(key);
+			return;
+		}
+		rows.remove(r);
+		if (rows.isEmpty()) {
+			index.remove(key);
+		}		
 	}
 }

@@ -11,7 +11,8 @@ public abstract class AbstractRowsModel {
 
 	private final ColumnsModel columnsModel;
 	
-	public abstract AbstractRowsModel updRow(Row row) throws RowsModelException;
+	public abstract AbstractRowsModel delRow(Row row) throws RowsModelException;
+	public abstract AbstractRowsModel updRow(Row oldRow, Row newRow) throws RowsModelException;
 	public abstract AbstractRowsModel addRow(Row row) throws RowsModelException;
 	public abstract AbstractRowsModel addRows(Row ...row) throws RowsModelException;
 	public abstract void stream(IConsumer<Row> c) throws RowsModelException, FilterExpressionException;
@@ -31,5 +32,5 @@ public abstract class AbstractRowsModel {
 	
 	public IGenericField getKey( Row row ) {
 		return row.getFields()[ columnsModel.getKey().getId() ];
-	}	
+	}
 }

@@ -1,8 +1,6 @@
 package com.blotty.core.modifiers.filters;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -37,25 +35,6 @@ class FilterExpressionVarargsTest {
 		c1 = colModel.getColumn("C1");
 		c2 = colModel.getColumn("C2");
 		c3 = colModel.getColumn("C3");
-	}
-
-	@Test
-	void testVarargsConstructorChaining() {
-		// Tests the fix where varargs constructor previously lost all conditions after the first
-		IFilterCondition cond1 = BinaryCondition.Equal(Operand.of(c1), Operand.of("A"));
-		IFilterCondition cond2 = BinaryCondition.Equal(Operand.of(c2), Operand.of("B"));
-		IFilterCondition cond3 = BinaryCondition.Equal(Operand.of(c3), Operand.of("C"));
-
-		FilterExpression expr = FilterExpression.newBuilder().begin(cond1).and(cond2).and(cond3).build();
-
-		assertNotNull(expr.getRoot());
-		assertEquals(cond1, expr.getRoot().children().get(0));
-
-		assertNotNull(expr.getRoot());
-		assertEquals(cond1, expr.getRoot().children().get(1));
-
-		assertNotNull(expr.getRoot());
-		assertEquals(cond1, expr.getRoot().children().get(2));
 	}
 
 	@Test

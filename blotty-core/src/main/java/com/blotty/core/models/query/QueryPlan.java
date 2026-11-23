@@ -37,9 +37,9 @@ public class QueryPlan {
 		this.residualFilter = residual;
 	}
 	
-	public QueryPlan() {
+	public QueryPlan(IFilterCondition residual) {
 		this.candidateRows = new RowSet();
-		this.residualFilter = null;
+		this.residualFilter = residual;
 	}
 
 	public RowSet getCandidateRows() {

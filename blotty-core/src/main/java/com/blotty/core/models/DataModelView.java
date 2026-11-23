@@ -59,16 +59,14 @@ public class DataModelView extends AbstractDataModel implements IListener<RowEve
 				break;
 			case UPD:
 				if (filter == null || filter.apply(row)) {
-					updRow(row);
+					updRow(row, event.getOldRow());
 					if (sorter != null) {
 						getRowsModel().sort(sorter);
 					}
 				}				
 				break;
 			case DEL:
-				// IGenericField key = getColumnsModel().getKey() != null ? getColumnsModel().getKey().fieldOf(row) : null;
-				// Se implementi deleteRow() nello storage:
-				// getRowsModel().deleteRow(key);
+				getRowsModel().delRow(row);
 				break;			
 			default:
 				break;

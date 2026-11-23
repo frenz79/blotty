@@ -256,7 +256,13 @@ public class LOBRowsModel extends AbstractRowsModel {
 	}
 
 	@Override
-	public AbstractRowsModel updRow(Row row) throws RowsModelException {
+	public AbstractRowsModel delRow(Row row) throws RowsModelException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public AbstractRowsModel updRow(Row oldRow, Row newRow) throws RowsModelException {
 		// TODO Auto-generated method stub
 		return null;
 	}
