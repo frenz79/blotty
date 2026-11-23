@@ -46,6 +46,7 @@ public class StringField implements IGenericField {
 
 	@Override
 	public int compareTo(IGenericField other) {
+		if (other.isNull()) return 1;
 		return Arrays.compare(value, ((StringField)other).value);
 	}
 
