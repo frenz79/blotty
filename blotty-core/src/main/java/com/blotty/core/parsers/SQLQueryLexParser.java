@@ -103,20 +103,43 @@ public class SQLQueryLexParser {
                     new IsNotNull());
         }
 
-        Token operatorToken = consume();
+        Token operatorToken = expectOperator();
         Token rightToken = consume();
         Operand left = Operand.of(leftColumn);
         Operand right;
 
-        if (rightToken.type() == TokenType.COLUMN) {
-            right = Operand.of(getColumn(rightToken.value()));
-        } else if (rightToken.type() == TokenType.LITERAL) {
-            right = Operand.of(rightToken.value(),leftColumn);
-        }
+        switch (rightToken.type()) {
+            case COLUMN:
+                right = Operand.of(getColumn(rightToken.value()));
+                break;            
+            case LITERAL:
+                right = Operand.of(rightToken.value(),leftColumn);
+                break;            
+            default:
+                throw error("Expected COLUMN or LITERAL, found "+ rightToken.type());
+        }      
         return new BinaryCondition(
                 left,
                 toOperator(operatorToken),
                 right);
+    }
+
+    private Token expectOperator() throws FilterExpressionException {
+        Token token = consume();   
+        switch (token.type()) {
+        case EQ:
+        case NE:
+        case GT:
+        case GTE:
+        case LT:
+        case LTE:
+        case LIKE:
+            return token;    
+        default:
+            throw error(
+                "Expected operator but found "
+                + token.type());
+        }
     }
 
     //------------------------------------------------------------
@@ -219,7 +242,10 @@ public class SQLQueryLexParser {
             //--------------------------------------
     
             if (Character.isDigit(c)
-                    || c == '-') {
+                ||
+               (c == '-'
+                && i + 1 < query.length()
+                && Character.isDigit(query.charAt(i+1)))) {
     
                 int start = i;
     
@@ -268,7 +294,7 @@ public class SQLQueryLexParser {
             String upper =
                 rem.toUpperCase();
     
-            if (upper.startsWith("IS NOT NULL")) {
+            if (startsWithKeyword(upper, "IS NOT NULL")){
     
                 result.add(
                     new Token(
@@ -279,7 +305,7 @@ public class SQLQueryLexParser {
                 continue;
             }
     
-            if (upper.startsWith("IS NULL")) {
+            if (startsWithKeyword(upper, "IS NULL")){
     
                 result.add(
                     new Token(
@@ -290,7 +316,7 @@ public class SQLQueryLexParser {
                 continue;
             }
     
-            if (upper.startsWith("LIKE")) {
+            if (startsWithKeyword(upper, "LIKE")){
     
                 result.add(
                     new Token(
@@ -301,9 +327,8 @@ public class SQLQueryLexParser {
                 continue;
             }
     
-            if (upper.startsWith("AND")) {
-    
-                result.add(
+            if (startsWithKeyword(upper, "AND")){
+               result.add(
                     new Token(
                         TokenType.AND,
                         "AND"));
@@ -312,8 +337,7 @@ public class SQLQueryLexParser {
                 continue;
             }
     
-            if (upper.startsWith("OR")) {
-    
+            if (startsWithKeyword(upper, "OR")){    
                 result.add(
                     new Token(
                         TokenType.OR,
@@ -323,8 +347,7 @@ public class SQLQueryLexParser {
                 continue;
             }
     
-            if (upper.startsWith("NOT")) {
-    
+           if (startsWithKeyword(upper, "NOT")){ 
                 result.add(
                     new Token(
                         TokenType.NOT,
@@ -338,8 +361,7 @@ public class SQLQueryLexParser {
             // true / false / null come literal
             //--------------------------------------
     
-            if (upper.startsWith("TRUE")) {
-    
+           if (startsWithKeyword(upper, "TRUE")){
                 result.add(
                     new Token(
                         TokenType.LITERAL,
@@ -349,8 +371,7 @@ public class SQLQueryLexParser {
                 continue;
             }
     
-            if (upper.startsWith("FALSE")) {
-    
+            if (startsWithKeyword(upper, "FALSE")){    
                 result.add(
                     new Token(
                         TokenType.LITERAL,
@@ -360,8 +381,7 @@ public class SQLQueryLexParser {
                 continue;
             }
     
-            if (upper.startsWith("NULL")) {
-    
+           if (startsWithKeyword(upper, "NULL")){    
                 result.add(
                     new Token(
                         TokenType.LITERAL,
@@ -453,6 +473,19 @@ public class SQLQueryLexParser {
         return result;
     }
 
+    private boolean startsWithKeyword( String text, String keyword) {
+        if (!text.startsWith(keyword)) {
+            return false;
+        }    
+        if (text.length() == keyword.length()) {
+            return true;
+        }    
+        char next = text.charAt(keyword.length());
+        return Character.isWhitespace(next)
+            || next == '('
+            || next == ')';
+    }
+    
     //------------------------------------------------------------
     // Utility
     //------------------------------------------------------------
@@ -522,14 +555,21 @@ public class SQLQueryLexParser {
         return token;
     }
 
-    private Token peek() {
+    private Token peek() {    
+        if (pos >= tokens.size()) {
+            return new Token(TokenType.EOF, "");
+        }    
         return tokens.get(pos);
     }
 
-    private Token consume() {
+    private Token consume() throws FilterExpressionException {    
+        if (pos >= tokens.size()) {
+            throw error(
+                "Unexpected end of query");
+        }    
         return tokens.get(pos++);
     }
-
+    
     private FilterExpressionException error(
             String msg) {
 
