@@ -109,11 +109,9 @@ public class SQLQueryParser2 {
         Operand right;
 
         if (rightToken.type() == TokenType.COLUMN) {
-            right = Operand.of( getColumn(rightToken.value()));
-        } else if (rightToken.type() == TokenType.CONST) {
-            right = Operand.of( rightToken.value(), leftColumn);
-        } else {
-            throw error("Expected column or constant");
+            right = Operand.of(getColumn(rightToken.value()));
+        } else if (rightToken.type() == TokenType.LITERAL) {
+            right = Operand.of(rightToken.value(),leftColumn);
         }
         return new BinaryCondition(
                 left,
