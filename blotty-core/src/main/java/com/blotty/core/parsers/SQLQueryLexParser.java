@@ -26,7 +26,7 @@ import com.blotty.core.modifiers.filters.conditions.unary.UnaryCondition;
 import com.blotty.core.modifiers.filters.conditions.unary.operators.IsNotNull;
 import com.blotty.core.modifiers.filters.conditions.unary.operators.IsNull;
 
-public class SQLQueryParser2 {
+public class SQLQueryLexParser {
 
     private ColumnsModel columns;
     private List<Token> tokens;
