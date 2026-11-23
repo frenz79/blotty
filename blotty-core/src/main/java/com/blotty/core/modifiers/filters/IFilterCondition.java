@@ -6,5 +6,6 @@ import com.blotty.core.models.Row;
 public interface IFilterCondition {
 
 	public boolean apply( Row row ) throws FilterExpressionException;
-	
+
+	default List<IFilterCondition> children() { return List.of(); }
 }
