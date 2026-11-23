@@ -1,7 +1,6 @@
 private enum TokenType {
 
     COLUMN,
-    CONST,
 
     LITERAL,
 
