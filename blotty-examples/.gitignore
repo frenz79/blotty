@@ -1,0 +1,13 @@
+/target/
+/.classpath
+/.project
+/.settings
+/bin
+/storage
+*.csv
+*.data
+*.bak
+*.orig
+*.tmp
+*.class
+*.zip

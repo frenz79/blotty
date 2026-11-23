@@ -1,0 +1,97 @@
+package com.blotty.core.models.indexes;
+
+import java.util.Collection;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
+
+import com.blotty.core.commons.IConsumer;
+import com.blotty.core.commons.exceptions.FilterExpressionException;
+import com.blotty.core.commons.exceptions.RowsModelException;
+import com.blotty.core.models.AbstractRowsModel;
+import com.blotty.core.models.Column;
+import com.blotty.core.models.Row;
+import com.blotty.core.modifiers.filters.conditions.IFilterCondition;
+import com.blotty.core.types.IGenericField;
+
+public abstract class AbstractIndex {
+
+	private final Column column;
+
+	final ReadLock rLock;
+	final WriteLock wlock;
+	
+	public abstract boolean supports( IFilterCondition c );
+	public abstract Collection<Row> lookup( IFilterCondition c );
+	protected abstract void _insert(IGenericField key, Row r);
+	protected abstract void _delete(IGenericField key, Row r);
+	
+	public long estimatedCardinality(IFilterCondition c) {
+		return lookup(c).size();
+	}
+	
+	public AbstractIndex(Column column) {
+		super();
+		this.column = column;
+		ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+		this.rLock = lock.readLock();
+		this.wlock = lock.writeLock();
+	}
+	
+	public void build(AbstractRowsModel model) throws RowsModelException, FilterExpressionException {
+		wlock.lock();
+		try {
+			model.stream( new IConsumer<Row>() {			
+				@Override
+				public boolean stream(Row r) throws RowsModelException {
+					_insert(getKey(r), r);
+					return true;
+				}
+			});
+		} finally {
+			wlock.unlock();
+		}
+	}
+
+	public Column getColumn() {
+		return column;
+	}
+	
+	public void update(Row oldR, Row newR) {
+		wlock.lock();
+		try {			
+			IGenericField oldK = getKey(oldR);
+			IGenericField newK = getKey(newR);
+			
+			if (oldK.equals(newK)) {
+				return;
+			}
+			_delete( oldK, oldR );
+			_insert( newK, newR );
+		} finally {
+			wlock.unlock();
+		}
+	}
+	
+	public void delete(Row r) {
+		wlock.lock();
+		try {			
+			_delete( getKey(r), r );
+		} finally {
+			wlock.unlock();
+		}
+	}	
+	
+	public void insert(Row r) {
+		wlock.lock();
+		try {			
+			_insert( getKey(r), r );
+		} finally {
+			wlock.unlock();
+		}
+	}
+	
+	private IGenericField getKey(Row r) {
+		return r.getFields()[getColumn().getId()];
+	}
+}
