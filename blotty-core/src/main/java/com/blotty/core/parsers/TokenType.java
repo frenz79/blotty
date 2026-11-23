@@ -3,9 +3,7 @@ private enum TokenType {
     COLUMN,
     CONST,
 
-    NUMBER,
-    BOOLEAN,
-    NULL,
+    LITERAL,
 
     EQ,
     NE,
