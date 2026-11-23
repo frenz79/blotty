@@ -124,330 +124,336 @@ public class SQLQueryParser2 {
     //------------------------------------------------------------
     // Tokenizer
     //------------------------------------------------------------
-   private List<Token> tokenize(String query)
+     private List<Token> tokenize(String query)
         throws FilterExpressionException {
 
-    List<Token> result = new ArrayList<>();
-
-    int i = 0;
-
-    while (i < query.length()) {
-
-        char c = query.charAt(i);
-
-        //--------------------------------------
-        // whitespace
-        //--------------------------------------
-
-        if (Character.isWhitespace(c)) {
-            i++;
-            continue;
-        }
-
-        //--------------------------------------
-        // (
-        //--------------------------------------
-
-        if (c == '(') {
-            result.add(
-                new Token(
-                    TokenType.LPAREN,
-                    "("));
-            i++;
-            continue;
-        }
-
-        //--------------------------------------
-        // )
-        //--------------------------------------
-
-        if (c == ')') {
-            result.add(
-                new Token(
-                    TokenType.RPAREN,
-                    ")"));
-            i++;
-            continue;
-        }
-
-        //--------------------------------------
-        // "COLUMN"
-        //--------------------------------------
-
-        if (c == '"') {
-
-            int end = query.indexOf('"', i + 1);
-
-            if (end < 0) {
-                throw new FilterExpressionException(
-                    "Missing closing double quote");
+        List<Token> result = new ArrayList<>();
+    
+        int i = 0;
+    
+        while (i < query.length()) {
+    
+            char c = query.charAt(i);
+    
+            //--------------------------------------
+            // whitespace
+            //--------------------------------------
+    
+            if (Character.isWhitespace(c)) {
+                i++;
+                continue;
             }
-
-            result.add(
-                new Token(
-                    TokenType.COLUMN,
-                    query.substring(i + 1, end)));
-
-            i = end + 1;
-            continue;
-        }
-
-        //--------------------------------------
-        // 'CONST'
-        //--------------------------------------
-
-        if (c == '\'') {
-
-            int end = query.indexOf('\'', i + 1);
-
-            if (end < 0) {
-                throw new FilterExpressionException(
-                    "Missing closing single quote");
+    
+            //--------------------------------------
+            // (
+            //--------------------------------------
+    
+            if (c == '(') {
+                result.add(
+                    new Token(
+                        TokenType.LPAREN,
+                        "("));
+                i++;
+                continue;
             }
-
-            result.add(
-                new Token(
-                    TokenType.CONST,
-                    query.substring(i + 1, end)));
-
-            i = end + 1;
-            continue;
-        }
-
-        //--------------------------------------
-        // numeric literals
-        //--------------------------------------
-
-        if (Character.isDigit(c)
-                || c == '-') {
-
-            int start = i;
-
-            boolean dotFound = false;
-
-            i++;
-
-            while (i < query.length()) {
-
-                char n = query.charAt(i);
-
-                if (Character.isDigit(n)) {
-                    i++;
-                    continue;
+    
+            //--------------------------------------
+            // )
+            //--------------------------------------
+    
+            if (c == ')') {
+                result.add(
+                    new Token(
+                        TokenType.RPAREN,
+                        ")"));
+                i++;
+                continue;
+            }
+    
+            //--------------------------------------
+            // "COLUMN"
+            //--------------------------------------
+    
+            if (c == '"') {
+    
+                int end =
+                    query.indexOf('"', i + 1);
+    
+                if (end < 0) {
+                    throw new FilterExpressionException(
+                        "Missing closing double quote");
                 }
-
-                if (n == '.') {
-
-                    if (dotFound) {
-                        break;
+    
+                result.add(
+                    new Token(
+                        TokenType.COLUMN,
+                        query.substring(i + 1, end)));
+    
+                i = end + 1;
+                continue;
+            }
+    
+            //--------------------------------------
+            // 'STRING LITERAL'
+            //--------------------------------------
+    
+            if (c == '\'') {
+    
+                int end =
+                    query.indexOf('\'', i + 1);
+    
+                if (end < 0) {
+                    throw new FilterExpressionException(
+                        "Missing closing single quote");
+                }
+    
+                result.add(
+                    new Token(
+                        TokenType.LITERAL,
+                        query.substring(i + 1, end)));
+    
+                i = end + 1;
+                continue;
+            }
+    
+            //--------------------------------------
+            // numeric literals
+            //--------------------------------------
+    
+            if (Character.isDigit(c)
+                    || c == '-') {
+    
+                int start = i;
+    
+                boolean dotFound = false;
+    
+                i++;
+    
+                while (i < query.length()) {
+    
+                    char n = query.charAt(i);
+    
+                    if (Character.isDigit(n)) {
+                        i++;
+                        continue;
                     }
-
-                    dotFound = true;
-                    i++;
-                    continue;
+    
+                    if (n == '.') {
+    
+                        if (dotFound) {
+                            break;
+                        }
+    
+                        dotFound = true;
+                        i++;
+                        continue;
+                    }
+    
+                    break;
                 }
-
-                break;
+    
+                result.add(
+                    new Token(
+                        TokenType.LITERAL,
+                        query.substring(start, i)));
+    
+                continue;
             }
-
-            result.add(
-                new Token(
-                    TokenType.NUMBER,
-                    query.substring(start, i)));
-
-            continue;
+    
+            //--------------------------------------
+            // keywords
+            //--------------------------------------
+    
+            String rem =
+                query.substring(i);
+    
+            String upper =
+                rem.toUpperCase();
+    
+            if (upper.startsWith("IS NOT NULL")) {
+    
+                result.add(
+                    new Token(
+                        TokenType.IS_NOT_NULL,
+                        "IS NOT NULL"));
+    
+                i += "IS NOT NULL".length();
+                continue;
+            }
+    
+            if (upper.startsWith("IS NULL")) {
+    
+                result.add(
+                    new Token(
+                        TokenType.IS_NULL,
+                        "IS NULL"));
+    
+                i += "IS NULL".length();
+                continue;
+            }
+    
+            if (upper.startsWith("LIKE")) {
+    
+                result.add(
+                    new Token(
+                        TokenType.LIKE,
+                        "LIKE"));
+    
+                i += 4;
+                continue;
+            }
+    
+            if (upper.startsWith("AND")) {
+    
+                result.add(
+                    new Token(
+                        TokenType.AND,
+                        "AND"));
+    
+                i += 3;
+                continue;
+            }
+    
+            if (upper.startsWith("OR")) {
+    
+                result.add(
+                    new Token(
+                        TokenType.OR,
+                        "OR"));
+    
+                i += 2;
+                continue;
+            }
+    
+            if (upper.startsWith("NOT")) {
+    
+                result.add(
+                    new Token(
+                        TokenType.NOT,
+                        "NOT"));
+    
+                i += 3;
+                continue;
+            }
+    
+            //--------------------------------------
+            // true / false / null come literal
+            //--------------------------------------
+    
+            if (upper.startsWith("TRUE")) {
+    
+                result.add(
+                    new Token(
+                        TokenType.LITERAL,
+                        "true"));
+    
+                i += 4;
+                continue;
+            }
+    
+            if (upper.startsWith("FALSE")) {
+    
+                result.add(
+                    new Token(
+                        TokenType.LITERAL,
+                        "false"));
+    
+                i += 5;
+                continue;
+            }
+    
+            if (upper.startsWith("NULL")) {
+    
+                result.add(
+                    new Token(
+                        TokenType.LITERAL,
+                        "NULL"));
+    
+                i += 4;
+                continue;
+            }
+    
+            //--------------------------------------
+            // operators
+            //--------------------------------------
+    
+            if (upper.startsWith(">=")) {
+    
+                result.add(
+                    new Token(
+                        TokenType.GTE,
+                        ">="));
+    
+                i += 2;
+                continue;
+            }
+    
+            if (upper.startsWith("<=")) {
+    
+                result.add(
+                    new Token(
+                        TokenType.LTE,
+                        "<="));
+    
+                i += 2;
+                continue;
+            }
+    
+            if (upper.startsWith("!=")) {
+    
+                result.add(
+                    new Token(
+                        TokenType.NE,
+                        "!="));
+    
+                i += 2;
+                continue;
+            }
+    
+            if (upper.startsWith("=")) {
+    
+                result.add(
+                    new Token(
+                        TokenType.EQ,
+                        "="));
+    
+                i++;
+                continue;
+            }
+    
+            if (upper.startsWith(">")) {
+    
+                result.add(
+                    new Token(
+                        TokenType.GT,
+                        ">"));
+    
+                i++;
+                continue;
+            }
+    
+            if (upper.startsWith("<")) {
+    
+                result.add(
+                    new Token(
+                        TokenType.LT,
+                        "<"));
+    
+                i++;
+                continue;
+            }
+    
+            throw new FilterExpressionException(
+                "Unexpected token near: " + rem);
         }
-
-        //--------------------------------------
-        // keywords/operators
-        //--------------------------------------
-
-        String rem =
-            query.substring(i);
-
-        String upper =
-            rem.toUpperCase();
-
-        if (upper.startsWith("IS NOT NULL")) {
-
-            result.add(
-                new Token(
-                    TokenType.IS_NOT_NULL,
-                    "IS NOT NULL"));
-
-            i += "IS NOT NULL".length();
-            continue;
-        }
-
-        if (upper.startsWith("IS NULL")) {
-
-            result.add(
-                new Token(
-                    TokenType.IS_NULL,
-                    "IS NULL"));
-
-            i += "IS NULL".length();
-            continue;
-        }
-
-        if (upper.startsWith("TRUE")) {
-
-            result.add(
-                new Token(
-                    TokenType.BOOLEAN,
-                    "true"));
-
-            i += 4;
-            continue;
-        }
-
-        if (upper.startsWith("FALSE")) {
-
-            result.add(
-                new Token(
-                    TokenType.BOOLEAN,
-                    "false"));
-
-            i += 5;
-            continue;
-        }
-
-        if (upper.startsWith("NULL")) {
-
-            result.add(
-                new Token(
-                    TokenType.NULL,
-                    "NULL"));
-
-            i += 4;
-            continue;
-        }
-
-        if (upper.startsWith("LIKE")) {
-
-            result.add(
-                new Token(
-                    TokenType.LIKE,
-                    "LIKE"));
-
-            i += 4;
-            continue;
-        }
-
-        if (upper.startsWith("AND")) {
-
-            result.add(
-                new Token(
-                    TokenType.AND,
-                    "AND"));
-
-            i += 3;
-            continue;
-        }
-
-        if (upper.startsWith("OR")) {
-
-            result.add(
-                new Token(
-                    TokenType.OR,
-                    "OR"));
-
-            i += 2;
-            continue;
-        }
-
-        if (upper.startsWith("NOT")) {
-
-            result.add(
-                new Token(
-                    TokenType.NOT,
-                    "NOT"));
-
-            i += 3;
-            continue;
-        }
-
-        //--------------------------------------
-        // operators
-        //--------------------------------------
-
-        if (upper.startsWith(">=")) {
-
-            result.add(
-                new Token(
-                    TokenType.GTE,
-                    ">="));
-
-            i += 2;
-            continue;
-        }
-
-        if (upper.startsWith("<=")) {
-
-            result.add(
-                new Token(
-                    TokenType.LTE,
-                    "<="));
-
-            i += 2;
-            continue;
-        }
-
-        if (upper.startsWith("!=")) {
-
-            result.add(
-                new Token(
-                    TokenType.NE,
-                    "!="));
-
-            i += 2;
-            continue;
-        }
-
-        if (upper.startsWith("=")) {
-
-            result.add(
-                new Token(
-                    TokenType.EQ,
-                    "="));
-
-            i++;
-            continue;
-        }
-
-        if (upper.startsWith(">")) {
-
-            result.add(
-                new Token(
-                    TokenType.GT,
-                    ">"));
-
-            i++;
-            continue;
-        }
-
-        if (upper.startsWith("<")) {
-
-            result.add(
-                new Token(
-                    TokenType.LT,
-                    "<"));
-
-            i++;
-            continue;
-        }
-
-        throw new FilterExpressionException(
-            "Unexpected token near: " + rem);
+    
+        result.add(
+            new Token(
+                TokenType.EOF,
+                ""));
+    
+        return result;
     }
-
-    result.add(
-        new Token(
-            TokenType.EOF,
-            ""));
-
-    return result;
-}
 
     //------------------------------------------------------------
     // Utility
