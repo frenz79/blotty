@@ -11,7 +11,7 @@ public class StringField implements IGenericField {
 	private int hash;
 	
 	public static StringField of( String v ) {
-		return new StringField( v.getBytes() );
+		return new StringField( v.getBytes(StandardCharsets.UTF_8) );
 	}
 	
 	StringField( byte[] v ){
