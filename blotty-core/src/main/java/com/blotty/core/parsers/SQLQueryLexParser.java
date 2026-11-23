@@ -32,7 +32,7 @@ public class SQLQueryLexParser {
     private List<Token> tokens;
     private int pos;
 
-    public FilterExpression parse(
+    public QueryDefinition parse(
             ColumnsModel columns,
             String query)
             throws FilterExpressionException, RowsTypeException {
