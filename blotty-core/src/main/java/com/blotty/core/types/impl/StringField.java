@@ -41,7 +41,7 @@ public class StringField implements IGenericField {
 
 	@Override
 	public String toString() {
-		return new String(value);
+		return new String(value, StandardCharsets.UTF_8);
 	}
 
 	@Override
