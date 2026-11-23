@@ -1,7 +1,11 @@
-enum TokenType {
+private enum TokenType {
 
     COLUMN,
     CONST,
+
+    NUMBER,
+    BOOLEAN,
+    NULL,
 
     EQ,
     NE,
@@ -16,11 +20,10 @@ enum TokenType {
 
     AND,
     OR,
+    NOT,
 
     LPAREN,
     RPAREN,
 
-    LITERAL,
-    
     EOF
 }
