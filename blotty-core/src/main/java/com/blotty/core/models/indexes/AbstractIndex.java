@@ -17,7 +17,8 @@ import com.blotty.core.types.IGenericField;
 public abstract class AbstractIndex {
 
 	private final Column column;
-
+	private final IndexStatistics statistics;
+	
 	final ReadLock rLock;
 	final WriteLock wlock;
 	
@@ -33,6 +34,7 @@ public abstract class AbstractIndex {
 	public AbstractIndex(Column column) {
 		super();
 		this.column = column;
+		this.statistics = new IndexStatistics();
 		ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 		this.rLock = lock.readLock();
 		this.wlock = lock.writeLock();
