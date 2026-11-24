@@ -23,12 +23,12 @@ public class QueryPlanner {
 			List<IFilterCondition> conditions = new ConditionCollector()
 				.collect( queryDef.getFilter().getRoot() );
 	
-			AbstractIndex bestIndex = null;
+			AbstractIndex<?> bestIndex = null;
 			IFilterCondition bestCond = null;
 			long bestCardinality = Long.MAX_VALUE;
 	
 			for ( IFilterCondition cond : conditions ) {
-				for (AbstractIndex index : model.getIndexes() ) {
+				for (AbstractIndex<?> index : model.getIndexes() ) {
 					if (!index.supports(cond)) {
 						continue;
 					}

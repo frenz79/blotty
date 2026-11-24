@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.blotty.core.commons.exceptions.RowsTypeException;
-import com.blotty.core.models.indexes.AbstractIndex;
 import com.blotty.core.types.FieldType;
 import com.blotty.core.types.IGenericField;
 import com.blotty.core.types.impl.BooleanField;
@@ -28,7 +27,6 @@ public final class Column {
 	private Map<String,Object> properties;
 	private final Map<String,StringField> stringFieldsCache = new ConcurrentHashMap<>();
 	
-	private AbstractIndex searchIndex;
 	private final ColumnStatistics statistics;
 	
 	public Column( String n, boolean isKey ){
