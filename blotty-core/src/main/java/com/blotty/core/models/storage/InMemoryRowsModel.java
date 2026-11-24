@@ -37,8 +37,8 @@ public class InMemoryRowsModel extends AbstractRowsModel {
 		IGenericField key = getKey(row);
 		wlock.lock();
 		try {
-			if ( this.rowsByKey.containsKey(key) ) {
-				throw new RowsModelException(String.format("Duplicated key:%s", key));
+			if ( !this.rowsByKey.containsKey(key) ) {
+				throw new RowsModelException(String.format("Cannot find row with key:%s", key));
 			}
 			this.rowsByKey.remove(key);
 			this.rows.remove(row);
