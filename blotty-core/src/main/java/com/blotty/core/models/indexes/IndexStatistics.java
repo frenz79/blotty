@@ -6,6 +6,8 @@ public class IndexStatistics {
 
     long nullRows;
 
-    double selectivity(
-        IGenericField value);
+    double selectivity( IGenericField value){
+        avgBucketSize =
+    notNullRows / distinctValue
+    }
 }
