@@ -16,10 +16,10 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import com.blotty.core.commons.exceptions.FilterExpressionException;
-import com.blotty.core.models.Column;
-import com.blotty.core.models.ColumnsModel;
-import com.blotty.core.models.Row;
+import com.blotty.core.models.columns.Column;
+import com.blotty.core.models.columns.ColumnsModel;
 import com.blotty.core.models.query.QueryDefinition;
+import com.blotty.core.models.rows.Row;
 import com.blotty.core.modifiers.filters.FilterExpression;
 import com.blotty.core.modifiers.filters.conditions.AndCondition;
 import com.blotty.core.modifiers.filters.conditions.NotCondition;

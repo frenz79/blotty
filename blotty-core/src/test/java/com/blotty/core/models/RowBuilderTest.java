@@ -6,6 +6,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.Test;
 
 import com.blotty.core.commons.exceptions.RowsModelException;
+import com.blotty.core.models.columns.Column;
+import com.blotty.core.models.columns.ColumnsModel;
+import com.blotty.core.models.rows.Row;
 import com.blotty.core.models.storage.InMemoryRowsModel;
 import com.blotty.core.types.FieldType;
 

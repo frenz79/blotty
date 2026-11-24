@@ -6,12 +6,16 @@ import java.util.concurrent.ConcurrentHashMap;
 import com.blotty.core.commons.IListener;
 import com.blotty.core.commons.exceptions.FilterExpressionException;
 import com.blotty.core.commons.exceptions.RowsModelException;
-import com.blotty.core.models.RowEvent.RowAction;
 import com.blotty.core.models.query.QueryDefinition;
+import com.blotty.core.models.rows.AbstractRowEvent;
+import com.blotty.core.models.rows.AbstractRowEvent.RowAction;
+import com.blotty.core.models.rows.Row;
+import com.blotty.core.models.rows.RowEvent;
+import com.blotty.core.models.rows.RowEventBatch;
 
 public class DataModel extends AbstractDataModel {
 	
-	private Map<String,IListener<RowEvent>> rowsEventListeners = new ConcurrentHashMap<>();
+	private Map<String,IListener<AbstractRowEvent>> rowsEventListeners = new ConcurrentHashMap<>();
 	
 	public DataModel( AbstractRowsModel rowsModel ) {
 		super(rowsModel);
@@ -27,6 +31,20 @@ public class DataModel extends AbstractDataModel {
 	}
 	
 	@Override
+	public AbstractDataModel delRow(Row r) throws RowsModelException {
+		super.delRow(r);
+		fireDataModelChanged( new RowEvent(RowAction.DEL, r) );
+		return this;
+	}
+	
+	@Override
+	public AbstractDataModel updRow(Row r, Row r1) throws RowsModelException {
+		super.updRow(r, r1);
+		fireDataModelChanged( new RowEvent(RowAction.UPD, r) );
+		return this;
+	}
+	
+	@Override
 	public AbstractDataModel addRow(Row r) throws RowsModelException {
 		super.addRow(r);
 		fireDataModelChanged( new RowEvent(RowAction.ADD, r) );
@@ -36,19 +54,17 @@ public class DataModel extends AbstractDataModel {
 	@Override
 	public AbstractDataModel addRows(Row ...rows) throws RowsModelException {
 		super.addRows(rows);
-		for (Row r : rows) {
-			fireDataModelChanged( new RowEvent(RowAction.ADD, r) );
-		}
+		fireDataModelChanged( new RowEventBatch(RowAction.ADD) );
 		return this;
 	}	
 	
-	private void fireDataModelChanged( RowEvent event ) {
-		for( IListener<RowEvent> l : this.rowsEventListeners.values() ) {
+	private void fireDataModelChanged( AbstractRowEvent event ) {
+		for( IListener<AbstractRowEvent> l : this.rowsEventListeners.values() ) {
 			l.onEvent(event);
 		}
 	}
 	
-	public void addRowsListener( String id, IListener<RowEvent> listener ) {
+	public void addRowsListener( String id, IListener<AbstractRowEvent> listener ) {
 		this.rowsEventListeners.put(id, listener);
 	}
 

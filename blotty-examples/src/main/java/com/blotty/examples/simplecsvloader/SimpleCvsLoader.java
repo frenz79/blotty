@@ -6,14 +6,14 @@ import java.io.Reader;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 
-import com.blotty.core.models.Column;
-import com.blotty.core.models.ColumnsModel;
 import com.blotty.core.models.DataModel;
 import com.blotty.core.models.DataModelView;
-import com.blotty.core.models.Row;
+import com.blotty.core.models.columns.Column;
+import com.blotty.core.models.columns.ColumnsModel;
+import com.blotty.core.models.query.QueryDefinition;
+import com.blotty.core.models.rows.Row;
 import com.blotty.core.models.storage.InMemoryRowsModel;
 import com.blotty.core.modifiers.filters.FilterExpression;
-import com.blotty.core.modifiers.filters.FilterExpressionBuilder;
 import com.blotty.core.modifiers.filters.conditions.Operand;
 import com.blotty.core.modifiers.filters.conditions.binary.BinaryCondition;
 import com.blotty.core.modifiers.sorters.SorterExpressionBuilder;
@@ -37,7 +37,7 @@ public class SimpleCvsLoader {
 		
 		DataModel dataModel = new DataModel( new InMemoryRowsModel(colModel) );
 		
-		Reader in = new FileReader("src/main/resources/organizations-10000.csv");
+		Reader in = new FileReader("src/test/resources/organizations-10000.csv");
 		Iterable<CSVRecord> records = CSVFormat.DEFAULT.parse(in);
 		int rowNumber = 0;
 		for (CSVRecord record : records) {
@@ -52,13 +52,13 @@ public class SimpleCvsLoader {
 		
 		System.out.println("Model size:"+dataModel.getRowsCount());
 				
-		FilterExpression filter = new FilterExpressionBuilder()
+		FilterExpression filter = FilterExpression.newBuilder()
 			.begin(	BinaryCondition.Equal(Operand.of(colModel.getColumn("Country")), Operand.of("Italy"))) 
 			.and( BinaryCondition.GreaterThanEqual(Operand.of(colModel.getColumn("Number of employees")), Operand.of(5000))) 
 			.and( BinaryCondition.Like(Operand.of(colModel.getColumn("Industry")), Operand.of("Engineering")))
 		.build();
 		
-		DataModelView view = dataModel.createView("ItalianOrganizations", filter);
+		DataModelView view = dataModel.createView("ItalianOrganizations", new QueryDefinition(filter,null));
 		
 		System.out.println(view.dumpToString());
 		

@@ -1,4 +1,4 @@
-package com.blotty.core.models;
+package com.blotty.core.models.columns;
 
 import java.util.ArrayList;
 import java.util.Collection;

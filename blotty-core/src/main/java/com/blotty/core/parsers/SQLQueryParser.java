@@ -13,8 +13,8 @@ import java.util.List;
 
 import com.blotty.core.commons.exceptions.FilterExpressionException;
 import com.blotty.core.commons.exceptions.RowsTypeException;
-import com.blotty.core.models.Column;
-import com.blotty.core.models.ColumnsModel;
+import com.blotty.core.models.columns.Column;
+import com.blotty.core.models.columns.ColumnsModel;
 import com.blotty.core.models.query.QueryDefinition;
 import com.blotty.core.modifiers.filters.FilterExpression;
 import com.blotty.core.modifiers.filters.conditions.AndCondition;

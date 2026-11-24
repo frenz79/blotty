@@ -5,6 +5,8 @@ import java.util.Comparator;
 import com.blotty.core.commons.IConsumer;
 import com.blotty.core.commons.exceptions.FilterExpressionException;
 import com.blotty.core.commons.exceptions.RowsModelException;
+import com.blotty.core.models.columns.ColumnsModel;
+import com.blotty.core.models.rows.Row;
 import com.blotty.core.types.IGenericField;
 
 public abstract class AbstractRowsModel {

@@ -9,15 +9,15 @@ import com.blotty.core.commons.IConsumer;
 import com.blotty.core.commons.exceptions.FilterExpressionException;
 import com.blotty.core.commons.exceptions.RowsModelException;
 import com.blotty.core.models.AbstractRowsModel;
-import com.blotty.core.models.Column;
-import com.blotty.core.models.Row;
+import com.blotty.core.models.columns.Column;
+import com.blotty.core.models.rows.Row;
 import com.blotty.core.modifiers.filters.conditions.IFilterCondition;
 import com.blotty.core.types.IGenericField;
 
-public abstract class AbstractIndex {
+public abstract class AbstractIndex<S extends IndexStatistics> {
 
 	private final Column column;
-	private final IndexStatistics statistics;
+	private final S statistics;
 	
 	final ReadLock rLock;
 	final WriteLock wlock;
@@ -31,10 +31,10 @@ public abstract class AbstractIndex {
 		return lookup(c).size();
 	}
 	
-	public AbstractIndex(Column column) {
+	public AbstractIndex(Column column, S statistics) {
 		super();
 		this.column = column;
-		this.statistics = new IndexStatistics();
+		this.statistics = statistics;
 		ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 		this.rLock = lock.readLock();
 		this.wlock = lock.writeLock();
@@ -95,5 +95,8 @@ public abstract class AbstractIndex {
 	
 	private IGenericField getKey(Row r) {
 		return r.getFields()[getColumn().getId()];
+	}
+	public S getStatistics() {
+		return statistics;
 	}
 }

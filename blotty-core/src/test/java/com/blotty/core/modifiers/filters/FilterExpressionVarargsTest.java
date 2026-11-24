@@ -9,9 +9,9 @@ import org.junit.jupiter.api.Test;
 import com.blotty.core.commons.exceptions.ColumnsModelException;
 import com.blotty.core.commons.exceptions.FilterExpressionException;
 import com.blotty.core.commons.exceptions.RowsTypeException;
-import com.blotty.core.models.Column;
-import com.blotty.core.models.ColumnsModel;
-import com.blotty.core.models.Row;
+import com.blotty.core.models.columns.Column;
+import com.blotty.core.models.columns.ColumnsModel;
+import com.blotty.core.models.rows.Row;
 import com.blotty.core.modifiers.filters.conditions.IFilterCondition;
 import com.blotty.core.modifiers.filters.conditions.Operand;
 import com.blotty.core.modifiers.filters.conditions.binary.BinaryCondition;
@@ -43,9 +43,9 @@ class FilterExpressionVarargsTest {
 		IFilterCondition cond2 = BinaryCondition.Equal(Operand.of(c2), Operand.of("B"));
 		FilterExpression expr = FilterExpression.newBuilder().begin(cond1).and(cond2).build();
 
-		Row match = new Row(colModel).set(colModel.getKey(), "K1").set(c1, "A").set(c2, "B").set(c3, "C");
-		Row mismatch1 = new Row(colModel).set(colModel.getKey(), "K2").set(c1, "X").set(c2, "B").set(c3, "C");
-		Row mismatch2 = new Row(colModel).set(colModel.getKey(), "K3").set(c1, "A").set(c2, "X").set(c3, "C");
+		Row match = Row.newBuilder(colModel).set(colModel.getKey(), "K1").set(c1, "A").set(c2, "B").set(c3, "C").build();
+		Row mismatch1 = Row.newBuilder(colModel).set(colModel.getKey(), "K2").set(c1, "X").set(c2, "B").set(c3, "C").build();
+		Row mismatch2 = Row.newBuilder(colModel).set(colModel.getKey(), "K3").set(c1, "A").set(c2, "X").set(c3, "C").build();
 
 		assertTrue(expr.apply(match));
 		assertFalse(expr.apply(mismatch1));

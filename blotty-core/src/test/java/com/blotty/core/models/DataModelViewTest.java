@@ -4,7 +4,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 
+import com.blotty.core.models.columns.Column;
+import com.blotty.core.models.columns.ColumnsModel;
 import com.blotty.core.models.query.QueryDefinition;
+import com.blotty.core.models.rows.Row;
 import com.blotty.core.models.storage.InMemoryRowsModel;
 import com.blotty.core.modifiers.filters.FilterExpression;
 import com.blotty.core.modifiers.filters.conditions.Operand;

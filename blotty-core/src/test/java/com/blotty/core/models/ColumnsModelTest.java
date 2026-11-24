@@ -4,7 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 
-import com.blotty.core.models.ColumnsModel.Builder;
+import com.blotty.core.models.columns.Column;
+import com.blotty.core.models.columns.ColumnsModel;
+import com.blotty.core.models.columns.ColumnsModel.Builder;
 import com.blotty.core.types.FieldType;
 
 class ColumnsModelTest {

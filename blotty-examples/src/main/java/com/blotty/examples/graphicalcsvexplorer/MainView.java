@@ -36,9 +36,9 @@ import javax.swing.table.TableCellRenderer;
 import com.blotty.core.commons.IConsumer;
 import com.blotty.core.commons.exceptions.RowsModelException;
 import com.blotty.core.models.AbstractDataModel;
-import com.blotty.core.models.Column;
-import com.blotty.core.models.ColumnsModel;
-import com.blotty.core.models.Row;
+import com.blotty.core.models.columns.Column;
+import com.blotty.core.models.columns.ColumnsModel;
+import com.blotty.core.models.rows.Row;
 
 public class MainView extends JFrame {
 

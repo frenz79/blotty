@@ -8,8 +8,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 import com.blotty.core.commons.IConsumer;
 import com.blotty.core.commons.exceptions.FilterExpressionException;
 import com.blotty.core.commons.exceptions.RowsModelException;
+import com.blotty.core.models.columns.Column;
+import com.blotty.core.models.columns.ColumnsModel;
 import com.blotty.core.models.indexes.AbstractIndex;
 import com.blotty.core.models.indexes.HashIndex;
+import com.blotty.core.models.rows.Row;
 import com.blotty.core.types.IGenericField;
 
 public abstract class AbstractDataModel {
@@ -17,7 +20,7 @@ public abstract class AbstractDataModel {
 	private final String id;
 	private final ColumnsModel columnsModel;
 	private final AbstractRowsModel rowsModel;
-	private final List<HashIndex> indexes;
+	private final List<AbstractIndex<?>> indexes;
 	
 	public AbstractDataModel( String id, AbstractRowsModel rowsModel ) {
 		this.id = id;
@@ -33,37 +36,71 @@ public abstract class AbstractDataModel {
 	public Row getRow(int i) {
 		return rowsModel.getRow(i);
 	}
-	
-	public AbstractDataModel updRow(Row oldR, Row newR) throws RowsModelException {
-		rowsModel.updRow(oldR, newR);
-		for ( AbstractIndex idx : indexes ) {
-			idx.update(oldR, newR);
-		}
-		return this;
-	}
-	
-	private void updateIndexes(Row ...rows) {
-		for ( Row r : rows ) {
-			for ( AbstractIndex idx : indexes ) {
-				idx.insert(r);
+		
+	private void updateStats(Row newR, Row oldR) {
+		for ( int i=0; i<getColumnsModel().getColumnsCount(); i++) {
+			if ( newR.getFields()[i].isNull() ) {
+				getColumnsModel().getColumn(i).getStatistics().incNullValues();
+			} else {
+				getColumnsModel().getColumn(i).getStatistics().incNotNullValues();
+			}
+			if (oldR!=null) {
+				if ( oldR.getFields()[i].isNull() ) {
+					getColumnsModel().getColumn(i).getStatistics().incNullValues();
+				} else {
+					getColumnsModel().getColumn(i).getStatistics().incNotNullValues();
+				}
 			}
 		}
 	}
-		
+
+	private void updateIndexesAndStats(Row ...rows) {
+		for ( Row r : rows ) {
+			for ( AbstractIndex<?> idx : indexes ) {
+				idx.insert(r);
+			}
+			updateStats(r, null);
+		}
+	}
+	
 	public AbstractDataModel addRow(Row r) throws RowsModelException {
 		rowsModel.addRow(r);
-		updateIndexes(r);
+		updateIndexesAndStats(r);
 		return this;
 	}
 	
 	public AbstractDataModel addRows(Row ...r) throws RowsModelException {
 		rowsModel.addRows(r);
-		updateIndexes(r);
+		updateIndexesAndStats(r);
 		return this;
 	}
 
 	public AbstractDataModel addRow(Row.Builder r) throws RowsModelException {
 		return addRow(r.build());
+	}
+	
+	public AbstractDataModel updRow(Row oldR, Row newR) throws RowsModelException {
+		rowsModel.updRow(oldR, newR);
+		for ( AbstractIndex<?> idx : indexes ) {
+			idx.update(oldR, newR);			
+			updateStats(newR, oldR);
+		}
+		return this;
+	}
+	
+	public AbstractDataModel delRow(Row r) throws RowsModelException {
+		rowsModel.delRow(r);
+		for ( AbstractIndex<?> idx : indexes ) {
+			idx.delete(r);			
+			for ( int i=0; i<getColumnsModel().getColumnsCount(); i++) {
+				if ( r.getFields()[i].isNull() ) {
+					getColumnsModel().getColumn(i).getStatistics().decNullValues();
+				} else {
+					getColumnsModel().getColumn(i).getStatistics().decNotNullValues();
+				}
+			}
+		}
+		return this;
 	}
 	
 	public int getRowsCount() {
@@ -88,11 +125,10 @@ public abstract class AbstractDataModel {
 	
 	public void addIndex(HashIndex i) throws RowsModelException, FilterExpressionException {
 		this.indexes.add(i);
-		i.getColumn().setSearchIndex(i);
 		i.build(rowsModel);
 	}
 	
-	public List<HashIndex> getIndexes() {
+	public List<AbstractIndex<?>> getIndexes() {
 		return indexes;
 	}
 	

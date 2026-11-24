@@ -12,13 +12,15 @@ import com.blotty.core.commons.exceptions.ColumnsModelException;
 import com.blotty.core.commons.exceptions.FilterExpressionException;
 import com.blotty.core.commons.exceptions.RowsModelException;
 import com.blotty.core.commons.exceptions.RowsTypeException;
-import com.blotty.core.models.Column;
-import com.blotty.core.models.ColumnsModel;
 import com.blotty.core.models.DataModel;
 import com.blotty.core.models.DataModelView;
-import com.blotty.core.models.Row;
+import com.blotty.core.models.columns.Column;
+import com.blotty.core.models.columns.ColumnsModel;
+import com.blotty.core.models.query.QueryDefinition;
+import com.blotty.core.models.rows.Row;
+import com.blotty.core.models.rows.Row.Builder;
 import com.blotty.core.models.storage.InMemoryRowsModel;
-import com.blotty.core.modifiers.filters.FilterExpressionBuilder;
+import com.blotty.core.modifiers.filters.FilterExpression;
 import com.blotty.core.modifiers.filters.conditions.Operand;
 import com.blotty.core.modifiers.filters.conditions.binary.BinaryCondition;
 import com.blotty.core.modifiers.sorters.SorterExpressionBuilder;
@@ -56,7 +58,7 @@ public class MainViewController {
 				dataModel = new DataModel( new InMemoryRowsModel(colModel) );
 				view.setTableColumns( colModel );
 			} else {
-				Row row = new Row(colModel);
+				Builder row = Row.newBuilder(colModel);
 				row.set(colModel.getKey(), String.valueOf(recordNumber));
 				for ( int i=0; i<record.size(); i++ ) {
 					row.set(colModel.getColumn(i + 1), record.get(i));
@@ -81,21 +83,21 @@ public class MainViewController {
 		Column col = dataModel.getColumnsModel().getColumn(colId);
 		
 		DataModelView sortedView = dataModel.createView("Sort:"+col.getName(), 
-			(ascending)?
+				new QueryDefinition(null,(ascending)?				
 				new SorterExpressionBuilder(dataModel.getColumnsModel())
 					.AscNullLast(col.getName()) 
 					.build()
 				:
 				new SorterExpressionBuilder(dataModel.getColumnsModel())
 					.DescNullLast(col.getName()) 
-					.build()
+					.build())
 		);
 		
 		view.setTableData( sortedView );
 	}
 
 	public void applyFilter(String colName, String operator, String value) throws RowsModelException, FilterExpressionException {	
-		FilterExpressionBuilder filterBuilder = new FilterExpressionBuilder();
+		com.blotty.core.modifiers.filters.FilterExpression.Builder filterBuilder = FilterExpression.newBuilder();
 		
 		if ("=".equals(operator)) {
 			filterBuilder.begin( BinaryCondition.Equal(Operand.of(dataModel.getColumnsModel().getColumn(colName)), Operand.of(value)));
@@ -122,7 +124,7 @@ public class MainViewController {
 			filterBuilder.begin( BinaryCondition.NotLike(Operand.of(dataModel.getColumnsModel().getColumn(colName)), Operand.of(value)));
 		}
 		
-		DataModelView filteredView = dataModel.createView("ItalianOrganizations", filterBuilder.build());
+		DataModelView filteredView = dataModel.createView("ItalianOrganizations", new QueryDefinition( filterBuilder.build(), null));
 		view.setTableData( filteredView );
 	}
 }

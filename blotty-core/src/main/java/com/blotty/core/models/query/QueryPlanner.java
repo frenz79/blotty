@@ -6,9 +6,9 @@ import com.blotty.core.commons.IConsumer;
 import com.blotty.core.commons.exceptions.FilterExpressionException;
 import com.blotty.core.commons.exceptions.RowsModelException;
 import com.blotty.core.models.AbstractDataModel;
-import com.blotty.core.models.Row;
 import com.blotty.core.models.indexes.AbstractIndex;
 import com.blotty.core.models.query.QueryPlan.RowSet;
+import com.blotty.core.models.rows.Row;
 import com.blotty.core.modifiers.filters.conditions.AndCondition;
 import com.blotty.core.modifiers.filters.conditions.IFilterCondition;
 

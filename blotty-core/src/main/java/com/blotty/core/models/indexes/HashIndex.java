@@ -10,19 +10,19 @@ import java.util.Set;
 import com.blotty.core.commons.IConsumer;
 import com.blotty.core.commons.exceptions.FilterExpressionException;
 import com.blotty.core.commons.exceptions.RowsModelException;
-import com.blotty.core.models.Column;
-import com.blotty.core.models.Row;
+import com.blotty.core.models.columns.Column;
+import com.blotty.core.models.rows.Row;
 import com.blotty.core.modifiers.filters.conditions.IFilterCondition;
 import com.blotty.core.modifiers.filters.conditions.binary.BinaryCondition;
 import com.blotty.core.modifiers.filters.conditions.binary.operators.Equal;
 import com.blotty.core.types.IGenericField;
 
-public class HashIndex extends AbstractIndex {
+public class HashIndex extends AbstractIndex<HashIndexStatistics> {
 
 	private final Map<IGenericField,Set<Row>> index = new HashMap<>();
 		
 	public HashIndex( Column column ) {
-		super(column);
+		super(column, new HashIndexStatistics());
 	}
 
 	public void stream(IGenericField searchVal, IConsumer<Row> iConsumer) throws RowsModelException, FilterExpressionException {
@@ -71,6 +71,8 @@ public class HashIndex extends AbstractIndex {
 			}
 			return v;
 		}).add(r);
+		// Update stats
+		getStatistics().setDistinctValues(index.size());
 	}
 
 	@Override
@@ -83,6 +85,8 @@ public class HashIndex extends AbstractIndex {
 		rows.remove(r);
 		if (rows.isEmpty()) {
 			index.remove(key);
-		}		
+		}
+		// Update stats
+		getStatistics().setDistinctValues(index.size());
 	}
 }

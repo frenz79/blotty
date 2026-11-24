@@ -1,7 +1,7 @@
 package com.blotty.core.modifiers.filters.conditions.binary;
 
 import com.blotty.core.commons.exceptions.FilterExpressionException;
-import com.blotty.core.models.Row;
+import com.blotty.core.models.rows.Row;
 import com.blotty.core.modifiers.filters.conditions.IFilterCondition;
 import com.blotty.core.modifiers.filters.conditions.Operand;
 import com.blotty.core.modifiers.filters.conditions.binary.operators.Equal;

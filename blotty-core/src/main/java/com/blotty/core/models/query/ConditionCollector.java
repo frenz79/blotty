@@ -27,7 +27,7 @@ public class ConditionCollector {
 			visit(or.getRight(), result);
 			return;
 		}
-		if (node instanceof NotCondition not) {
+		if (node instanceof NotCondition) {
 			// visit(not.getCondition(), result);
 			// NOT subtrees are not indexable:
 			// Avoid NOT STATUS='OPEN' to use HashIndex(STATUS)='OPEN'

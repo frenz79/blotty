@@ -1,11 +1,11 @@
-package com.blotty.core.models;
+package com.blotty.core.models.columns;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.blotty.core.commons.exceptions.RowsTypeException;
-import com.blotty.core.models.indexes.HashIndex;
+import com.blotty.core.models.indexes.AbstractIndex;
 import com.blotty.core.types.FieldType;
 import com.blotty.core.types.IGenericField;
 import com.blotty.core.types.impl.BooleanField;
@@ -28,11 +28,13 @@ public final class Column {
 	private Map<String,Object> properties;
 	private final Map<String,StringField> stringFieldsCache = new ConcurrentHashMap<>();
 	
-	private HashIndex searchIndex;
+	private AbstractIndex searchIndex;
+	private final ColumnStatistics statistics;
 	
 	public Column( String n, boolean isKey ){
 		this.name = n;
 		this.isKey = isKey;
+		this.statistics = new ColumnStatistics();
 	}
 	
 	public int getId() {
@@ -239,11 +241,7 @@ public final class Column {
 		}
 	}
 
-	public HashIndex getSearchIndex() {
-		return searchIndex;
-	}
-
-	public void setSearchIndex(HashIndex searchIndex) {
-		this.searchIndex = searchIndex;
+	public ColumnStatistics getStatistics() {
+		return statistics;
 	}
 }

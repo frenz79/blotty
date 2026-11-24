@@ -8,13 +8,15 @@ import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.Test;
 
 import com.blotty.core.commons.IConsumer;
+import com.blotty.core.models.columns.Column;
+import com.blotty.core.models.columns.ColumnsModel;
 import com.blotty.core.models.query.QueryDefinition;
+import com.blotty.core.models.rows.Row;
 import com.blotty.core.models.storage.InMemoryRowsModel;
 import com.blotty.core.modifiers.filters.FilterExpression;
 import com.blotty.core.modifiers.filters.conditions.Operand;
 import com.blotty.core.modifiers.filters.conditions.binary.BinaryCondition;
 import com.blotty.core.types.FieldType;
-import com.blotty.core.types.impl.StringField;
 
 class DataModelTest {
 
@@ -28,20 +30,20 @@ class DataModelTest {
 				
 		// Adding rows using addRow from model
 		DataModel dataModel = (DataModel) new DataModel( new InMemoryRowsModel(colModel) )
-			.addRow( new Row(colModel)
+			.addRow( Row.newBuilder(colModel)
 				.set(colModel.getKey(), "KEY_1")
 				.set(colModel.getColumn("COL_1"), "V1_1")
 				.set(colModel.getColumn("COL_2"), "V1_2")
 			)
-			.addRow( new Row(colModel)
+			.addRow( Row.newBuilder(colModel)
 				.set(colModel.getKey(), "KEY_2")
 				.set(colModel.getColumn("COL_1"), "V2_1")
 				.set(colModel.getColumn("COL_2"), "V2_2")
 			)
-			.addRow( new Row(colModel)
+			.addRow( Row.newBuilder(colModel)
 				.set(colModel.getKey(), "KEY_3")
-				.set(colModel.getColumn("COL_1"), StringField.of("V3_1"))
-				.set(colModel.getColumn("COL_2"), StringField.of("V3_2"))
+				.set(colModel.getColumn("COL_1"), "V3_1")
+				.set(colModel.getColumn("COL_2"), "V3_2")
 			)			
 		;
 		

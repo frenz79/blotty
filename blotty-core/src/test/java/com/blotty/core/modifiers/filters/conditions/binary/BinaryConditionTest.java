@@ -9,12 +9,11 @@ import org.junit.jupiter.api.Test;
 import com.blotty.core.commons.exceptions.ColumnsModelException;
 import com.blotty.core.commons.exceptions.FilterExpressionException;
 import com.blotty.core.commons.exceptions.RowsTypeException;
-import com.blotty.core.models.Column;
-import com.blotty.core.models.ColumnsModel;
-import com.blotty.core.models.Row;
+import com.blotty.core.models.columns.Column;
+import com.blotty.core.models.columns.ColumnsModel;
+import com.blotty.core.models.rows.Row;
 import com.blotty.core.modifiers.filters.conditions.Operand;
 import com.blotty.core.types.FieldType;
-import com.blotty.core.types.impl.NullField;
 
 class BinaryConditionTest {
 
@@ -43,9 +42,9 @@ class BinaryConditionTest {
 		BinaryCondition condLess = BinaryCondition.LesserThan(Operand.of(colA), Operand.of(colB));
 		BinaryCondition condGreater = BinaryCondition.GreaterThan(Operand.of(colA), Operand.of(colB));
 
-		Row r1 = new Row(colModel).set(colModel.getKey(), "K1").set(colA, 10).set(colB, 10);
-		Row r2 = new Row(colModel).set(colModel.getKey(), "K2").set(colA, 5).set(colB, 10);
-		Row r3 = new Row(colModel).set(colModel.getKey(), "K3").set(colA, 15).set(colB, 10);
+		Row r1 = Row.newBuilder(colModel).set(colModel.getKey(), "K1").set(colA, 10).set(colB, 10).build();
+		Row r2 = Row.newBuilder(colModel).set(colModel.getKey(), "K2").set(colA, 5).set(colB, 10).build();
+		Row r3 = Row.newBuilder(colModel).set(colModel.getKey(), "K3").set(colA, 15).set(colB, 10).build();
 
 		assertTrue(condEqual.apply(r1));
 		assertFalse(condEqual.apply(r2));
@@ -65,9 +64,9 @@ class BinaryConditionTest {
 		BinaryCondition colVsConst = BinaryCondition.GreaterThanEqual(Operand.of(colA), Operand.of("10", colA));
 		BinaryCondition constVsCol = BinaryCondition.LesserThanEqual(Operand.of("10", colA), Operand.of(colA));
 
-		Row r1 = new Row(colModel).set(colModel.getKey(), "K1").set(colA, 10);
-		Row r2 = new Row(colModel).set(colModel.getKey(), "K2").set(colA, 9);
-		Row r3 = new Row(colModel).set(colModel.getKey(), "K3").set(colA, 11);
+		Row r1 = Row.newBuilder(colModel).set(colModel.getKey(), "K1").set(colA, 10).build();
+		Row r2 = Row.newBuilder(colModel).set(colModel.getKey(), "K2").set(colA, 9).build();
+		Row r3 = Row.newBuilder(colModel).set(colModel.getKey(), "K3").set(colA, 11).build();
 
 		assertTrue(colVsConst.apply(r1));
 		assertFalse(colVsConst.apply(r2));
@@ -83,9 +82,9 @@ class BinaryConditionTest {
 		BinaryCondition like = BinaryCondition.Like(Operand.of(colText), Operand.of("World"));
 		BinaryCondition notLike = BinaryCondition.NotLike(Operand.of(colText), Operand.of("World"));
 
-		Row rMatch = new Row(colModel).set(colModel.getKey(), "K1").set(colText, "Hello World!");
-		Row rNoMatch = new Row(colModel).set(colModel.getKey(), "K2").set(colText, "Hello Java!");
-		Row rNull = new Row(colModel).set(colModel.getKey(), "K3").set(colText, NullField.NULL);
+		Row rMatch = Row.newBuilder(colModel).set(colModel.getKey(), "K1").set(colText, "Hello World!").build();
+		Row rNoMatch = Row.newBuilder(colModel).set(colModel.getKey(), "K2").set(colText, "Hello Java!").build();
+		Row rNull = Row.newBuilder(colModel).set(colModel.getKey(), "K3").setNull(colText).build();
 
 		assertTrue(like.apply(rMatch));
 		assertFalse(like.apply(rNoMatch));
@@ -105,9 +104,9 @@ class BinaryConditionTest {
 		BinaryCondition lt = BinaryCondition.LesserThan(Operand.of(colA), Operand.of(10));
 		BinaryCondition lte = BinaryCondition.LesserThanEqual(Operand.of(colA), Operand.of(10));
 
-		Row r10 = new Row(colModel).set(colModel.getKey(), "K1").set(colA, 10);
-		Row r5 = new Row(colModel).set(colModel.getKey(), "K2").set(colA, 5);
-		Row r15 = new Row(colModel).set(colModel.getKey(), "K3").set(colA, 15);
+		Row r10 = Row.newBuilder(colModel).set(colModel.getKey(), "K1").set(colA, 10).build();
+		Row r5 = Row.newBuilder(colModel).set(colModel.getKey(), "K2").set(colA, 5).build();
+		Row r15 = Row.newBuilder(colModel).set(colModel.getKey(), "K3").set(colA, 15).build();
 
 		assertTrue(eq.apply(r10));
 		assertFalse(eq.apply(r5));

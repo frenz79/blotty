@@ -9,9 +9,9 @@ import org.junit.jupiter.api.Test;
 import com.blotty.core.commons.exceptions.ColumnsModelException;
 import com.blotty.core.commons.exceptions.RowsModelException;
 import com.blotty.core.commons.exceptions.RowsTypeException;
-import com.blotty.core.models.Column;
-import com.blotty.core.models.ColumnsModel;
-import com.blotty.core.models.Row;
+import com.blotty.core.models.columns.Column;
+import com.blotty.core.models.columns.ColumnsModel;
+import com.blotty.core.models.rows.Row;
 import com.blotty.core.types.FieldType;
 import com.blotty.core.types.impl.StringField;
 
@@ -31,8 +31,8 @@ class InMemoryRowsModelTest {
 
 	@Test
 	void testAddAndGetRows() throws RowsModelException, RowsTypeException {
-		Row r1 = new Row(colModel).set(colModel.getKey(), "1").set(colModel.getColumn("NAME"), "Alice");
-		Row r2 = new Row(colModel).set(colModel.getKey(), "2").set(colModel.getColumn("NAME"), "Bob");
+		Row r1 = Row.newBuilder(colModel).set(colModel.getKey(), "1").set(colModel.getColumn("NAME"), "Alice").build();
+		Row r2 = Row.newBuilder(colModel).set(colModel.getKey(), "2").set(colModel.getColumn("NAME"), "Bob").build();
 
 		rowsModel.addRow(r1);
 		rowsModel.addRow(r2);
@@ -48,8 +48,8 @@ class InMemoryRowsModelTest {
 
 	@Test
 	void testDuplicateKeyException() throws RowsModelException, RowsTypeException {
-		Row r1 = new Row(colModel).set(colModel.getKey(), "1").set(colModel.getColumn("NAME"), "Alice");
-		Row rDuplicate = new Row(colModel).set(colModel.getKey(), "1").set(colModel.getColumn("NAME"), "Alice Clone");
+		Row r1 = Row.newBuilder(colModel).set(colModel.getKey(), "1").set(colModel.getColumn("NAME"), "Alice").build();
+		Row rDuplicate = Row.newBuilder(colModel).set(colModel.getKey(), "1").set(colModel.getColumn("NAME"), "Alice Clone").build();
 
 		rowsModel.addRow(r1);
 		assertThrows(RowsModelException.class, () -> rowsModel.addRow(rDuplicate));

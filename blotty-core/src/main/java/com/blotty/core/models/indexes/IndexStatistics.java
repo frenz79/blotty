@@ -1,13 +1,5 @@
-public class IndexStatistics {
+package com.blotty.core.models.indexes;
 
-    long distinctValues;
+public interface IndexStatistics {
 
-    long totalRows;
-
-    long nullRows;
-
-    double selectivity( IGenericField value){
-        avgBucketSize =
-    notNullRows / distinctValue
-    }
 }

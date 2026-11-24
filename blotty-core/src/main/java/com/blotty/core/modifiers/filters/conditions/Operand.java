@@ -1,7 +1,7 @@
 package com.blotty.core.modifiers.filters.conditions;
 
 import com.blotty.core.commons.exceptions.RowsTypeException;
-import com.blotty.core.models.Column;
+import com.blotty.core.models.columns.Column;
 import com.blotty.core.types.IGenericField;
 import com.blotty.core.types.impl.BooleanField;
 import com.blotty.core.types.impl.IntegerField;

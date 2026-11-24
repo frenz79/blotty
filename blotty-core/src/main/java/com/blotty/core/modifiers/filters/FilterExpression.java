@@ -3,7 +3,7 @@ package com.blotty.core.modifiers.filters;
 import java.awt.IllegalComponentStateException;
 
 import com.blotty.core.commons.exceptions.FilterExpressionException;
-import com.blotty.core.models.Row;
+import com.blotty.core.models.rows.Row;
 import com.blotty.core.modifiers.filters.conditions.AndCondition;
 import com.blotty.core.modifiers.filters.conditions.IFilterCondition;
 import com.blotty.core.modifiers.filters.conditions.NotCondition;

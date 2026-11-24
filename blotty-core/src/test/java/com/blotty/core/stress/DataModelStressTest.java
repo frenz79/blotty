@@ -22,13 +22,13 @@ import org.junit.jupiter.api.TestMethodOrder;
 
 import com.blotty.core.commons.IConsumer;
 import com.blotty.core.commons.exceptions.RowsModelException;
-import com.blotty.core.models.Column;
-import com.blotty.core.models.ColumnsModel;
 import com.blotty.core.models.DataModel;
 import com.blotty.core.models.DataModelView;
-import com.blotty.core.models.Row;
+import com.blotty.core.models.columns.Column;
+import com.blotty.core.models.columns.ColumnsModel;
 import com.blotty.core.models.indexes.HashIndex;
 import com.blotty.core.models.query.QueryDefinition;
+import com.blotty.core.models.rows.Row;
 import com.blotty.core.models.storage.InMemoryRowsModel;
 import com.blotty.core.modifiers.filters.FilterExpression;
 import com.blotty.core.modifiers.filters.conditions.Operand;
@@ -69,14 +69,14 @@ public class DataModelStressTest {
 		boolean active = (index % 2 == 0);
 		String dept = DEPARTMENTS[index % DEPARTMENTS.length];
 
-		return new Row(cm)
+		return Row.newBuilder(cm)
 				.set(cm.getKey(), id)
 				.set(cm.getColumn("FIRST_NAME"), firstName)
 				.set(cm.getColumn("LAST_NAME"), lastName)
 				.set(cm.getColumn("AGE"), age)
 				.set(cm.getColumn("SALARY"), salary)
 				.set(cm.getColumn("ACTIVE"), active)
-				.set(cm.getColumn("DEPARTMENT"), dept);
+				.set(cm.getColumn("DEPARTMENT"), dept).build();
 	}
 
 	@Test

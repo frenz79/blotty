@@ -8,9 +8,9 @@ import org.junit.jupiter.api.Test;
 import com.blotty.core.commons.exceptions.ColumnsModelException;
 import com.blotty.core.commons.exceptions.FilterExpressionException;
 import com.blotty.core.commons.exceptions.RowsTypeException;
-import com.blotty.core.models.Column;
-import com.blotty.core.models.ColumnsModel;
-import com.blotty.core.models.Row;
+import com.blotty.core.models.columns.Column;
+import com.blotty.core.models.columns.ColumnsModel;
+import com.blotty.core.models.rows.Row;
 import com.blotty.core.modifiers.filters.conditions.Operand;
 import com.blotty.core.modifiers.filters.conditions.binary.BinaryCondition;
 import com.blotty.core.modifiers.filters.conditions.binary.operators.Equal;
@@ -19,7 +19,6 @@ import com.blotty.core.modifiers.filters.conditions.unary.UnaryCondition;
 import com.blotty.core.modifiers.filters.conditions.unary.operators.IsNotNull;
 import com.blotty.core.modifiers.filters.conditions.unary.operators.IsNull;
 import com.blotty.core.types.FieldType;
-import com.blotty.core.types.impl.NullField;
 
 class FilterExpressionTest {
 
@@ -36,8 +35,8 @@ class FilterExpressionTest {
 			new BinaryCondition(Operand.of(colModel.getKey()), new Equal(), Operand.of("KEY_2"))
 		);
 		
-		Row row1 = new Row(colModel).set(colModel.getKey(), "KEY_1").set(col1, "TEST_VALUE_1");
-		Row row2 = new Row(colModel).set(colModel.getKey(), "KEY_2").set(col1, "TEST_VALUE_2");
+		Row row1 = Row.newBuilder(colModel).set(colModel.getKey(), "KEY_1").set(col1, "TEST_VALUE_1").build();
+		Row row2 = Row.newBuilder(colModel).set(colModel.getKey(), "KEY_2").set(col1, "TEST_VALUE_2").build();
 		
 		assertFalse( equal.apply( row1 ) );		
 		assertTrue ( equal.apply( row2 ) );
@@ -56,8 +55,8 @@ class FilterExpressionTest {
 			new BinaryCondition(Operand.of(col1), new Equal(), Operand.of("TEST_VALUE_2"))
 		);
 		
-		Row row1 = new Row(colModel).set(colModel.getKey(), "KEY_1").set(col1, "TEST_VALUE_1");
-		Row row2 = new Row(colModel).set(colModel.getKey(), "KEY_2").set(col1, "TEST_VALUE_2");
+		Row row1 = Row.newBuilder(colModel).set(colModel.getKey(), "KEY_1").set(col1, "TEST_VALUE_1").build();
+		Row row2 = Row.newBuilder(colModel).set(colModel.getKey(), "KEY_2").set(col1, "TEST_VALUE_2").build();
 		
 		assertFalse( equal.apply( row1 ) );		
 		assertTrue ( equal.apply( row2 ) );
@@ -69,7 +68,7 @@ class FilterExpressionTest {
 		assertTrue ( notEqual.apply( row1 ) );		
 		assertFalse( notEqual.apply( row2 ) );
 				
-		Row row3 = new Row(colModel).set(colModel.getKey(), "KEY_3").set(col1, NullField.NULL);
+		Row row3 = Row.newBuilder(colModel).set(colModel.getKey(), "KEY_3").setNull(col1).build();
 		
 		assertFalse( equal.apply( row3 ) );		
 		assertFalse( equal.apply( row3 ) );
@@ -94,9 +93,9 @@ class FilterExpressionTest {
 			new UnaryCondition(Operand.of(col1), new IsNotNull())
 		);
 		
-		Row row1 = new Row(colModel).set(colModel.getKey(), "KEY_1").set(col1, "TEST_VALUE_1");
-		Row row2 = new Row(colModel).set(colModel.getKey(), "KEY_2").set(col1, "TEST_VALUE_2");
-		Row row3 = new Row(colModel).set(colModel.getKey(), "KEY_3").set(col1, NullField.NULL);
+		Row row1 = Row.newBuilder(colModel).set(colModel.getKey(), "KEY_1").set(col1, "TEST_VALUE_1").build();
+		Row row2 = Row.newBuilder(colModel).set(colModel.getKey(), "KEY_2").set(col1, "TEST_VALUE_2").build();
+		Row row3 = Row.newBuilder(colModel).set(colModel.getKey(), "KEY_3").setNull(col1).build();
 		
 		assertFalse( isNull.apply( row1 ) );		
 		assertFalse( isNull.apply( row2 ) );
@@ -118,11 +117,11 @@ class FilterExpressionTest {
 		Column col1 = colModel.getColumn("COL_1");
 		Column col2 = colModel.getColumn("COL_2");
 		
-		Row row1 = new Row(colModel).set(colModel.getKey(), "KEY_1").set(col1, "AAA").set(col2, "CCC");
-		Row row2 = new Row(colModel).set(colModel.getKey(), "KEY_2").set(col1, "YYY").set(col2, "YYY");
-		Row row3 = new Row(colModel).set(colModel.getKey(), "KEY_3").set(col1, NullField.NULL).set(col2, "ZZZ");
-		Row row4 = new Row(colModel).set(colModel.getKey(), "KEY_4").set(col1, "YYY").set(col2, "ZZZ");
-		Row row5 = new Row(colModel).set(colModel.getKey(), "KEY_5").set(col1, "XXX").set(col2, "ZZZ");
+		Row row1 = Row.newBuilder(colModel).set(colModel.getKey(), "KEY_1").set(col1, "AAA").set(col2, "CCC").build();
+		Row row2 = Row.newBuilder(colModel).set(colModel.getKey(), "KEY_2").set(col1, "YYY").set(col2, "YYY").build();
+		Row row3 = Row.newBuilder(colModel).set(colModel.getKey(), "KEY_3").setNull(col1).set(col2, "ZZZ").build();
+		Row row4 = Row.newBuilder(colModel).set(colModel.getKey(), "KEY_4").set(col1, "YYY").set(col2, "ZZZ").build();
+		Row row5 = Row.newBuilder(colModel).set(colModel.getKey(), "KEY_5").set(col1, "XXX").set(col2, "ZZZ").build();
 		
 		FilterExpression exprBuilder1 = FilterExpression.newBuilder()
 			.begin(	new BinaryCondition(Operand.of(col1), new Equal(), Operand.of("XXX")))

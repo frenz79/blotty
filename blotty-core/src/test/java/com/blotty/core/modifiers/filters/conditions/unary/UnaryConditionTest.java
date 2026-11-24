@@ -8,9 +8,9 @@ import org.junit.jupiter.api.Test;
 
 import com.blotty.core.commons.exceptions.ColumnsModelException;
 import com.blotty.core.commons.exceptions.RowsTypeException;
-import com.blotty.core.models.Column;
-import com.blotty.core.models.ColumnsModel;
-import com.blotty.core.models.Row;
+import com.blotty.core.models.columns.Column;
+import com.blotty.core.models.columns.ColumnsModel;
+import com.blotty.core.models.rows.Row;
 import com.blotty.core.modifiers.filters.conditions.Operand;
 import com.blotty.core.modifiers.filters.conditions.unary.operators.IsNotNull;
 import com.blotty.core.modifiers.filters.conditions.unary.operators.IsNull;
@@ -35,8 +35,8 @@ class UnaryConditionTest {
 	void testIsNull() throws RowsTypeException {
 		UnaryCondition isNull = new UnaryCondition(Operand.of(col), new IsNull());
 
-		Row rNull = new Row(colModel).set(colModel.getKey(), "K1").set(col, NullField.NULL);
-		Row rVal = new Row(colModel).set(colModel.getKey(), "K2").set(col, "Value");
+		Row rNull = Row.newBuilder(colModel).set(colModel.getKey(), "K1").setNull(col).build();
+		Row rVal = Row.newBuilder(colModel).set(colModel.getKey(), "K2").set(col, "Value").build();
 
 		assertTrue(isNull.apply(rNull));
 		assertFalse(isNull.apply(rVal));
@@ -46,8 +46,8 @@ class UnaryConditionTest {
 	void testIsNotNull() throws RowsTypeException {
 		UnaryCondition isNotNull = new UnaryCondition(Operand.of(col), new IsNotNull());
 
-		Row rNull = new Row(colModel).set(colModel.getKey(), "K1").set(col, NullField.NULL);
-		Row rVal = new Row(colModel).set(colModel.getKey(), "K2").set(col, "Value");
+		Row rNull = Row.newBuilder(colModel).set(colModel.getKey(), "K1").setNull(col).build();
+		Row rVal = Row.newBuilder(colModel).set(colModel.getKey(), "K2").set(col, "Value").build();
 
 		assertFalse(isNotNull.apply(rNull));
 		assertTrue(isNotNull.apply(rVal));
