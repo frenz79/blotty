@@ -13,6 +13,7 @@ import com.blotty.core.models.columns.ColumnsModel;
 import com.blotty.core.models.indexes.AbstractIndex;
 import com.blotty.core.models.indexes.HashIndex;
 import com.blotty.core.models.rows.Row;
+import com.blotty.core.models.rows.Row.RowChange;
 import com.blotty.core.types.IGenericField;
 
 public abstract class AbstractDataModel {
@@ -79,11 +80,14 @@ public abstract class AbstractDataModel {
 		return addRow(r.build());
 	}
 	
-	public AbstractDataModel updRow(Row oldR, Row newR) throws RowsModelException {
-		rowsModel.updRow(oldR, newR);
-		for ( AbstractIndex<?> idx : indexes ) {
-			idx.update(oldR, newR);			
-			updateStats(newR, oldR);
+	public AbstractDataModel updRow(Row r, boolean trackChanges) throws RowsModelException {
+		RowChange changes = rowsModel.updRow(r, trackChanges);
+		
+		if (changes!=null) {
+			for ( AbstractIndex<?> idx : indexes ) {
+				idx.update(r, changes);			
+				updateStats(r, changes);
+			}
 		}
 		return this;
 	}

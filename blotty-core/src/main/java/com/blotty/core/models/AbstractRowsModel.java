@@ -7,16 +7,17 @@ import com.blotty.core.commons.exceptions.FilterExpressionException;
 import com.blotty.core.commons.exceptions.RowsModelException;
 import com.blotty.core.models.columns.ColumnsModel;
 import com.blotty.core.models.rows.Row;
+import com.blotty.core.models.rows.Row.RowChange;
 import com.blotty.core.types.IGenericField;
 
 public abstract class AbstractRowsModel {
 
 	private final ColumnsModel columnsModel;
 	
-	public abstract AbstractRowsModel delRow(Row row) throws RowsModelException;
-	public abstract AbstractRowsModel updRow(Row oldRow, Row newRow) throws RowsModelException;
-	public abstract AbstractRowsModel addRow(Row row) throws RowsModelException;
-	public abstract AbstractRowsModel addRows(Row ...row) throws RowsModelException;
+	public abstract void delRow(Row row) throws RowsModelException;
+	public abstract RowChange updRow(Row row, boolean trackChanges) throws RowsModelException;
+	public abstract void addRow(Row row) throws RowsModelException;
+	public abstract void addRows(Row ...row) throws RowsModelException;
 	public abstract void stream(IConsumer<Row> c) throws RowsModelException, FilterExpressionException;
 	public abstract void sort(Comparator<Row> c) throws RowsModelException;
 	public abstract int getRowsCount();

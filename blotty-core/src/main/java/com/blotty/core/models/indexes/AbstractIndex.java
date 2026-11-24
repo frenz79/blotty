@@ -11,6 +11,7 @@ import com.blotty.core.commons.exceptions.RowsModelException;
 import com.blotty.core.models.AbstractRowsModel;
 import com.blotty.core.models.columns.Column;
 import com.blotty.core.models.rows.Row;
+import com.blotty.core.models.rows.Row.RowChange;
 import com.blotty.core.modifiers.filters.conditions.IFilterCondition;
 import com.blotty.core.types.IGenericField;
 
@@ -59,17 +60,22 @@ public abstract class AbstractIndex<S extends IndexStatistics> {
 		return column;
 	}
 	
-	public void update(Row oldR, Row newR) {
+	public void update(Row r, RowChange change) {
 		wlock.lock();
-		try {			
-			IGenericField oldK = getKey(oldR);
-			IGenericField newK = getKey(newR);
+		try {
+			int colId = getColumn().getId();
 			
-			if (oldK.equals(newK)) {
-				return;
-			}
-			_delete( oldK, oldR );
-			_insert( newK, newR );
+			if ( change.modifieldCols().get(colId) ) {
+				IGenericField oldK = r.getFields()[colId];
+				IGenericField newK = change.oldValues().get(change.resolveId(colId));
+				
+				if (oldK.equals(newK)) {
+					// Should not happen!
+					return;
+				}
+				_delete( oldK, oldR );
+				_insert( newK, newR );
+			}			
 		} finally {
 			wlock.unlock();
 		}

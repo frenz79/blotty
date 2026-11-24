@@ -15,6 +15,7 @@ import com.blotty.core.commons.exceptions.RowsModelException;
 import com.blotty.core.models.AbstractRowsModel;
 import com.blotty.core.models.columns.ColumnsModel;
 import com.blotty.core.models.rows.Row;
+import com.blotty.core.models.rows.Row.RowChange;
 import com.blotty.core.types.IGenericField;
 
 public class InMemoryRowsModel extends AbstractRowsModel {
@@ -33,7 +34,7 @@ public class InMemoryRowsModel extends AbstractRowsModel {
 	}
 
 	@Override
-	public AbstractRowsModel delRow(Row row) throws RowsModelException {
+	public void delRow( Row row ) throws RowsModelException {
 		IGenericField key = getKey(row);
 		wlock.lock();
 		try {
@@ -45,27 +46,25 @@ public class InMemoryRowsModel extends AbstractRowsModel {
 		} finally {
 			wlock.unlock();
 		}
-		return this;
 	}
 	
 	@Override
-	public AbstractRowsModel updRow(Row oldRow, Row newRow) throws RowsModelException {
-		IGenericField key = getKey(oldRow);
+	public RowChange updRow( Row row, boolean trackChanges ) throws RowsModelException {
+		IGenericField key = getKey(row);
 		wlock.lock();
 		try {
 			Row modelRow = rowsByKey.get(key);
 			if (modelRow==null) {
 				throw new RowsModelException(String.format("Cannot find row with key:%s", key));
 			}
-			modelRow.upd(newRow);
+			return modelRow.upd(row, trackChanges);
 		} finally {
 			wlock.unlock();
 		}
-		return this;
 	}
 	
 	@Override
-	public AbstractRowsModel addRow( Row row ) throws RowsModelException {
+	public void addRow( Row row ) throws RowsModelException {
 		IGenericField key = getKey(row);
 		wlock.lock();
 		try {
@@ -77,11 +76,10 @@ public class InMemoryRowsModel extends AbstractRowsModel {
 		} finally {
 			wlock.unlock();
 		}
-		return this;
 	}
 
 	@Override
-	public AbstractRowsModel addRows( Row ...rows ) throws RowsModelException {
+	public void addRows( Row ...rows ) throws RowsModelException {
 		wlock.lock();
 		try {
 			for ( Row row : rows ) {
@@ -95,7 +93,6 @@ public class InMemoryRowsModel extends AbstractRowsModel {
 		} finally {
 			wlock.unlock();
 		}
-		return this;
 	}
 
 	@Override

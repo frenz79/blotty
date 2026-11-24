@@ -1,5 +1,9 @@
 package com.blotty.core.models.rows;
 
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.List;
+
 import com.blotty.core.commons.exceptions.RowsModelException;
 import com.blotty.core.commons.exceptions.RowsTypeException;
 import com.blotty.core.models.columns.Column;
@@ -22,8 +26,42 @@ public class Row {
 		this.fields = fields;
 	}
 	
+	public static record RowChange(
+		BitSet modifieldCols,
+		List<IGenericField> oldValues
+	) {
+		// Count number of set bits before colId
+		public int resolveId(int colId) {
+			int counter = 0;
+			for (int i=0; i<colId;i++) {
+				if (modifieldCols.get(i)) {
+					counter++;
+				}
+			}
+			return counter;
+		}}
+	
 	public IGenericField[] getFields() {
 		return fields;
+	}
+	
+	public RowChange upd(Row row, boolean trackChanges ) {
+		if (!trackChanges) {
+			System.arraycopy(row.fields, 0, this.fields, 0, this.fields.length);
+			return null;
+		}
+		
+		BitSet modifieldCols = new BitSet(fields.length);
+		List<IGenericField> oldValues = new ArrayList<>();
+		for (int i=0; i<fields.length; i++) {
+			if (fields[i].compareTo(row.fields[i])!=0) {
+				modifieldCols.set(i, true);
+				oldValues.add(fields[i]);
+				fields[i] = row.fields[i];
+			}
+		}
+		
+		return new RowChange(modifieldCols, oldValues);
 	}
 	
 	public Row set( Column c, IGenericField f) throws RowsTypeException {
@@ -37,10 +75,6 @@ public class Row {
 	public Row clear( Column c ) {
 		this.fields[c.getId()] = NullField.NULL;
 		return this;
-	}
-	
-	public void upd(Row row) {
-		System.arraycopy(row.fields, 0, this.fields, 0, this.fields.length);
 	}
 	
 	public static Builder newBuilder(ColumnsModel colModel) {
