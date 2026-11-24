@@ -74,7 +74,7 @@ public class DataModelView extends AbstractDataModel implements IListener<Abstra
 			break;
 		case UPD:
 			if (filter == null || filter.apply(row)) {
-				updRow(row, event.getOldRow());
+				updRow(row, false);
 				if (sorter != null) {
 					getRowsModel().sort(sorter);
 				}

@@ -38,19 +38,21 @@ public abstract class AbstractDataModel {
 		return rowsModel.getRow(i);
 	}
 		
-	private void updateStats(Row newR, Row oldR) {
+	private void updateStats(Row r, RowChange changes) {
 		for ( int i=0; i<getColumnsModel().getColumnsCount(); i++) {
-			if ( newR.getFields()[i].isNull() ) {
+			if ( r.getFields()[i].isNull() ) {
 				getColumnsModel().getColumn(i).getStatistics().incNullValues();
 			} else {
 				getColumnsModel().getColumn(i).getStatistics().incNotNullValues();
 			}
-			if (oldR!=null) {
+			if (changes!=null) {
+				/* TODO
 				if ( oldR.getFields()[i].isNull() ) {
 					getColumnsModel().getColumn(i).getStatistics().incNullValues();
 				} else {
 					getColumnsModel().getColumn(i).getStatistics().incNotNullValues();
 				}
+				*/
 			}
 		}
 	}

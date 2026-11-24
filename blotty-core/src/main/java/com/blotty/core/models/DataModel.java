@@ -38,8 +38,8 @@ public class DataModel extends AbstractDataModel {
 	}
 	
 	@Override
-	public AbstractDataModel updRow(Row r, Row r1) throws RowsModelException {
-		super.updRow(r, r1);
+	public AbstractDataModel updRow(Row r, boolean trackChanges) throws RowsModelException {
+		super.updRow(r, trackChanges);
 		fireDataModelChanged( new RowEvent(RowAction.UPD, r) );
 		return this;
 	}

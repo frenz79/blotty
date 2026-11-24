@@ -1,25 +1,27 @@
 package com.blotty.core.models.rows;
 
+import com.blotty.core.models.rows.Row.RowChange;
+
 public class RowEvent extends AbstractRowEvent {
 	
 	private final Row row;
-	private final Row oldRow;
+	private final RowChange rowChange;
 	
 	public RowEvent(RowAction action, Row row) {
 		this(action, row, null);
 	}
 	
-	public RowEvent(RowAction action, Row row, Row oldRow) {
+	public RowEvent(RowAction action, Row row, RowChange rowChange) {
 		super(action);
 		this.row = row;
-		this.oldRow = oldRow;
+		this.rowChange = rowChange;
 	}
 
 	public Row getRow() {
 		return row;
 	}
 
-	public Row getOldRow() {
-		return oldRow;
+	public RowChange getRowChange() {
+		return rowChange;
 	}
 }

@@ -21,6 +21,7 @@ import com.blotty.core.commons.exceptions.RowsModelException;
 import com.blotty.core.models.AbstractRowsModel;
 import com.blotty.core.models.columns.ColumnsModel;
 import com.blotty.core.models.rows.Row;
+import com.blotty.core.models.rows.Row.RowChange;
 import com.blotty.core.models.storage.LOBRowsModel.StorageManager.StorageEntry;
 import com.blotty.core.types.IGenericField;
 
@@ -94,7 +95,7 @@ public class LOBRowsModel extends AbstractRowsModel {
 	private Map<IGenericField,StorageEntry> storedEntries = new HashMap<>();
 	
 	@Override
-	public AbstractRowsModel addRow( Row row ) throws RowsModelException {	
+	public void addRow( Row row ) throws RowsModelException {	
 		IGenericField key = getKey(row);
 		
 		RowDump rowDump = storageManagerLUT.get(key);
@@ -108,12 +109,12 @@ public class LOBRowsModel extends AbstractRowsModel {
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
-					return this;
+					return;
 				}
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-				return this;
+				return;
 			}	
 			storageManagerLUT.put(key, rowDump);
 		}
@@ -124,7 +125,7 @@ public class LOBRowsModel extends AbstractRowsModel {
 		}
 		this.rows.add(rowDump);
 		
-		return this;
+		return;
 	}	
 	
 	@Override
@@ -250,20 +251,20 @@ public class LOBRowsModel extends AbstractRowsModel {
 	}
 
 	@Override
-	public AbstractRowsModel addRows(Row... row) throws RowsModelException {
+	public RowChange updRow(Row row, boolean trackChanges) throws RowsModelException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public AbstractRowsModel delRow(Row row) throws RowsModelException {
+	public void delRow(Row row) throws RowsModelException {
 		// TODO Auto-generated method stub
-		return null;
+		
 	}
 
 	@Override
-	public AbstractRowsModel updRow(Row oldRow, Row newRow) throws RowsModelException {
+	public void addRows(Row... row) throws RowsModelException {
 		// TODO Auto-generated method stub
-		return null;
+		
 	}
 }

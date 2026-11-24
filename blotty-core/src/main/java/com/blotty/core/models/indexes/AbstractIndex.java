@@ -73,8 +73,8 @@ public abstract class AbstractIndex<S extends IndexStatistics> {
 					// Should not happen!
 					return;
 				}
-				_delete( oldK, oldR );
-				_insert( newK, newR );
+				// TODO: _delete( oldK, oldR );
+				// TODO: _insert( newK, newR );
 			}			
 		} finally {
 			wlock.unlock();
