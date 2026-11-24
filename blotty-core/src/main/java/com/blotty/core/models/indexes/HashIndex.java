@@ -27,10 +27,12 @@ public class HashIndex extends AbstractIndex {
 
 	public void stream(IGenericField searchVal, IConsumer<Row> iConsumer) throws RowsModelException, FilterExpressionException {
 		rLock.lock();
-			try {
+		try {
 			Set<Row> rows = index.get(searchVal);
-			for ( Row r : rows ) {
-				iConsumer.stream(r);
+			if (rows!=null && !rows.isEmpty()){
+				for ( Row r : rows ) {
+					iConsumer.stream(r);
+				}
 			}
 		} finally {
 			rLock.unlock();
