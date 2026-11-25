@@ -73,12 +73,10 @@ public class HashIndex extends AbstractIndex<HashIndexStatistics> {
 
 	@Override
 	protected void _insert(IGenericField key, Row r) {
-		index.compute(key, (k,v) ->{
-			if (v==null) {
-				return new HashSet<>();
-			}
-			return v;
-		}).add(r);
+		index.computeIfAbsent(
+		        key,
+		        k -> new HashSet<>())
+		     .add(r);
 		// Update stats
 		getStatistics().setDistinctValues(index.size());
 	}
