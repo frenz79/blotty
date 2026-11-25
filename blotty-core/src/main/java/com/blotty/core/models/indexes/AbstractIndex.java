@@ -73,7 +73,7 @@ public abstract class AbstractIndex<S extends IndexStatistics> {
 		try {
 			int colId = getColumn().getId();
 			
-			if ( change.modifieldCols().get(colId) ) {
+			if ( change.isModified(colId) ) {
 				IGenericField newK = r.getFields()[colId];
 				IGenericField oldK = change.oldValues().get(change.resolveId(colId));
 				

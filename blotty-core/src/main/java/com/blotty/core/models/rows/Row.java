@@ -41,6 +41,7 @@ public class Row {
 		public boolean isModified( int columnId ) {
 			return modifiedCols.get(columnId);
 		}
+		
 		// Count number of set bits before colId
 		public int resolveId(int colId) {
 			int counter = 0;
@@ -50,7 +51,8 @@ public class Row {
 				}
 			}
 			return counter;
-		}}
+		}
+	}
 	
 	public IGenericField[] getFields() {
 		return fields;

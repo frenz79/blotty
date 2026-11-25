@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
@@ -47,11 +48,10 @@ public class MainViewController {
 		for (CSVRecord record : records) {
 			if ( recordNumber==0 ) {
 				ColumnsModel.Builder colModelBuilder = ColumnsModel.newBuilder();
-				colModelBuilder.add(Column.newBuilder("AUTO_KEY", true).type(FieldType.STRING_TYPE));
 				
 				// Header : col=0 is the key
 				for ( int i=0; i<record.size(); i++ ) {
-					colModelBuilder.add(Column.newBuilder(record.get(i)).type(FieldType.STRING_TYPE));
+					colModelBuilder.add(Column.newBuilder(record.get(i), i==0).type(FieldType.STRING_TYPE).cacheable());
 				}
 				
 				colModel = colModelBuilder.build();
@@ -59,9 +59,8 @@ public class MainViewController {
 				view.setTableColumns( colModel );
 			} else {
 				Builder row = Row.newBuilder(colModel);
-				row.set(colModel.getKey(), String.valueOf(recordNumber));
 				for ( int i=0; i<record.size(); i++ ) {
-					row.set(colModel.getColumn(i + 1), record.get(i));
+					row.set(colModel.getColumn(i), record.get(i));
 				}
 				dataModel.addRow(row);
 			}
@@ -123,8 +122,10 @@ public class MainViewController {
 		else if ("NOT LIKE".equals(operator)) {
 			filterBuilder.begin( BinaryCondition.NotLike(Operand.of(dataModel.getColumnsModel().getColumn(colName)), Operand.of(value)));
 		}
-		
+		long startTime = System.nanoTime();
 		DataModelView filteredView = dataModel.createView("ItalianOrganizations", new QueryDefinition( filterBuilder.build(), null));
+		long endTime = System.nanoTime();
+		System.out.println("Filtering time:"+TimeUnit.NANOSECONDS.toMicros(endTime-startTime));
 		view.setTableData( filteredView );
 	}
 }

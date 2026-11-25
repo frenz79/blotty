@@ -191,7 +191,8 @@ public class MainView extends JFrame {
 					DefaultTableModel tableModel = new DefaultTableModel();
 					columnFilter.removeAllItems();
 					
-					for(Column col : colModel.getColumns()){
+					for(int i=0; i<colModel.getColumnsCount(); i++){
+						Column col = colModel.getColumn(i);
 						tableModel.addColumn(col.getName());
 						columnFilter.addItem(col.getName());
 					}

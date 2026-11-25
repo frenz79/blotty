@@ -17,6 +17,7 @@ import com.blotty.core.commons.IConsumer;
 import com.blotty.core.commons.exceptions.FilterExpressionException;
 import com.blotty.core.commons.exceptions.RowsModelException;
 import com.blotty.core.models.columns.Column;
+import com.blotty.core.models.columns.ColumnStatistics;
 import com.blotty.core.models.columns.ColumnsModel;
 import com.blotty.core.models.indexes.AbstractIndex;
 import com.blotty.core.models.indexes.HashIndex;

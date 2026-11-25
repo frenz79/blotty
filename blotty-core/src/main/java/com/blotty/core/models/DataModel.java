@@ -18,6 +18,7 @@ import com.blotty.core.models.query.QueryDefinition;
 import com.blotty.core.models.rows.AbstractRowEvent;
 import com.blotty.core.models.rows.AbstractRowEvent.RowAction;
 import com.blotty.core.models.rows.Row;
+import com.blotty.core.models.rows.Row.RowChange;
 import com.blotty.core.models.rows.RowEvent;
 import com.blotty.core.models.rows.RowEventBatch;
 
@@ -49,7 +50,7 @@ public class DataModel extends AbstractDataModel {
 	public RowChange updRow(Row r, boolean trackChanges) throws RowsModelException {
 		RowChange changes = super.updRow(r, trackChanges);
 		fireDataModelChanged( new RowEvent(RowAction.UPD, r, changes) );
-		return this;
+		return changes;
 	}
 	
 	@Override
