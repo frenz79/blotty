@@ -6,14 +6,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import com.blotty.core.columns.Column;
+import com.blotty.core.columns.ColumnsModel;
 import com.blotty.core.commons.exceptions.ColumnsModelException;
 import com.blotty.core.commons.exceptions.RowsTypeException;
-import com.blotty.core.models.columns.Column;
-import com.blotty.core.models.columns.ColumnsModel;
-import com.blotty.core.models.rows.Row;
 import com.blotty.core.modifiers.filters.conditions.Operand;
 import com.blotty.core.modifiers.filters.conditions.unary.operators.IsNotNull;
 import com.blotty.core.modifiers.filters.conditions.unary.operators.IsNull;
+import com.blotty.core.rows.Row;
 import com.blotty.core.types.FieldType;
 import com.blotty.core.types.impl.NullField;
 

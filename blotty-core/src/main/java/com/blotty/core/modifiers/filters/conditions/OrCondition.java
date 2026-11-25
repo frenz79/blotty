@@ -9,7 +9,7 @@
 package com.blotty.core.modifiers.filters.conditions;
 
 import com.blotty.core.commons.exceptions.FilterExpressionException;
-import com.blotty.core.models.rows.Row;
+import com.blotty.core.rows.Row;
 
 public class OrCondition implements IFilterCondition {
 

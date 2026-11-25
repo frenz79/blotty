@@ -33,12 +33,12 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 
+import com.blotty.core.AbstractDataModel;
+import com.blotty.core.columns.Column;
+import com.blotty.core.columns.ColumnsModel;
 import com.blotty.core.commons.IConsumer;
 import com.blotty.core.commons.exceptions.RowsModelException;
-import com.blotty.core.models.AbstractDataModel;
-import com.blotty.core.models.columns.Column;
-import com.blotty.core.models.columns.ColumnsModel;
-import com.blotty.core.models.rows.Row;
+import com.blotty.core.rows.Row;
 
 public class MainView extends JFrame {
 

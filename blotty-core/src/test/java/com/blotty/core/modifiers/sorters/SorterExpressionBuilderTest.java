@@ -4,17 +4,17 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 
+import com.blotty.core.DataModel;
+import com.blotty.core.DataModelView;
+import com.blotty.core.columns.Column;
+import com.blotty.core.columns.ColumnsModel;
 import com.blotty.core.commons.exceptions.ColumnsModelException;
 import com.blotty.core.commons.exceptions.FilterExpressionException;
 import com.blotty.core.commons.exceptions.RowsModelException;
 import com.blotty.core.commons.exceptions.RowsTypeException;
-import com.blotty.core.models.DataModel;
-import com.blotty.core.models.DataModelView;
-import com.blotty.core.models.columns.Column;
-import com.blotty.core.models.columns.ColumnsModel;
-import com.blotty.core.models.rows.Row;
-import com.blotty.core.models.storage.InMemoryRowsModel;
 import com.blotty.core.parsers.SQLQueryParser;
+import com.blotty.core.rows.Row;
+import com.blotty.core.storage.InMemoryRowsModel;
 import com.blotty.core.types.FieldType;
 import com.blotty.core.types.impl.IntegerField;
 import com.blotty.core.types.impl.NullField;

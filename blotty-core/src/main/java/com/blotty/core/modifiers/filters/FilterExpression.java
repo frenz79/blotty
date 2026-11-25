@@ -9,11 +9,11 @@
 package com.blotty.core.modifiers.filters;
 
 import com.blotty.core.commons.exceptions.FilterExpressionException;
-import com.blotty.core.models.rows.Row;
 import com.blotty.core.modifiers.filters.conditions.AndCondition;
 import com.blotty.core.modifiers.filters.conditions.IFilterCondition;
 import com.blotty.core.modifiers.filters.conditions.NotCondition;
 import com.blotty.core.modifiers.filters.conditions.OrCondition;
+import com.blotty.core.rows.Row;
 
 /**
  * Represents a filter expression composed by an Abstract Syntax Tree (AST).

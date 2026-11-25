@@ -11,11 +11,10 @@ package com.blotty.core.parsers;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.blotty.core.columns.Column;
+import com.blotty.core.columns.ColumnsModel;
 import com.blotty.core.commons.exceptions.FilterExpressionException;
 import com.blotty.core.commons.exceptions.RowsTypeException;
-import com.blotty.core.models.columns.Column;
-import com.blotty.core.models.columns.ColumnsModel;
-import com.blotty.core.models.query.QueryDefinition;
 import com.blotty.core.modifiers.filters.FilterExpression;
 import com.blotty.core.modifiers.filters.conditions.AndCondition;
 import com.blotty.core.modifiers.filters.conditions.IFilterCondition;
@@ -34,6 +33,7 @@ import com.blotty.core.modifiers.filters.conditions.binary.operators.NotEqual;
 import com.blotty.core.modifiers.filters.conditions.unary.UnaryCondition;
 import com.blotty.core.modifiers.filters.conditions.unary.operators.IsNotNull;
 import com.blotty.core.modifiers.filters.conditions.unary.operators.IsNull;
+import com.blotty.core.query.QueryDefinition;
 
 /**
  * SQL-inspired filter parser used by Blotty.

@@ -8,9 +8,9 @@
  */
 package com.blotty.core.modifiers.sorters;
 
+import com.blotty.core.columns.Column;
+import com.blotty.core.columns.ColumnsModel;
 import com.blotty.core.commons.exceptions.FilterExpressionException;
-import com.blotty.core.models.columns.Column;
-import com.blotty.core.models.columns.ColumnsModel;
 import com.blotty.core.modifiers.sorters.operators.AscNullFirst;
 import com.blotty.core.modifiers.sorters.operators.AscNullLast;
 import com.blotty.core.modifiers.sorters.operators.DescNullFirst;

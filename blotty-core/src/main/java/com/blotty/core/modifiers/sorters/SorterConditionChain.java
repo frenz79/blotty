@@ -12,9 +12,9 @@ import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.blotty.core.AbstractRowsModel;
 import com.blotty.core.commons.exceptions.RowsModelException;
-import com.blotty.core.models.AbstractRowsModel;
-import com.blotty.core.models.rows.Row;
+import com.blotty.core.rows.Row;
 import com.blotty.core.types.IGenericField;
 
 public class SorterConditionChain implements ISorterCondition, Comparator<Row> {

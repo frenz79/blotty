@@ -8,9 +8,9 @@
  */
 package com.blotty.core.modifiers.filters.conditions.unary;
 
-import com.blotty.core.models.rows.Row;
 import com.blotty.core.modifiers.filters.conditions.IFilterCondition;
 import com.blotty.core.modifiers.filters.conditions.Operand;
+import com.blotty.core.rows.Row;
 import com.blotty.core.types.IGenericField;
 
 public class UnaryCondition implements IFilterCondition {

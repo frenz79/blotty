@@ -6,18 +6,18 @@ import java.io.Reader;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 
-import com.blotty.core.models.DataModel;
-import com.blotty.core.models.DataModelView;
-import com.blotty.core.models.columns.Column;
-import com.blotty.core.models.columns.ColumnsModel;
-import com.blotty.core.models.query.QueryDefinition;
-import com.blotty.core.models.rows.Row;
-import com.blotty.core.models.storage.InMemoryRowsModel;
+import com.blotty.core.DataModel;
+import com.blotty.core.DataModelView;
+import com.blotty.core.columns.Column;
+import com.blotty.core.columns.ColumnsModel;
 import com.blotty.core.modifiers.filters.FilterExpression;
 import com.blotty.core.modifiers.filters.conditions.Operand;
 import com.blotty.core.modifiers.filters.conditions.binary.BinaryCondition;
 import com.blotty.core.modifiers.sorters.SorterExpressionBuilder;
 import com.blotty.core.parsers.SQLQueryParser;
+import com.blotty.core.query.QueryDefinition;
+import com.blotty.core.rows.Row;
+import com.blotty.core.storage.InMemoryRowsModel;
 import com.blotty.core.types.FieldType;
 
 public class SimpleCvsLoader {

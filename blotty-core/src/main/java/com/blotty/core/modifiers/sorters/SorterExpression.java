@@ -8,7 +8,7 @@
  */
 package com.blotty.core.modifiers.sorters;
 
-import com.blotty.core.models.columns.Column;
+import com.blotty.core.columns.Column;
 import com.blotty.core.modifiers.sorters.operators.ISorterOperator;
 
 public class SorterExpression {
