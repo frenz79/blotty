@@ -100,7 +100,7 @@ public abstract class AbstractDataModel {
 		return addRow(r.build());
 	}
 	
-	public AbstractDataModel updRow(Row r, boolean trackChanges) throws RowsModelException {
+	public RowChange updRow(Row r, boolean trackChanges) throws RowsModelException {
 		RowChange changes = rowsModel.updRow(r, trackChanges);
 		
 		if (changes!=null) {
@@ -109,7 +109,7 @@ public abstract class AbstractDataModel {
 			}
 			updateStats(r, changes);
 		}
-		return this;
+		return changes;
 	}
 	
 	public AbstractDataModel delRow(Row r) throws RowsModelException {
