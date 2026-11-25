@@ -35,14 +35,14 @@ public class Row {
 	}
 	
 	public static record RowChange(
-		BitSet modifieldCols,
+		BitSet modifiedCols,
 		List<IGenericField> oldValues
 	) {
 		// Count number of set bits before colId
 		public int resolveId(int colId) {
 			int counter = 0;
 			for (int i=0; i<colId;i++) {
-				if (modifieldCols.get(i)) {
+				if (modifiedCols.get(i)) {
 					counter++;
 				}
 			}
@@ -59,17 +59,17 @@ public class Row {
 			return null;
 		}
 		
-		BitSet modifieldCols = new BitSet(fields.length);
+		BitSet modifiedCols = new BitSet(fields.length);
 		List<IGenericField> oldValues = new ArrayList<>();
 		for (int i=0; i<fields.length; i++) {
 			if (fields[i].compareTo(row.fields[i])!=0) {
-				modifieldCols.set(i, true);
+				modifiedCols.set(i, true);
 				oldValues.add(fields[i]);
 				fields[i] = row.fields[i];
 			}
 		}
 		
-		return new RowChange(modifieldCols, oldValues);
+		return new RowChange(modifiedCols, oldValues);
 	}
 	
 	public Row set( Column c, IGenericField f) throws RowsTypeException {
