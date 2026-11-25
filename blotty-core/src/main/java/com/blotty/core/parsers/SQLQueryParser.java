@@ -35,12 +35,57 @@ import com.blotty.core.modifiers.filters.conditions.unary.UnaryCondition;
 import com.blotty.core.modifiers.filters.conditions.unary.operators.IsNotNull;
 import com.blotty.core.modifiers.filters.conditions.unary.operators.IsNull;
 
+/**
+ * SQL-inspired filter parser used by Blotty.
+ *
+ * The parser converts a textual filter expression into an Abstract
+ * Syntax Tree (AST) composed of:
+ *
+ * - BinaryCondition
+ * - UnaryCondition
+ * - AndCondition
+ * - OrCondition
+ * - NotCondition
+ *
+ * Example:
+ *
+ *      "STATUS" = 'OPEN'
+ *      AND
+ *      "QTY" > 100
+ *
+ * becomes:
+ *
+ *              AND
+ *             /   \
+ *            EQ    GT
+ *
+ * The parser is implemented as a simple recursive-descent parser with
+ * operator precedence handled by the grammar hierarchy:
+ *
+ *      NOT > AND > OR
+ *
+ * Parenthesized expressions are fully supported.
+ */
 public class SQLQueryParser {
 
 	private ColumnsModel columns;
 	private List<Token> tokens;
 	private int pos;
 
+	/**
+	 * Entry point.
+	 *
+	 * Parsing is performed in two phases:
+	 *
+	 * 1. Tokenization
+	 *      String -> List<Token>
+	 *
+	 * 2. AST construction
+	 *      List<Token> -> IFilterCondition tree
+	 *
+	 * After parsing, the root node is wrapped inside a FilterExpression
+	 * and stored inside a QueryDefinition.
+	 */
 	public QueryDefinition parse(ColumnsModel columns,	String query)throws FilterExpressionException, RowsTypeException {
 		this.columns = columns;
 		this.tokens = tokenize(query);
@@ -53,13 +98,51 @@ public class SQLQueryParser {
 	//------------------------------------------------------------
 	// Grammar
 	//
-	// expression   := or
-	// or           := and ( OR and )*
-	// and          := not ( AND not )*
-	// not          := NOT primary | primary
-	// primary      := '(' or ')' | condition
-	// condition    := ...
+	// The grammar is intentionally organized to enforce operator
+	// precedence.
+	//
+	//      NOT  (highest)
+	//      AND
+	//      OR   (lowest)
+	//
+	// Example:
+	//
+	//      A OR B AND C
+	//
+	// is parsed as:
+	//
+	//      A OR (B AND C)
+	//
+	// and not:
+	//
+	//      (A OR B) AND C
+	//
+	// Parentheses can always be used to explicitly override
+	// precedence.
+	//
+	// Example:
+	//
+	//      (A OR B) AND C
 	//------------------------------------------------------------
+
+	/**
+	 * Parses OR expressions.
+	 *
+	 * OR is the lowest precedence operator of the language,
+	 * therefore it is the top-level rule of the grammar.
+	 *
+	 * Example:
+	 *
+	 *      A OR B OR C
+	 *
+	 * generates:
+	 *
+	 *             OR
+	 *            /  \
+	 *          OR    C
+	 *         /  \
+	 *        A    B
+	 */
 	private IFilterCondition parseOr() throws FilterExpressionException, RowsTypeException {
 		IFilterCondition left = parseAnd();
 		while (match(TokenType.OR)) {
@@ -68,6 +151,23 @@ public class SQLQueryParser {
 		return left;
 	}
 
+	/**
+	 * Parses AND expressions.
+	 *
+	 * AND has higher precedence than OR.
+	 *
+	 * Example:
+	 *
+	 *      A AND B OR C
+	 *
+	 * becomes:
+	 *
+	 *          OR
+	 *         /  \
+	 *       AND   C
+	 *       / \
+	 *      A   B
+	 */
 	private IFilterCondition parseAnd() throws FilterExpressionException, RowsTypeException {
 		IFilterCondition left = parseNot();
 		while (match(TokenType.AND)) {
@@ -76,6 +176,34 @@ public class SQLQueryParser {
 		return left;
 	}
 
+	/**
+	 * Parses unary NOT expressions.
+	 *
+	 * NOT is right-associative and has the highest precedence
+	 * among logical operators.
+	 *
+	 * Example:
+	 *
+	 *      NOT A
+	 *
+	 * becomes:
+	 *
+	 *          NOT
+	 *           |
+	 *           A
+	 *
+	 * Example:
+	 *
+	 *      NOT NOT A
+	 *
+	 * becomes:
+	 *
+	 *          NOT
+	 *           |
+	 *          NOT
+	 *           |
+	 *           A
+	 */
 	private IFilterCondition parseNot() throws FilterExpressionException, RowsTypeException {
 		if (match(TokenType.NOT)) {        
 			if (peek().type() == TokenType.EOF) {
@@ -86,6 +214,17 @@ public class SQLQueryParser {
 		return parsePrimary();
 	}
 
+	/**
+	 * Parses the smallest evaluable unit.
+	 *
+	 * A primary expression can be:
+	 *
+	 * - a parenthesized sub-expression
+	 * - a leaf condition
+	 *
+	 * Parentheses cause a recursive descent back into the OR
+	 * rule, effectively creating a nested AST subtree.
+	 */
 	private IFilterCondition parsePrimary() throws FilterExpressionException, RowsTypeException {
 		if (match(TokenType.LPAREN)) {
 			IFilterCondition expr = parseOr();
@@ -95,6 +234,21 @@ public class SQLQueryParser {
 		return parseCondition();
 	}
 
+	/**
+	 * Parses a filter leaf node.
+	 *
+	 * Supported forms:
+	 *
+	 *      "COL" = 'value'
+	 *      "COL" > 10
+	 *      "COL" LIKE 'ABC'
+	 *      "COL" IS NULL
+	 *      "COL" IS NOT NULL
+	 *      "COL1" = "COL2"
+	 *
+	 * Column-to-column comparisons are resolved during execution,
+	 * not during parsing.
+	 */
 	private IFilterCondition parseCondition() throws FilterExpressionException, RowsTypeException {
 		Token leftToken = expect(TokenType.COLUMN);
 		Column leftColumn = getColumn(leftToken.value());
@@ -137,6 +291,13 @@ public class SQLQueryParser {
 				right);
 	}
 
+	/**
+	 * Validates that the current token is a supported
+	 * binary comparison operator.
+	 *
+	 * Unary operators (IS NULL / IS NOT NULL) are handled
+	 * separately inside parseCondition().
+	 */
 	private Token expectOperator() throws FilterExpressionException {
 		Token token = consume();   
 		switch (token.type()) {
@@ -156,6 +317,29 @@ public class SQLQueryParser {
 	//------------------------------------------------------------
 	// Tokenizer
 	//------------------------------------------------------------
+	/**
+	 * Converts the input query string into a flat token stream.
+	 *
+	 * The tokenizer performs no semantic validation and does not
+	 * build any AST structures.
+	 *
+	 * Example:
+	 *
+	 *      "AGE" >= 18 AND "ACTIVE" = true
+	 *
+	 * becomes:
+	 *
+	 *      COLUMN(AGE)
+	 *      GTE
+	 *      LITERAL(18)
+	 *      AND
+	 *      COLUMN(ACTIVE)
+	 *      EQ
+	 *      LITERAL(true)
+	 *
+	 * Parsing and operator precedence are handled later by
+	 * the recursive-descent parser.
+	 */
 	private List<Token> tokenize(String query) throws FilterExpressionException {
 		List<Token> result = new ArrayList<>();
 		int i = 0;
@@ -321,6 +505,17 @@ public class SQLQueryParser {
 		return result;
 	}
 
+	/**
+	 * Ensures that a keyword is recognized only when
+	 * delimited by a token boundary.
+	 *
+	 * Example:
+	 *
+	 *      AND      -> valid keyword
+	 *      ANDREA   -> not a keyword
+	 *
+	 * This prevents accidental matches inside identifiers.
+	 */
 	private static boolean startsWithKeyword( String text, String keyword) {
 		if (!text.startsWith(keyword)) {
 			return false;
@@ -338,6 +533,12 @@ public class SQLQueryParser {
 	// Utility
 	//------------------------------------------------------------
 
+	/**
+	 * Maps parser tokens to executable operator objects.
+	 *
+	 * This is the bridge between the parser layer and the
+	 * filter execution engine.
+	 */
 	private static IBinaryOperator toOperator(Token token) {
 		return switch (token.type()) {
 		case EQ -> new Equal();
@@ -360,6 +561,11 @@ public class SQLQueryParser {
 		return c;
 	}
 
+	/**
+	 * Consumes the next token only if it matches the expected type.
+	 *
+	 * Unlike expect(), no exception is thrown when the match fails.
+	 */
 	private boolean match(TokenType type) {
 		if (peek().type() == type) {
 			pos++;
@@ -368,6 +574,12 @@ public class SQLQueryParser {
 		return false;
 	}
 
+	/**
+	 * Consumes the next token and verifies its type.
+	 *
+	 * A FilterExpressionException is thrown whenever the expected
+	 * grammar rule cannot be satisfied.
+	 */
 	private Token expect(TokenType type) throws FilterExpressionException {
 		Token token = consume();   
 		if (token.type() != type) {    
@@ -381,7 +593,9 @@ public class SQLQueryParser {
 		}    
 		return token;
 	}
-
+	/**
+	 * Returns the next token without consuming it.
+	 */
 	private Token peek() {    
 		if (pos >= tokens.size()) {
 			return new Token(TokenType.EOF, "");
