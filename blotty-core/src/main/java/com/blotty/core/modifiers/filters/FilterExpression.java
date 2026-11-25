@@ -217,6 +217,11 @@ public class FilterExpression {
 	        checkInit();
 	        return new FilterExpression(root);
 	    }
+
+		public IFilterCondition buildCondition() {
+		    checkInit();
+		    return root;
+		}
 	
 	    private void checkInit() {
 	        if (root == null) {
