@@ -299,4 +299,200 @@ class FilterExpressionTest {
         assertTrue(exprBuilder3.apply(row4));
         assertTrue(exprBuilder3.apply(row5));
     }
+
+    @Test
+    void testSqlParentheses()
+            throws Exception {
+    
+        ColumnsModel colModel = ColumnsModel.newBuilder()
+                .add(
+                    Column.newBuilder("PK", true)
+                        .type(FieldType.STRING_TYPE))
+                .add(
+                    Column.newBuilder("COL_1")
+                        .type(FieldType.STRING_TYPE))
+                .add(
+                    Column.newBuilder("COL_2")
+                        .type(FieldType.STRING_TYPE))
+                .build();
+    
+        Column col1 = colModel.getColumn("COL_1");
+        Column col2 = colModel.getColumn("COL_2");
+    
+        Row row1 = Row.newBuilder(colModel)
+                .set(colModel.getKey(), "KEY_1")
+                .set(col1, "AAA")
+                .set(col2, "CCC")
+                .build();
+    
+        Row row2 = Row.newBuilder(colModel)
+                .set(colModel.getKey(), "KEY_2")
+                .set(col1, "YYY")
+                .set(col2, "YYY")
+                .build();
+    
+        Row row3 = Row.newBuilder(colModel)
+                .set(colModel.getKey(), "KEY_3")
+                .set(col1, "YYY")
+                .set(col2, "ZZZ")
+                .build();
+    
+        /*
+         * (COL_1='XXX' OR COL_1='YYY')
+         * AND
+         * COL_2='ZZZ'
+         */
+    
+        FilterExpression expr1 =
+            new SQLQueryParser()
+                .parse(
+                    colModel,
+    
+                    "(\"COL_1\"='XXX' "
+                  + "OR "
+                  + "\"COL_1\"='YYY') "
+    
+                  + "AND "
+    
+                  + "\"COL_2\"='ZZZ'")
+                .getFilter();
+    
+        assertFalse(expr1.apply(row1));
+        assertFalse(expr1.apply(row2));
+        assertTrue (expr1.apply(row3));
+    
+        /*
+         * COL_1='XXX'
+         * OR
+         * (COL_1='YYY' AND COL_2='ZZZ')
+         */
+    
+        FilterExpression expr2 =
+            new SQLQueryParser()
+                .parse(
+                    colModel,
+    
+                    "\"COL_1\"='XXX' "
+    
+                  + "OR "
+    
+                  + "(\"COL_1\"='YYY' "
+                  + "AND "
+                  + "\"COL_2\"='ZZZ')")
+                .getFilter();
+    
+        assertFalse(expr2.apply(row1));
+        assertFalse(expr2.apply(row2));
+        assertTrue (expr2.apply(row3));
+    }
+
+    @Test
+    void testSqlNestedParentheses()
+            throws Exception {
+    
+        ColumnsModel colModel = ColumnsModel.newBuilder()
+                .add(
+                    Column.newBuilder("PK", true)
+                        .type(FieldType.STRING_TYPE))
+                .add(
+                    Column.newBuilder("COL_1")
+                        .type(FieldType.STRING_TYPE))
+                .add(
+                    Column.newBuilder("COL_2")
+                        .type(FieldType.STRING_TYPE))
+                .add(
+                    Column.newBuilder("COL_3")
+                        .type(FieldType.STRING_TYPE))
+                .build();
+    
+        Column col1 = colModel.getColumn("COL_1");
+        Column col2 = colModel.getColumn("COL_2");
+        Column col3 = colModel.getColumn("COL_3");
+    
+        Row row1 = Row.newBuilder(colModel)
+                .set(colModel.getKey(), "KEY_1")
+                .set(col1, "A")
+                .set(col2, "B")
+                .set(col3, "C")
+                .build();
+    
+        Row row2 = Row.newBuilder(colModel)
+                .set(colModel.getKey(), "KEY_2")
+                .set(col1, "A")
+                .set(col2, "X")
+                .set(col3, "C")
+                .build();
+    
+        Row row3 = Row.newBuilder(colModel)
+                .set(colModel.getKey(), "KEY_3")
+                .set(col1, "A")
+                .set(col2, "Y")
+                .set(col3, "Z")
+                .build();
+    
+        Row row4 = Row.newBuilder(colModel)
+                .set(colModel.getKey(), "KEY_4")
+                .set(col1, "X")
+                .set(col2, "Y")
+                .set(col3, "Z")
+                .build();
+    
+        QueryDefinition query =
+            new SQLQueryParser().parse(
+    
+                colModel,
+    
+                "\"COL_1\"='A' "
+    
+                + "AND "
+    
+                + "( "
+    
+                    + "\"COL_2\"='B' "
+    
+                    + "OR "
+    
+                    + "( "
+    
+                        + "\"COL_2\"='Y' "
+    
+                        + "AND "
+    
+                        + "\"COL_3\"='Z' "
+    
+                    + ") "
+    
+                + ")"
+            );
+    
+        FilterExpression expr = query.getFilter();
+    
+        assertTrue(expr.apply(row1));
+        assertFalse(expr.apply(row2));
+        assertTrue(expr.apply(row3));
+        assertFalse(expr.apply(row4));
+    }
+
+    @Test
+    void testSqlMissingClosingParenthesis()
+            throws Exception {
+    
+        ColumnsModel colModel = ColumnsModel.newBuilder()
+                .add(
+                    Column.newBuilder("PK", true)
+                        .type(FieldType.STRING_TYPE))
+                .build();
+    
+        assertThrows(
+    
+            FilterExpressionException.class,
+    
+            () -> new SQLQueryParser().parse(
+    
+                colModel,
+    
+                "(\"PK\"='AAA'"
+            )
+        );
+    }
 }
