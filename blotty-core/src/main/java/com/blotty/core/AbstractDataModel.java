@@ -105,10 +105,11 @@ public abstract class AbstractDataModel {
 		RowChange changes = rowsModel.updRow(r, trackChanges);
 		
 		if (changes!=null) {
+			Row storedRow = rowsModel.getRow(rowsModel.getKey(r));
 			for ( AbstractIndex<?> idx : indexes ) {
-				idx.update(r, changes);	
+				idx.update(storedRow, changes);	
 			}
-			updateStats(r, changes);
+			updateStats(storedRow, changes);
 		}
 		return changes;
 	}

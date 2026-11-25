@@ -8,6 +8,8 @@
  */
 package com.blotty.core.modifiers.filters.conditions;
 
+import java.util.List;
+
 import com.blotty.core.commons.exceptions.FilterExpressionException;
 import com.blotty.core.rows.Row;
 
@@ -28,6 +30,11 @@ public class OrCondition implements IFilterCondition {
     public boolean apply(Row row) throws FilterExpressionException {
         return left.apply(row)
             || right.apply(row);
+    }
+
+    @Override
+    public List<IFilterCondition> children() {
+        return List.of(left, right);
     }
 
     public IFilterCondition getLeft() {

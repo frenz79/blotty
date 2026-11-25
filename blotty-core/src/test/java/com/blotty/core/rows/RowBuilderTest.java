@@ -9,7 +9,6 @@ import com.blotty.core.DataModel;
 import com.blotty.core.columns.Column;
 import com.blotty.core.columns.ColumnsModel;
 import com.blotty.core.commons.exceptions.RowsModelException;
-import com.blotty.core.rows.Row;
 import com.blotty.core.storage.InMemoryRowsModel;
 import com.blotty.core.types.FieldType;
 

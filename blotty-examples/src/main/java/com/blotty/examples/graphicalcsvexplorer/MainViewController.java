@@ -17,6 +17,7 @@ import com.blotty.core.commons.exceptions.ColumnsModelException;
 import com.blotty.core.commons.exceptions.FilterExpressionException;
 import com.blotty.core.commons.exceptions.RowsModelException;
 import com.blotty.core.commons.exceptions.RowsTypeException;
+import com.blotty.core.indexes.HashIndex;
 import com.blotty.core.modifiers.filters.FilterExpression;
 import com.blotty.core.modifiers.filters.conditions.Operand;
 import com.blotty.core.modifiers.filters.conditions.binary.BinaryCondition;
@@ -39,7 +40,7 @@ public class MainViewController {
 		ctr.getView().setVisible( true );
 	}
 	
-	public void loadCsv(File selectedFile) throws ColumnsModelException, IOException, RowsTypeException, RowsModelException {
+	public void loadCsv(File selectedFile) throws ColumnsModelException, IOException, RowsTypeException, RowsModelException, FilterExpressionException {
 		Reader in = new FileReader(selectedFile);
 		ColumnsModel colModel = null;
 		
@@ -56,6 +57,8 @@ public class MainViewController {
 				
 				colModel = colModelBuilder.build();
 				dataModel = new DataModel( new InMemoryRowsModel(colModel) );
+				// 1Million benchmark
+				// dataModel.addIndex( new HashIndex(colModel.getColumn("city")));
 				view.setTableColumns( colModel );
 			} else {
 				Builder row = Row.newBuilder(colModel);
