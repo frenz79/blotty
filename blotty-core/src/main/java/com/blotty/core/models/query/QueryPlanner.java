@@ -22,6 +22,42 @@ import com.blotty.core.modifiers.filters.conditions.IFilterCondition;
 
 public class QueryPlanner {
 
+	 /**
+     * Creates a query execution plan.
+     *
+     * Strategy:
+     *
+     * 1) If no filter is defined, the whole model becomes
+     *    the candidate dataset.
+     *
+     * 2) Extract all leaf conditions from the filter AST.
+     *
+     * 3) Ask every available index if it can support one of
+     *    those conditions.
+     *
+     * 4) Choose the most selective index
+     *    (smallest estimated cardinality).
+     *
+     * 5) Build a residual filter removing the condition already
+     *    satisfied by the chosen index.
+     *
+     * Example:
+     *
+     *      STATUS='OPEN'
+     *      AND
+     *      QTY > 100
+     *
+     * If a HashIndex(STATUS) is available:
+     *
+     *      candidateRows = index.lookup(STATUS='OPEN')
+     *      residualFilter = QTY > 100
+     *
+     * The residual filter is evaluated later by the view.
+     *
+     * NOTE:
+     * OR branches are not optimized in the current implementation.
+     * NOT subtrees are intentionally ignored by the ConditionCollector.
+     */
 	public QueryPlan plan( QueryDefinition queryDef, AbstractDataModel model ) throws RowsModelException, FilterExpressionException {
 		if (!queryDef.hasFilter()) {
 			return useAllRows(model, null);
@@ -34,7 +70,11 @@ public class QueryPlanner {
 			AbstractIndex<?> bestIndex = null;
 			IFilterCondition bestCond = null;
 			long bestCardinality = Long.MAX_VALUE;
-	
+
+			 /**
+             * Evaluate all indexable conditions and
+             * keep the most selective index access path.
+             */
 			for ( IFilterCondition cond : conditions ) {
 				for (AbstractIndex<?> index : model.getIndexes() ) {
 					if (!index.supports(cond)) {
@@ -48,7 +88,11 @@ public class QueryPlanner {
 					}
 				}
 			}
-			
+			 /**
+             * If a suitable index has been found,
+             * use it as candidate generator and
+             * compute the residual filter.
+             */
 			if (bestIndex != null) {
 				IFilterCondition residual = removeCondition(	queryDef.getFilter().getRoot(), bestCond );
 				return new QueryPlan(
@@ -57,10 +101,40 @@ public class QueryPlanner {
 				);
 			}			
 		}
-		
+		/**
+         * Fallback:
+         * full scan over all rows.
+         */
 		return useAllRows(model, queryDef.getFilter().getRoot());
 	}
-	
+
+	/**
+     * Removes a condition from an AND subtree.
+     *
+     * Example:
+     *
+     *      A AND B AND C
+     *
+     * removing B becomes:
+     *
+     *      A AND C
+     *
+     * This is safe because the candidate set
+     * produced by the index already guarantees
+     * that B is true.
+     *
+     * IMPORTANT:
+     *
+     * This optimization is intentionally restricted
+     * to AND trees.
+     *
+     * For OR trees:
+     *
+     *      A OR B
+     *
+     * removing A would produce wrong results,
+     * therefore OR branches are preserved.
+     */
 	private IFilterCondition removeCondition(IFilterCondition root, IFilterCondition condition) {
 		if (root==condition) {
 			return null;
@@ -79,6 +153,12 @@ public class QueryPlanner {
 		return new AndCondition(l, r);
 	}
 
+	/**
+     * Generates a plan performing a full scan of the model.
+     *
+     * All rows become candidates and the complete filter
+     * is evaluated later.
+     */
 	private QueryPlan useAllRows(AbstractDataModel model, IFilterCondition residual) throws RowsModelException, FilterExpressionException {
 		QueryPlan ret = new QueryPlan(residual);
 		RowSet rows = ret.getCandidateRows();
