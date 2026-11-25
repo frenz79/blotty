@@ -54,13 +54,23 @@ public abstract class AbstractDataModel {
 				getColumnsModel().getColumn(i).getStatistics().incNotNullValues();
 			}
 			if (changes!=null) {
-				/* TODO
-				if ( oldR.getFields()[i].isNull() ) {
-					getColumnsModel().getColumn(i).getStatistics().incNullValues();
-				} else {
-					getColumnsModel().getColumn(i).getStatistics().incNotNullValues();
+				for (int colId =  changes.modifiedCols().nextSetBit(0);
+				     colId >= 0;
+				     colId = changes.modifiedCols().nextSetBit(colId+1)) {
+				
+				    ColumnStatistics stats = getColumnsModel().getColumn(colId).getStatistics();
+				    IGenericField oldValue = changes.oldValues().get(changes.resolveId(colId));
+				
+				    IGenericField newValue = r.getFields()[colId];
+				
+				    if (oldValue.isNull() && !newValue.isNull()) {
+				        stats.decNullValues();
+				        stats.incNotNullValues();
+				    } else if (!oldValue.isNull() && newValue.isNull()) {				
+				        stats.decNotNullValues();
+				        stats.incNullValues();
+				    }
 				}
-				*/
 			}
 		}
 	}
@@ -95,9 +105,9 @@ public abstract class AbstractDataModel {
 		
 		if (changes!=null) {
 			for ( AbstractIndex<?> idx : indexes ) {
-				idx.update(r, changes);			
-				updateStats(r, changes);
+				idx.update(r, changes);	
 			}
+			updateStats(r, changes);
 		}
 		return this;
 	}
@@ -105,13 +115,13 @@ public abstract class AbstractDataModel {
 	public AbstractDataModel delRow(Row r) throws RowsModelException {
 		rowsModel.delRow(r);
 		for ( AbstractIndex<?> idx : indexes ) {
-			idx.delete(r);			
-			for ( int i=0; i<getColumnsModel().getColumnsCount(); i++) {
-				if ( r.getFields()[i].isNull() ) {
-					getColumnsModel().getColumn(i).getStatistics().decNullValues();
-				} else {
-					getColumnsModel().getColumn(i).getStatistics().decNotNullValues();
-				}
+			idx.delete(r);
+		}
+		for ( int i=0; i<getColumnsModel().getColumnsCount(); i++) {
+			if ( r.getFields()[i].isNull() ) {
+				getColumnsModel().getColumn(i).getStatistics().decNullValues();
+			} else {
+				getColumnsModel().getColumn(i).getStatistics().decNotNullValues();
 			}
 		}
 		return this;
