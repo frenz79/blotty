@@ -25,6 +25,7 @@ public class ConditionCollector {
 	}
 	
 	private void visit(IFilterCondition node, List<IFilterCondition> result ) {
+		/*
 		if (node instanceof AndCondition and) {
 			visit(and.getLeft(), result);
 			visit(and.getRight(), result);
@@ -35,11 +36,16 @@ public class ConditionCollector {
 			visit(or.getRight(), result);
 			return;
 		}
+		*/
 		if (node instanceof NotCondition) {
 			// visit(not.getCondition(), result);
 			// NOT subtrees are not indexable:
 			// Avoid NOT STATUS='OPEN' to use HashIndex(STATUS)='OPEN'
 			return;
+		}
+		
+		for (IFilterCondition child : node.children()) {
+		    visit(child, result);
 		}
 		result.add(node);
 	}
