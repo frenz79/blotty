@@ -22,4 +22,6 @@ interface FilterVisitor<T> {
     T visit(AndCondition c);
 
     T visit(OrCondition c);
+
+    T visit(NotCondition c);
 }
