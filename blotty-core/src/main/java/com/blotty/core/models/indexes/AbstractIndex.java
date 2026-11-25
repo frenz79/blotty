@@ -74,15 +74,15 @@ public abstract class AbstractIndex<S extends IndexStatistics> {
 			int colId = getColumn().getId();
 			
 			if ( change.modifieldCols().get(colId) ) {
-				IGenericField oldK = r.getFields()[colId];
-				IGenericField newK = change.oldValues().get(change.resolveId(colId));
+				IGenericField newK = r.getFields()[colId];
+				IGenericField oldK = change.oldValues().get(change.resolveId(colId));
 				
 				if (oldK.equals(newK)) {
 					// Should not happen!
 					return;
 				}
-				// TODO: _delete( oldK, oldR );
-				// TODO: _insert( newK, newR );
+				_delete( oldK, r );
+				_insert( newK, r );
 			}			
 		} finally {
 			wlock.unlock();
