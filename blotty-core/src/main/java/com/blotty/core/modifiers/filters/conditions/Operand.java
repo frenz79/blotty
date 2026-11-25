@@ -67,12 +67,12 @@ public class Operand {
 		return (IGenericField)operand;
 	}
 	
-	public boolean isConst() {
-		return type.equals(Type.CONST);
-	}
-
 	public boolean isColumn() {
-		return type.equals(Type.COLUMN);
+	    return type == Type.COLUMN;
+	}
+	
+	public boolean isConst() {
+	    return type == Type.CONST;
 	}
 	
 	@Override
