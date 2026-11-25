@@ -147,7 +147,7 @@ public abstract class AbstractDataModel {
 		return id;
 	}
 	
-	public void addIndex(HashIndex i) throws RowsModelException, FilterExpressionException {
+	public void addIndex(AbstractIndex<?> i) throws RowsModelException, FilterExpressionException {
 		this.indexes.add(i);
 		i.build(rowsModel);
 	}
