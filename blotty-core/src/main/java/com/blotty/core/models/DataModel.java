@@ -46,9 +46,9 @@ public class DataModel extends AbstractDataModel {
 	}
 	
 	@Override
-	public AbstractDataModel updRow(Row r, boolean trackChanges) throws RowsModelException {
-		super.updRow(r, trackChanges);
-		fireDataModelChanged( new RowEvent(RowAction.UPD, r) );
+	public RowChange updRow(Row r, boolean trackChanges) throws RowsModelException {
+		RowChange changes = super.updRow(r, trackChanges);
+		fireDataModelChanged( new RowEvent(RowAction.UPD, r, changes) );
 		return this;
 	}
 	
