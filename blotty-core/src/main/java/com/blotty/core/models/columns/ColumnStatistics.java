@@ -30,11 +30,23 @@ public class ColumnStatistics {
 	}
 	
 	public void decNullValues() {
-		Math.min( 0, --nullValues);
+	    if (nullValues > 0) {
+	        nullValues--;
+	    }
 	}
 	
 	public void decNotNullValues() {
-		Math.min( 0, --notNullValues);
+	    if (notNullValues > 0) {
+	        notNullValues--;
+	    }
 	}
-	
+
+	public long getTotalValues() {
+	    return nullValues + notNullValues;
+	}
+
+	public double getNullRatio() {
+	   	long total = getTotalValues();
+	    return total == 0 ? 0 : ((double) nullValues) / total;
+	}
 }
