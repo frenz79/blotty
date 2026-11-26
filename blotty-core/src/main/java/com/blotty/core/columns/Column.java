@@ -91,7 +91,7 @@ public final class Column {
 	
 	public IGenericField<?> fieldOf(String v) throws RowsTypeException {
 		if (v==null || v.length()==0 ) {
-			return StringField.NULL;
+			return fieldNull();
 		}
 		switch ( type ) {
 		case STRING_TYPE: return from(v);
