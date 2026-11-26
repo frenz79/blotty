@@ -11,12 +11,15 @@ package com.blotty.core.types.impl;
 import com.blotty.core.types.FieldType;
 import com.blotty.core.types.IGenericField;
 
-public class ShortField implements IGenericField<Short> {
+public class ShortField implements IGenericField<ShortField> {
 
 	private short value;
 	
 	public static final ShortField ZERO = new ShortField( (short)0 );
 	public static final ShortField ONE = new ShortField( (short)1 );
+
+	public static final ShortField MAX_VALUE = null;
+	public static final ShortField MIN_VALUE = null;
 	
 	public static ShortField of(String str) {
 		return new ShortField( Short.valueOf(str) );
@@ -59,33 +62,11 @@ public class ShortField implements IGenericField<Short> {
 	}
 
 	@Override
-	public int compareTo(IGenericField<Short> other) {
-	    if (other.isNull()) return 1;
+	public int compareTo(ShortField other) {
 	    return Short.compare(this.value, ((ShortField)other).value);
 	}
 	
-	@Override
-	public int compareTo(Short o) {
-		if (o==null) return 1;
-		return (int)(value - o.shortValue());
-	}
-
 	public short getValue() {
-		return value;
-	}
-
-	@Override
-	public Short getDefaultMax() {
-		return Short.MAX_VALUE;
-	}
-
-	@Override
-	public Short getDefaultMin() {
-		return Short.MIN_VALUE;
-	}
-
-	@Override
-	public Short value() {
 		return value;
 	}
 }

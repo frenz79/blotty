@@ -44,13 +44,12 @@ public class ColumnStatistics {
 		} else if (val.compareTo(maxValue)>0) {
 			maxValue = val;
 			maxCount = 1;
-		} else if (val = minValue) {
+		} else if (val == minValue) {
 			minCount++;
-		} else if (val < minValue) {
+		} else if (val.compareTo(maxValue)<0) {
 			minValue = val;
 			minCount = 1;
 		}
-		
 		
 	}
 	

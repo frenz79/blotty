@@ -8,21 +8,28 @@
  */
 package com.blotty.core.types;
 
+import com.blotty.core.types.impl.BooleanField;
+import com.blotty.core.types.impl.DoubleField;
+import com.blotty.core.types.impl.FloatField;
+import com.blotty.core.types.impl.IntegerField;
+import com.blotty.core.types.impl.LongField;
 import com.blotty.core.types.impl.NullField;
+import com.blotty.core.types.impl.ShortField;
+import com.blotty.core.types.impl.StringField;
 
 public enum FieldType {
 
-	NULL(NullField.),
-	STRING_TYPE,
+	NULL(NullField.NULL,NullField.NULL),
+	STRING_TYPE(StringField.MIN_VALUE, StringField.MAX_VALUE),
 	
-	BOOLEAN_TYPE,
+	BOOLEAN_TYPE(BooleanField.FALSE, BooleanField.TRUE),
 	
-	SHORT_TYPE,
-	INTEGER_TYPE,
-	LONG_TYPE,
+	SHORT_TYPE(ShortField.MIN_VALUE, ShortField.MAX_VALUE),
+	INTEGER_TYPE(IntegerField.MIN_VALUE, IntegerField.MAX_VALUE),
+	LONG_TYPE(LongField.MIN_VALUE, LongField.MAX_VALUE),
 	
-	FLOAT_TYPE,
-	DOUBLE_TYPE;
+	FLOAT_TYPE(FloatField.MIN_VALUE, FloatField.MAX_VALUE),
+	DOUBLE_TYPE(DoubleField.MIN_VALUE, DoubleField.MAX_VALUE);
 
 	private final IGenericField<?> min;
 	private final IGenericField<?> man;

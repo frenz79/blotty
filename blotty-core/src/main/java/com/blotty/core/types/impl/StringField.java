@@ -14,8 +14,11 @@ import java.util.Arrays;
 import com.blotty.core.types.FieldType;
 import com.blotty.core.types.IGenericField;
 
-public class StringField implements IGenericField<byte[]> {
+public class StringField implements IGenericField<StringField> {
 
+	public static final StringField MAX_VALUE = null;
+	public static final StringField MIN_VALUE = null;
+	
 	private byte[] value;
 	private int hash;
 	
@@ -54,16 +57,8 @@ public class StringField implements IGenericField<byte[]> {
 	}
 
 	@Override
-	public int compareTo(IGenericField<byte[]> other) {
-		if (other.isNull()) return 1;
-		if (this==other) return 0;
-		return Arrays.compare(value, ((StringField)other).value);
-	}
-	
-	@Override
-	public int compareTo(byte[] o) {
-		if (o==null) return 1;
-		return Arrays.compare(value, o);
+	public int compareTo(StringField other) {
+		return Arrays.compare(value, other.value);
 	}
 
 	public boolean contains(StringField other) {
@@ -101,18 +96,7 @@ public class StringField implements IGenericField<byte[]> {
 	    return false;
 	}
 
-	@Override
-	public byte[] getDefaultMax() {
-		return null;
-	}
-
-	@Override
-	public byte[] getDefaultMin() {
-		return null;
-	}
-
-	@Override
-	public byte[] value() {
+	public byte[] getValue() {
 		return value;
 	}
 }
