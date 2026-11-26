@@ -29,6 +29,21 @@ public class StringField implements IGenericField<StringField> {
 	private byte[] value;
 	private int hash;
 	
+	public static StringField of(int v) {
+		return of(String.valueOf(v));
+	}
+	public static StringField of(float v) {
+		return of(String.valueOf(v));
+	}
+	public static StringField of(double v) {
+		return of(String.valueOf(v));
+	}
+	public static StringField of(long v) {
+		return of(String.valueOf(v));
+	}
+	public static StringField of(boolean v) {
+		return of(String.valueOf(v));
+	}
 	public static StringField of( String v ) {
 		return new StringField( v.getBytes(StandardCharsets.UTF_8) );
 	}

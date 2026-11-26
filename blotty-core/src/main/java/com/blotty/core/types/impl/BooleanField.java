@@ -40,7 +40,15 @@ public class BooleanField implements IGenericField<BooleanField> {
 	public static BooleanField of(int b) {
 		return (b!=0)?TRUE:FALSE;
 	}
-
+	public static BooleanField of(float v) {
+		return (v!=0.0f)?TRUE:FALSE;
+	}
+	public static BooleanField of(double v) {
+		return (v!=0.0d)?TRUE:FALSE;
+	}
+	public static BooleanField of(long v) {
+		return (v!=0l)?TRUE:FALSE;
+	}
 	public static BooleanField of(boolean v) {
 		return (v)?TRUE:FALSE;
 	}

@@ -23,9 +23,8 @@ public class ColumnsModel {
 	private Column key;
 	
 	private ColumnsModel(){
-		
 	}
-	
+
 	public int getColumnsCount() {
 		return columns.size();
 	}

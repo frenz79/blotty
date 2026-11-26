@@ -29,7 +29,18 @@ public class DoubleField implements IGenericField<DoubleField> {
 	public static DoubleField of(String str) {
 		return new DoubleField( Double.valueOf(str) );
 	}
-
+	public static DoubleField of(long v) {
+		return of((double)v);
+	}
+	public static DoubleField of(float v) {
+		return of((double)v);
+	}
+	public static DoubleField of(int v) {
+		return of((double)v);
+	}
+	public static DoubleField of(boolean v) {
+		return of(v?1.0:0.0);
+	}
 	public static DoubleField of(double v) {
 		if ( v==0.0 ) {
 			return ZERO;

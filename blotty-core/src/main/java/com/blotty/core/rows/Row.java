@@ -25,7 +25,7 @@ public class Row {
 	Row( ColumnsModel colModel ) throws RowsTypeException {
 		this.fields = new IGenericField[ colModel.getColumnsCount() ];
 		for (int i=0; i<this.fields.length; i++) {
-			this.fields[i] = colModel.getColumn(i).fieldNull();
+			this.fields[i] = colModel.getColumn(i).nullField();
 		}
 	}
 
@@ -85,7 +85,7 @@ public class Row {
 	}
 	
 	public Row clear( Column c ) throws RowsTypeException {
-		this.fields[c.getId()] = c.fieldNull();
+		this.fields[c.getId()] = c.nullField();
 		return this;
 	}
 	
@@ -103,27 +103,27 @@ public class Row {
 		}
 		
 		public Builder setNull(Column col) throws RowsTypeException {
-			this.row.set(col, col.fieldNull());
+			this.row.set(col, col.nullField());
 			return this;
 		}
 		
 		public Builder set(Column col, boolean v) throws RowsTypeException {
-			this.row.set(col, col.fieldOf(v));
+			this.row.set(col, col.newField(v));
 			return this;
 		}
 		
 		public Builder set(Column col, long v) throws RowsTypeException {
-			this.row.set(col, col.fieldOf(v));
+			this.row.set(col, col.newField(v));
 			return this;
 		}
 		
 		public Builder set(Column col, double v) throws RowsTypeException {
-			this.row.set(col, col.fieldOf(v));
+			this.row.set(col, col.newField(v));
 			return this;
 		}
 		
 		public Builder set(Column col, String v) throws RowsTypeException {
-			this.row.set(col, col.fieldOf(v));
+			this.row.set(col, col.newField(v));
 			return this;
 		}
 		
@@ -139,7 +139,7 @@ public class Row {
 		
 		public Builder set(String cName, String v) throws RowsTypeException {
 			Column col = colModel.getColumn(cName);
-			this.row.set(col, col.fieldOf(v));
+			this.row.set(col, col.newField(v));
 			return this;
 		}
 		
@@ -151,7 +151,7 @@ public class Row {
 			}
 			for (int i=0; i<len; i++) {
 				Column col = colModel.getColumn(i);
-				this.row.set(col, col.fieldOf(values[i]));
+				this.row.set(col, col.newField(values[i]));
 			}			
 			return this;
 		}

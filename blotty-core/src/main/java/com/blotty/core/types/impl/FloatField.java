@@ -29,7 +29,18 @@ public class FloatField implements IGenericField<FloatField> {
 	public static FloatField of(String str) {
 		return new FloatField( Float.valueOf(str) );
 	}
-
+	public static FloatField of(long v) {
+		return of((float)v);
+	}
+	public static FloatField of(double v) {
+		return of((float)v);
+	}
+	public static FloatField of(int v) {
+		return of((float)v);
+	}
+	public static FloatField of(boolean v) {
+		return of(v?1.0f:0.0f);
+	}
 	public static FloatField of(float v) {
 		if ( v==0.0f ) {
 			return ZERO;

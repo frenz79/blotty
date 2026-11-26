@@ -12,7 +12,10 @@ import com.blotty.core.columns.Column;
 import com.blotty.core.commons.exceptions.RowsTypeException;
 import com.blotty.core.types.IGenericField;
 import com.blotty.core.types.impl.BooleanField;
+import com.blotty.core.types.impl.DoubleField;
+import com.blotty.core.types.impl.FloatField;
 import com.blotty.core.types.impl.IntegerField;
+import com.blotty.core.types.impl.LongField;
 import com.blotty.core.types.impl.StringField;
 
 public class Operand {
@@ -23,21 +26,27 @@ public class Operand {
 	}
 	
 	public static Operand of(String v, Column c) throws RowsTypeException {
-		return new Operand(c.fieldOf(v), Type.CONST);
+		return new Operand(c.newField(v), Type.CONST);
 	}
 	
 	public static Operand of( Column c ) {
 		return new Operand(c, Type.COLUMN);
-	}
-	
+	}	
 	public static Operand of( String c ) {
 		return new Operand(StringField.of(c), Type.CONST);
 	}
-	
 	public static Operand of( int c ) {
 		return new Operand(IntegerField.of(c), Type.CONST);
 	}
-	
+	public static Operand of( long c ) {
+		return new Operand(LongField.of(c), Type.CONST);
+	}
+	public static Operand of( float c ) {
+		return new Operand(FloatField.of(c), Type.CONST);
+	}
+	public static Operand of( double c ) {
+		return new Operand(DoubleField.of(c), Type.CONST);
+	}
 	public static Operand of( boolean c ) {
 		return new Operand(BooleanField.of(c), Type.CONST);
 	}

@@ -32,7 +32,18 @@ public class LongField implements IGenericField<LongField> {
 	public static LongField of(String str) {
 		return new LongField( Long.valueOf(str) );
 	}
-
+	public static LongField of(float v) {
+		return of((long)v);
+	}
+	public static LongField of(double v) {
+		return of((long)v);
+	}
+	public static LongField of(int v) {
+		return of((long)v);
+	}
+	public static LongField of(boolean v) {
+		return of(v?1:0);
+	}
 	public static LongField of(long v) {
 	    if (v == 0L) return ZERO;
 	    if (v == 1L) return ONE;

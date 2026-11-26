@@ -29,7 +29,21 @@ public class ShortField implements IGenericField<ShortField> {
 	public static ShortField of(String str) {
 		return new ShortField( Short.valueOf(str) );
 	}
-
+	public static ShortField of(int v) {
+		return of((short)v);
+	}
+	public static ShortField of(float v) {
+		return of((short)v);
+	}
+	public static ShortField of(double v) {
+		return of((short)v);
+	}
+	public static ShortField of(long v) {
+		return of((short)v);
+	}
+	public static ShortField of(boolean v) {
+		return of(v?1:0);
+	}
 	public static ShortField of(short v) {
 		switch(v) {
 		case 0: return ZERO;

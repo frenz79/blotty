@@ -12,15 +12,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.blotty.core.commons.exceptions.RowsTypeException;
 import com.blotty.core.types.FieldType;
 import com.blotty.core.types.IGenericField;
-import com.blotty.core.types.impl.BooleanField;
-import com.blotty.core.types.impl.DoubleField;
-import com.blotty.core.types.impl.FloatField;
-import com.blotty.core.types.impl.IntegerField;
-import com.blotty.core.types.impl.LongField;
-import com.blotty.core.types.impl.ShortField;
 import com.blotty.core.types.impl.StringField;
 
 public final class Column {
@@ -70,119 +63,34 @@ public final class Column {
 		return type;
 	}
 	
-	private StringField from( String str ) {
-	    return (isCacheable())
-	        ? (StringField) valuesCache.computeIfAbsent(str, StringField::of)
-	        : StringField.of(str);
+	public IGenericField<?> newField(boolean v) {
+		return type.of(v);
+	}
+	public IGenericField<?> newField(short v) {
+		return type.of(v);
+	}
+	public IGenericField<?> newField(int v) {
+		return type.of(v);
+	}
+	public IGenericField<?> newField(long v) {
+		return type.of(v);
+	}
+	public IGenericField<?> newField(float v) {
+		return type.of(v);
+	}
+	public IGenericField<?> newField(double v) {
+		return type.of(v);
+	}
+	public IGenericField<?> newField(String v) {
+		return (isCacheable())
+		        ? (StringField) valuesCache.computeIfAbsent(v, StringField::of)
+		        : StringField.of(v);
 	}
 	
-	public IGenericField<?> fieldNull() throws RowsTypeException {
-		switch ( type ) {
-		case STRING_TYPE: return StringField.NULL;
-		case INTEGER_TYPE: return IntegerField.NULL;
-		case LONG_TYPE:  return LongField.NULL;
-		case BOOLEAN_TYPE: return BooleanField.NULL;
-		case DOUBLE_TYPE: return DoubleField.NULL;
-		case FLOAT_TYPE: return FloatField.NULL;
-		case SHORT_TYPE: return ShortField.NULL;
-		default: throw new RowsTypeException(String.format("Missing impl for type:%s", String.valueOf(type)));
-		}
+	public IGenericField<?> nullField() {
+		return type.ofNull();
 	}
-	
-	public IGenericField<?> fieldOf(String v) throws RowsTypeException {
-		if (v==null || v.length()==0 ) {
-			return fieldNull();
-		}
-		switch ( type ) {
-		case STRING_TYPE: return from(v);
-		case INTEGER_TYPE: return IntegerField.of(v);
-		case LONG_TYPE:  return LongField.of(v);
-		case BOOLEAN_TYPE: return BooleanField.of(v);
-		case DOUBLE_TYPE: return DoubleField.of(v);
-		case FLOAT_TYPE: return FloatField.of(v);
-		case SHORT_TYPE: return ShortField.of(v);
-		default: throw new RowsTypeException(String.format("Missing impl for type:%s", String.valueOf(type)));
-		}		
-	}
-	
-	public IGenericField<?> fieldOf(long v) throws RowsTypeException {
-		switch ( type ) {
-		case STRING_TYPE: return from(String.valueOf(v));
-		case INTEGER_TYPE: return IntegerField.of((int)v);
-		case LONG_TYPE:  return LongField.of(v);
-		case BOOLEAN_TYPE: return BooleanField.of((int)v);
-		case DOUBLE_TYPE: return DoubleField.of(v);
-		case FLOAT_TYPE: return FloatField.of(v);
-		case SHORT_TYPE: return ShortField.of((short)v);
-		default: throw new RowsTypeException(String.format("Missing impl for type:%s", String.valueOf(type)));
-		}
-	}
-	
-	public IGenericField<?> fieldOf(int v) throws RowsTypeException {
-		switch ( type ) {
-		case STRING_TYPE: return from(String.valueOf(v));
-		case INTEGER_TYPE: return IntegerField.of(v);
-		case LONG_TYPE:  return LongField.of((long)v);
-		case BOOLEAN_TYPE: return BooleanField.of(v);
-		case DOUBLE_TYPE: return DoubleField.of(v);
-		case FLOAT_TYPE: return FloatField.of(v);
-		case SHORT_TYPE: return ShortField.of((short)v);
-		default: throw new RowsTypeException(String.format("Missing impl for type:%s", String.valueOf(type)));
-		}
-	}	
-
-	public IGenericField<?> fieldOf(float v) throws RowsTypeException {
-		switch ( type ) {
-		case STRING_TYPE: return from(String.valueOf(v));
-		case INTEGER_TYPE: return IntegerField.of((int)v);
-		case LONG_TYPE:  return LongField.of((long)v);
-		case BOOLEAN_TYPE: return BooleanField.of((int)v);
-		case DOUBLE_TYPE: return DoubleField.of(v);
-		case FLOAT_TYPE: return FloatField.of(v);
-		case SHORT_TYPE: return ShortField.of((short)v);
-		default: throw new RowsTypeException(String.format("Missing impl for type:%s", String.valueOf(type)));
-		}
-	}
-	
-	public IGenericField<?> fieldOf(double v) throws RowsTypeException {
-		switch ( type ) {
-		case STRING_TYPE: return from(String.valueOf(v));
-		case INTEGER_TYPE: return IntegerField.of((int)v);
-		case LONG_TYPE:  return LongField.of((long)v);
-		case BOOLEAN_TYPE: return BooleanField.of((int)v);
-		case DOUBLE_TYPE: return DoubleField.of(v);
-		case FLOAT_TYPE: return FloatField.of((float)v);
-		case SHORT_TYPE: return ShortField.of((short)v);
-		default: throw new RowsTypeException(String.format("Missing impl for type:%s", String.valueOf(type)));
-		}
-	}
-	
-	public IGenericField<?> fieldOf(boolean v) throws RowsTypeException {
-		switch ( type ) {
-		case STRING_TYPE: return from(String.valueOf(v));
-	//	case INTEGER_TYPE: return IntegerField.of(v);
-	//	case LONG_TYPE:  return LongField.of((long)v);
-		case BOOLEAN_TYPE: return BooleanField.of(v);
-	//	case DOUBLE_TYPE: return DoubleField.of(v);
-	//	case FLOAT_TYPE: return FloatField.of(v);
-	//	case SHORT_TYPE: return ShortField.of((short)v);
-		default: throw new RowsTypeException(String.format("Missing impl for type:%s", String.valueOf(type)));
-		}
-	}
-	
-	public IGenericField<?> fieldOf(short v) throws RowsTypeException {
-		switch ( type ) {
-		case STRING_TYPE: return from(String.valueOf(v));
-		case INTEGER_TYPE: return IntegerField.of((int)v);
-		case LONG_TYPE:  return LongField.of((long)v);
-		case BOOLEAN_TYPE: return BooleanField.of(v);
-		case DOUBLE_TYPE: return DoubleField.of(v);
-		case FLOAT_TYPE: return FloatField.of(v);
-		case SHORT_TYPE: return ShortField.of((short)v);
-		default: throw new RowsTypeException(String.format("Missing impl for type:%s", String.valueOf(type)));
-		}
-	}
-	
+		
 	@Override
 	public String toString() {
 		return "Column [id=" + id + ", name=" + name + ", type=" + type + "]";

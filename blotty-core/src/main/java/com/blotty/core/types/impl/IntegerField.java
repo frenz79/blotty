@@ -33,7 +33,18 @@ public class IntegerField implements IGenericField<IntegerField> {
 	public static IntegerField of(String str) {
 		return new IntegerField( Integer.valueOf(str) );
 	}
-
+	public static IntegerField of(float v) {
+		return of((int)v);
+	}
+	public static IntegerField of(double v) {
+		return of((int)v);
+	}
+	public static IntegerField of(long v) {
+		return of((int)v);
+	}
+	public static IntegerField of(boolean v) {
+		return of(v?1:0);
+	}
 	public static IntegerField of(int v) {
 		switch(v) {
 		case 0: return ZERO;
