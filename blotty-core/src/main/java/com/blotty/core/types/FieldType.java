@@ -8,9 +8,11 @@
  */
 package com.blotty.core.types;
 
+import com.blotty.core.types.impl.NullField;
+
 public enum FieldType {
 
-	NULL,
+	NULL(NullField.),
 	STRING_TYPE,
 	
 	BOOLEAN_TYPE,
@@ -20,6 +22,21 @@ public enum FieldType {
 	LONG_TYPE,
 	
 	FLOAT_TYPE,
-	DOUBLE_TYPE
+	DOUBLE_TYPE;
+
+	private final IGenericField<?> min;
+	private final IGenericField<?> man;
 	
+	public IGenericField<?> getDefaultMax() {
+		return man;
+	}
+
+	public IGenericField<?> getDefaultMin() {
+		return min;
+	}
+
+	private FieldType(IGenericField<?> min, IGenericField<?> man) {
+		this.min = min;
+		this.man = man;
+	}	
 }

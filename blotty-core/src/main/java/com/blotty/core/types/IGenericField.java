@@ -10,7 +10,7 @@ package com.blotty.core.types;
 
 import java.io.Serializable;
 
-public interface IGenericField extends Serializable {
+public interface IGenericField<T extends IGenericField<T>> extends Comparable<T>, Serializable {
 
 	public default boolean isNull() {
 		return false;
@@ -18,5 +18,13 @@ public interface IGenericField extends Serializable {
 	
 	public FieldType getType();
 
-	public int compareTo(IGenericField other);
+	public default T value() {
+		return (T)this;
+	}
+
+	public default int compareTo(IGenericField<?> v) {
+		if (v==null) return 1;
+		if (this==v) return 0;
+		return this.compareTo((T)v);
+	}
 }

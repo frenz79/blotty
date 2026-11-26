@@ -11,7 +11,7 @@ package com.blotty.core.types.impl;
 import com.blotty.core.types.FieldType;
 import com.blotty.core.types.IGenericField;
 
-public class FloatField implements IGenericField {
+public class FloatField implements IGenericField<Float> {
 
 	private float value;
 	
@@ -61,9 +61,30 @@ public class FloatField implements IGenericField {
 	}
 
 	@Override
-	public int compareTo(IGenericField other) {
+	public int compareTo(IGenericField<Float> other) {
 	    if (other.isNull()) return 1;
 	    return Float.compare(this.value, ((FloatField)other).value);
+	}
+	
+	@Override
+	public int compareTo(Float o) {
+		if (o==null) return 1;
+		return (int)(value - o.floatValue());
+	}
+	
+	@Override
+	public Float getDefaultMax() {
+		return Float.MAX_VALUE;
+	}
+
+	@Override
+	public Float getDefaultMin() {
+		return Float.MIN_VALUE;
+	}
+
+	@Override
+	public Float value() {
+		return value;
 	}
 }
 

@@ -33,7 +33,7 @@ public final class Column {
 	private final boolean isKey;
 	
 	private Map<String,Object> properties;
-	private final Map<String,StringField> stringFieldsCache = new ConcurrentHashMap<>();
+	private Map<String,? extends IGenericField> valuesCache;
 	
 	private final ColumnStatistics statistics;
 	
@@ -73,7 +73,7 @@ public final class Column {
 	
 	private StringField from( String str ) {
 	    return (isCacheable())
-	        ? stringFieldsCache.computeIfAbsent(str, StringField::of)
+	        ? (StringField) valuesCache.computeIfAbsent(str, StringField::of)
 	        : StringField.of(str);
 	}
 	
@@ -192,16 +192,15 @@ public final class Column {
 		return properties;
 	}
 
-	public Map<String, StringField> getStringFieldsCache() {
-		return stringFieldsCache;
-	}
-
 	public void setType(FieldType type) {
 		this.type = type;
 	}
 
 	public void setCacheable(boolean cacheable) {
 		this.cacheable = cacheable;
+		if (cacheable) {
+			this.valuesCache = new ConcurrentHashMap<>();
+		}
 	}
 		
 	public static Builder newBuilder(String colName, boolean isKey) {

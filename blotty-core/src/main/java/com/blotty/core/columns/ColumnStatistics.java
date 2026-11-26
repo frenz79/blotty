@@ -8,11 +8,61 @@
  */
 package com.blotty.core.columns;
 
+import java.util.BitSet;
+
+import com.blotty.core.types.FieldType;
+import com.blotty.core.types.IGenericField;
+
 public class ColumnStatistics {
 
 	private long nullValues = 0;
 	private long notNullValues = 0;
+	private IGenericField<?> maxValue;
+	private IGenericField<?> minValue;
+	private boolean dirtyMax = false;
+	private boolean dirtyMin = false;
+	private int maxCount = 0;
+	private int minCount = 0;	
+	private final BitSet footprint = new BitSet(512);
+	private final int[] distribution = new int[32];
+		
+	public ColumnStatistics( FieldType colType ) {
+		this.maxValue = colType.getDefaultMax();
+		this.minValue = colType.getDefaultMin();
+	}
 	
+	private void add ( IGenericField<?> v) {
+		if (v.isNull()) {
+			nullValues++;
+			return;
+		}
+		notNullValues++;
+		
+		IGenericField<?> val = v.value();
+		if (val == maxValue) {
+			maxCount++;
+		} else if (val.compareTo(maxValue)>0) {
+			maxValue = val;
+			maxCount = 1;
+		} else if (val = minValue) {
+			minCount++;
+		} else if (val < minValue) {
+			minValue = val;
+			minCount = 1;
+		}
+		
+		
+	}
+	
+	private void del ( IGenericField v) {
+		
+	}
+	
+	private void upd ( IGenericField v) {
+		
+	}
+	
+
 	public long getNullValues() {
 		return nullValues;
 	}

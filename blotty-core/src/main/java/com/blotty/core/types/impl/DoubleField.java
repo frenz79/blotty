@@ -11,7 +11,7 @@ package com.blotty.core.types.impl;
 import com.blotty.core.types.FieldType;
 import com.blotty.core.types.IGenericField;
 
-public class DoubleField implements IGenericField {
+public class DoubleField implements IGenericField<Double> {
 
 	private double value;
 	
@@ -61,12 +61,33 @@ public class DoubleField implements IGenericField {
 	}
 
 	@Override
-	public int compareTo(IGenericField other) {
+	public int compareTo(IGenericField<Double> other) {
 	    if (other.isNull()) return 1;
 	    return Double.compare(this.value, ((DoubleField)other).value);
 	}
+	
+	@Override
+	public int compareTo(Double o) {
+		if (o==null) return 1;
+		return (int)(value - o.doubleValue());
+	}
 
 	public double getValue() {
+		return value;
+	}
+	
+	@Override
+	public Double getDefaultMax() {
+		return Double.MAX_VALUE;
+	}
+
+	@Override
+	public Double getDefaultMin() {
+		return Double.MIN_VALUE;
+	}
+
+	@Override
+	public Double value() {
 		return value;
 	}
 }

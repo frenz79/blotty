@@ -11,7 +11,7 @@ package com.blotty.core.types.impl;
 import com.blotty.core.types.FieldType;
 import com.blotty.core.types.IGenericField;
 
-public class IntegerField implements IGenericField {
+public class IntegerField implements IGenericField<IntegerField> {
 
 	private int value;
 	
@@ -63,14 +63,14 @@ public class IntegerField implements IGenericField {
 	public String toString() {
 		return String.valueOf(value);
 	}
-
-	@Override
-	public int compareTo(IGenericField other) {
-	    if (other.isNull()) return 1;
-	    return Integer.compare(this.value, ((IntegerField)other).value);
-	}
-
+	
 	public int getValue() {
 		return value;
+	}
+
+	@Override
+	public int compareTo(IntegerField other) {
+		  if (other.isNull()) return 1;
+		  return Integer.compare(this.value, other.value);
 	}
 }

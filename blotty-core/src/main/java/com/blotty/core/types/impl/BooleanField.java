@@ -11,7 +11,7 @@ package com.blotty.core.types.impl;
 import com.blotty.core.types.FieldType;
 import com.blotty.core.types.IGenericField;
 
-public class BooleanField implements IGenericField {
+public class BooleanField implements IGenericField<Boolean> {
 
 	private boolean value;
 	
@@ -27,9 +27,16 @@ public class BooleanField implements IGenericField {
 	}
 
 	@Override
-	public int compareTo(IGenericField other) {
+	public int compareTo(IGenericField<Boolean> other) {
 	    if (other.isNull()) return 1;
 	    return Boolean.compare(this.value, ((BooleanField)other).value);
+	}
+	
+	@Override
+	public int compareTo(Boolean o) {
+		if (o==null) return 1;
+		if (value==o.booleanValue()) return 0;
+		return (value)?1:-1;
 	}
 	
 	public static BooleanField of(int b) {
@@ -69,6 +76,21 @@ public class BooleanField implements IGenericField {
 	}
 
 	public boolean getValue() {
+		return value;
+	}
+
+	@Override
+	public Boolean getDefaultMax() {
+		return null;
+	}
+
+	@Override
+	public Boolean getDefaultMin() {
+		return null;
+	}
+
+	@Override
+	public Boolean value() {
 		return value;
 	}
 }

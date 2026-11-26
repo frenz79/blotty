@@ -11,7 +11,7 @@ package com.blotty.core.types.impl;
 import com.blotty.core.types.FieldType;
 import com.blotty.core.types.IGenericField;
 
-public class ShortField implements IGenericField {
+public class ShortField implements IGenericField<Short> {
 
 	private short value;
 	
@@ -59,12 +59,33 @@ public class ShortField implements IGenericField {
 	}
 
 	@Override
-	public int compareTo(IGenericField other) {
+	public int compareTo(IGenericField<Short> other) {
 	    if (other.isNull()) return 1;
 	    return Short.compare(this.value, ((ShortField)other).value);
 	}
+	
+	@Override
+	public int compareTo(Short o) {
+		if (o==null) return 1;
+		return (int)(value - o.shortValue());
+	}
 
 	public short getValue() {
+		return value;
+	}
+
+	@Override
+	public Short getDefaultMax() {
+		return Short.MAX_VALUE;
+	}
+
+	@Override
+	public Short getDefaultMin() {
+		return Short.MIN_VALUE;
+	}
+
+	@Override
+	public Short value() {
 		return value;
 	}
 }

@@ -11,7 +11,7 @@ package com.blotty.core.types.impl;
 import com.blotty.core.types.FieldType;
 import com.blotty.core.types.IGenericField;
 
-public class LongField implements IGenericField {
+public class LongField implements IGenericField<Long> {
 
 	private long value;
 	
@@ -35,9 +35,15 @@ public class LongField implements IGenericField {
 	}
 
 	@Override
-	public int compareTo(IGenericField other) {
+	public int compareTo(IGenericField<Long> other) {
 	    if (other.isNull()) return 1;
 	    return Long.compare(this.value, ((LongField)other).value);
+	}
+	
+	@Override
+	public int compareTo(Long o) {
+		if (o==null) return 1;
+		return (int)(value - o.longValue());
 	}
 	
 	LongField( long v ){
@@ -69,6 +75,21 @@ public class LongField implements IGenericField {
 	}
 
 	public long getValue() {
+		return value;
+	}
+
+	@Override
+	public Long getDefaultMax() {
+		return Long.MAX_VALUE;
+	}
+
+	@Override
+	public Long getDefaultMin() {
+		return Long.MIN_VALUE;
+	}
+
+	@Override
+	public Long value() {
 		return value;
 	}
 }
