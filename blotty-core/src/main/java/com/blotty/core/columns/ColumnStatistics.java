@@ -66,14 +66,14 @@ public class ColumnStatistics {
 		}
 		
 		setUnsetDistributionStats(val, true);
+		
 		// first ins
-		if (this.maxValue == defaultMaxValue) {
+		if (getNotNullValues()==1) {
 			maxValue = val;
 			maxCount = 1;	
-		}
-		if (this.minValue == defaultMinValue) {
 			minValue = val;
-			minCount = 1;	
+			minCount = 1;
+			return;
 		}
 		
 		int cmpMax = val.compareGeneric(maxValue);
@@ -202,6 +202,8 @@ public class ColumnStatistics {
 	 * higher (>0.9) -> high uniformity
 	 */
 	public double getUniformityScore() {
+		if (getNotNullValues()==0) return 0.0d;
+		
 		double mean = getNotNullValues() / (double)DISTRIBUTION_SIZE;
 		double deviation = 0.0d;
 		for (int v: distribution) {
@@ -234,12 +236,16 @@ public class ColumnStatistics {
 	 * smaller(<0.1) -> useless
 	 * higher (>0.9) -> yeah!
 	 */
-	public double getSelectivityEstimate() {
+	public double getIndexAffinity() {
 		return getDistinctness() * getBucketOccupancy();
 	}
 	
+	public double getSparsity() {
+		return 1.0 - getNotNullRatio();
+	}
+	
 	public double getPlannerScore() {
-		return getNotNullRatio() * getDistinctness() * getUniformityScore();
+		return Math.sqrt(getNotNullRatio() * getDistinctness() * getUniformityScore());
 	}
 	
 	public double getNullRatio() {
