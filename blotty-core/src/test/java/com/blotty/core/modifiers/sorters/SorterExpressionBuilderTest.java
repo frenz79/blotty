@@ -17,7 +17,6 @@ import com.blotty.core.rows.Row;
 import com.blotty.core.storage.InMemoryRowsModel;
 import com.blotty.core.types.FieldType;
 import com.blotty.core.types.impl.IntegerField;
-import com.blotty.core.types.impl.NullField;
 
 class SorterExpressionBuilderTest {
 

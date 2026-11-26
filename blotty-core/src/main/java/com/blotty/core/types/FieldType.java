@@ -13,13 +13,11 @@ import com.blotty.core.types.impl.DoubleField;
 import com.blotty.core.types.impl.FloatField;
 import com.blotty.core.types.impl.IntegerField;
 import com.blotty.core.types.impl.LongField;
-import com.blotty.core.types.impl.NullField;
 import com.blotty.core.types.impl.ShortField;
 import com.blotty.core.types.impl.StringField;
 
 public enum FieldType {
 
-	NULL(NullField.NULL,NullField.NULL),
 	STRING_TYPE(StringField.MIN_VALUE, StringField.MAX_VALUE),
 	
 	BOOLEAN_TYPE(BooleanField.FALSE, BooleanField.TRUE),

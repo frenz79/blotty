@@ -20,8 +20,14 @@ public class LongField implements IGenericField<LongField> {
 	public static final LongField TEN = new LongField( 10l );
 	public static final LongField ONE_HUNDRED = new LongField( 100l );
 	public static final LongField ONE_THOUSAND = new LongField( 1000l );
-	public static final LongField MAX_VALUE = null;
-	public static final LongField MIN_VALUE = null;
+	public static final LongField MAX_VALUE = new LongField( Long.MAX_VALUE );
+	public static final LongField MIN_VALUE = new LongField( Long.MAX_VALUE );
+	public static final LongField NULL = new LongField( 0L ) {
+		@Override
+		public boolean isNull() {
+			return true;
+		}
+	};
 	
 	public static LongField of(String str) {
 		return new LongField( Long.valueOf(str) );

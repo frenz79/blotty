@@ -21,8 +21,14 @@ public class IntegerField implements IGenericField<IntegerField> {
 	public static final IntegerField ONE_HUNDRED = new IntegerField( 100 );
 	public static final IntegerField ONE_THOUSAND = new IntegerField( 1000 );
 	
-	public static final IntegerField MAX_VALUE = null;
-	public static final IntegerField MIN_VALUE = null;
+	public static final IntegerField MAX_VALUE = new IntegerField( Integer.MAX_VALUE );
+	public static final IntegerField MIN_VALUE = new IntegerField( Integer.MIN_VALUE );
+	public static final IntegerField NULL = new IntegerField( 0 ) {
+		@Override
+		public boolean isNull() {
+			return true;
+		}
+	};
 	
 	public static IntegerField of(String str) {
 		return new IntegerField( Integer.valueOf(str) );

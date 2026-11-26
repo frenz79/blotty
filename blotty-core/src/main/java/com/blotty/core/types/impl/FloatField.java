@@ -17,8 +17,14 @@ public class FloatField implements IGenericField<FloatField> {
 	
 	public static final FloatField ZERO = new FloatField( 0.0f );
 	public static final FloatField ONE = new FloatField( 1.0f );
-	public static final FloatField MAX_VALUE = null;
-	public static final FloatField MIN_VALUE = null;
+	public static final FloatField MAX_VALUE = new FloatField( Float.MAX_VALUE );
+	public static final FloatField MIN_VALUE = new FloatField( Float.MIN_VALUE );
+	public static final FloatField NULL = new FloatField( 0.0f ) {
+		@Override
+		public boolean isNull() {
+			return true;
+		}
+	};
 	
 	public static FloatField of(String str) {
 		return new FloatField( Float.valueOf(str) );

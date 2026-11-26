@@ -6,26 +6,25 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 
 import com.blotty.core.types.impl.IntegerField;
-import com.blotty.core.types.impl.NullField;
 
 class AscNullFirstTest {
 
 	@Test
 	void testCompareBothNull() {
 		AscNullFirst op = new AscNullFirst();
-		assertEquals(0, op.compare(NullField.NULL, NullField.NULL));
+		assertEquals(0, op.compare(IntegerField.NULL, IntegerField.NULL));
 	}
 
 	@Test
 	void testCompareFirstNull() {
 		AscNullFirst op = new AscNullFirst();
-		assertEquals(-1, op.compare(NullField.NULL, IntegerField.of(5)));
+		assertEquals(-1, op.compare(IntegerField.NULL, IntegerField.of(5)));
 	}
 
 	@Test
 	void testCompareSecondNull() {
 		AscNullFirst op = new AscNullFirst();
-		assertEquals(1, op.compare(IntegerField.of(5), NullField.NULL));
+		assertEquals(1, op.compare(IntegerField.of(5), IntegerField.NULL));
 	}
 
 	@Test

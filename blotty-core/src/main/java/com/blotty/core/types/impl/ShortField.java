@@ -17,9 +17,14 @@ public class ShortField implements IGenericField<ShortField> {
 	
 	public static final ShortField ZERO = new ShortField( (short)0 );
 	public static final ShortField ONE = new ShortField( (short)1 );
-
-	public static final ShortField MAX_VALUE = null;
-	public static final ShortField MIN_VALUE = null;
+	public static final ShortField MAX_VALUE = new ShortField( Short.MAX_VALUE );
+	public static final ShortField MIN_VALUE = new ShortField( Short.MIN_VALUE );
+	public static final ShortField NULL = new ShortField( (short)0 ) {
+		@Override
+		public boolean isNull() {
+			return true;
+		}
+	};
 	
 	public static ShortField of(String str) {
 		return new ShortField( Short.valueOf(str) );

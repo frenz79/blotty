@@ -17,8 +17,14 @@ public class DoubleField implements IGenericField<DoubleField> {
 	
 	public static final DoubleField ZERO = new DoubleField( 0.0d );
 	public static final DoubleField ONE = new DoubleField( 1.0d );
-	public static final DoubleField MAX_VALUE = null;
-	public static final DoubleField MIN_VALUE = null;
+	public static final DoubleField MAX_VALUE = new DoubleField( Double.MAX_VALUE );
+	public static final DoubleField MIN_VALUE = new DoubleField( Double.MIN_VALUE );
+	public static final DoubleField NULL = new DoubleField( 0.0d ) {
+		@Override
+		public boolean isNull() {
+			return true;
+		}
+	};
 	
 	public static DoubleField of(String str) {
 		return new DoubleField( Double.valueOf(str) );

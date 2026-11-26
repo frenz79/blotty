@@ -17,16 +17,15 @@ import com.blotty.core.columns.ColumnsModel;
 import com.blotty.core.commons.exceptions.RowsModelException;
 import com.blotty.core.commons.exceptions.RowsTypeException;
 import com.blotty.core.types.IGenericField;
-import com.blotty.core.types.impl.NullField;
 
 public class Row {
 
-	private final IGenericField[] fields;
+	private final IGenericField<?>[] fields;
 	
-	Row( ColumnsModel colModel ) {
+	Row( ColumnsModel colModel ) throws RowsTypeException {
 		this.fields = new IGenericField[ colModel.getColumnsCount() ];
 		for (int i=0; i<this.fields.length; i++) {
-			this.fields[i] = NullField.NULL;
+			this.fields[i] = colModel.getColumn(i).fieldNull();
 		}
 	}
 
@@ -36,7 +35,7 @@ public class Row {
 	
 	public static record RowChange(
 		BitSet modifiedCols,
-		List<IGenericField> oldValues
+		List<IGenericField<?>> oldValues
 	) {
 		public boolean isModified( int columnId ) {
 			return modifiedCols.get(columnId);
@@ -65,9 +64,9 @@ public class Row {
 		}
 		
 		BitSet modifiedCols = new BitSet(fields.length);
-		List<IGenericField> oldValues = new ArrayList<>();
+		List<IGenericField<?>> oldValues = new ArrayList<>();
 		for (int i=0; i<fields.length; i++) {
-			if (fields[i].compareTo(row.fields[i])!=0) {
+			if (fields[i].compareGeneric(row.fields[i])!=0) {
 				modifiedCols.set(i, true);
 				oldValues.add(fields[i]);
 				fields[i] = row.fields[i];
@@ -85,12 +84,12 @@ public class Row {
 		return this;
 	}
 	
-	public Row clear( Column c ) {
-		this.fields[c.getId()] = NullField.NULL;
+	public Row clear( Column c ) throws RowsTypeException {
+		this.fields[c.getId()] = c.fieldNull();
 		return this;
 	}
 	
-	public static Builder newBuilder(ColumnsModel colModel) {
+	public static Builder newBuilder(ColumnsModel colModel) throws RowsTypeException {
 		return new Builder(colModel);
 	}
 	
@@ -98,13 +97,13 @@ public class Row {
 		private final Row row;
 		private final ColumnsModel colModel;
 		
-		public Builder(ColumnsModel colModel) {
+		public Builder(ColumnsModel colModel) throws RowsTypeException {
 			this.row = new Row(colModel);
 			this.colModel = colModel;
 		}
 		
 		public Builder setNull(Column col) throws RowsTypeException {
-			this.row.set(col, NullField.NULL);
+			this.row.set(col, col.fieldNull());
 			return this;
 		}
 		

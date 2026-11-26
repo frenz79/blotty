@@ -41,7 +41,7 @@ class FieldsTest {
 		assertTrue(BooleanField.FALSE.compareTo(BooleanField.TRUE) < 0);
 		assertTrue(BooleanField.TRUE.compareTo(BooleanField.FALSE) > 0);
 		assertEquals(0, BooleanField.TRUE.compareTo(BooleanField.TRUE));
-		assertTrue(BooleanField.TRUE.compareTo(NullField.NULL) > 0);
+		assertTrue(BooleanField.TRUE.compareGeneric(BooleanField.NULL) > 0);
 	}
 
 	@Test
@@ -64,7 +64,7 @@ class FieldsTest {
 		assertTrue(min.compareTo(one) < 0);
 		assertTrue(one.compareTo(min) > 0);
 		assertEquals(0, one.compareTo(IntegerField.of(1)));
-		assertTrue(one.compareTo(NullField.NULL) > 0);
+		assertTrue(one.compareGeneric(IntegerField.NULL) > 0);
 	}
 
 	@Test
@@ -89,7 +89,7 @@ class FieldsTest {
 		// Test comparison across large spans
 		assertTrue(LongField.of(3_000_000_000L).compareTo(LongField.of(0L)) > 0);
 		assertTrue(LongField.of(0L).compareTo(LongField.of(3_000_000_000L)) < 0);
-		assertTrue(LongField.of(1L).compareTo(NullField.NULL) > 0);
+		assertTrue(LongField.of(1L).compareGeneric(LongField.NULL) > 0);
 	}
 
 	@Test
@@ -108,7 +108,7 @@ class FieldsTest {
 		assertTrue(d1.compareTo(d2) < 0);
 		assertTrue(d2.compareTo(d1) > 0);
 		assertEquals(0, d1.compareTo(DoubleField.of(1.2)));
-		assertTrue(d1.compareTo(NullField.NULL) > 0);
+		assertTrue(d1.compareGeneric(DoubleField.NULL) > 0);
 	}
 
 	@Test
@@ -127,7 +127,7 @@ class FieldsTest {
 		assertTrue(f1.compareTo(f2) < 0);
 		assertTrue(f2.compareTo(f1) > 0);
 		assertEquals(0, f1.compareTo(FloatField.of(1.2f)));
-		assertTrue(f1.compareTo(NullField.NULL) > 0);
+		assertTrue(f1.compareGeneric(FloatField.NULL) > 0);
 	}
 
 	@Test
@@ -141,7 +141,7 @@ class FieldsTest {
 		assertEquals(ShortField.of((short) 15), ShortField.of("15"));
 		assertTrue(ShortField.of((short) 10).compareTo(ShortField.of((short) 20)) < 0);
 		assertTrue(ShortField.of((short) 20).compareTo(ShortField.of((short) 10)) > 0);
-		assertTrue(ShortField.of((short) 1).compareTo(NullField.NULL) > 0);
+		assertTrue(ShortField.of((short) 1).compareGeneric(ShortField.NULL) > 0);
 	}
 
 	@Test
@@ -165,21 +165,5 @@ class FieldsTest {
 		assertTrue(s2.compareTo(s1) < 0);
 		assertTrue(s1.compareTo(s2) > 0);
 		assertEquals(0, s1.compareTo(s3));
-	}
-
-	@Test
-	void testNullField() {
-		NullField n1 = NullField.NULL;
-		NullField n2 = new NullField();
-
-		assertTrue(n1.isNull());
-		assertEquals(FieldType.NULL, n1.getType());
-		assertEquals("NULL", n1.toString());
-
-		assertEquals(n1, n2);
-		assertEquals(n1.hashCode(), n2.hashCode());
-
-		assertEquals(0, n1.compareTo(n2));
-		assertTrue(n1.compareTo(StringField.of("abc")) < 0);
 	}
 }

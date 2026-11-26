@@ -15,7 +15,6 @@ import com.blotty.core.modifiers.filters.conditions.unary.operators.IsNotNull;
 import com.blotty.core.modifiers.filters.conditions.unary.operators.IsNull;
 import com.blotty.core.rows.Row;
 import com.blotty.core.types.FieldType;
-import com.blotty.core.types.impl.NullField;
 
 class UnaryConditionTest {
 

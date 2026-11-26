@@ -31,33 +31,34 @@ public class ColumnStatistics {
 		this.minValue = colType.getDefaultMin();
 	}
 	
-	private void add ( IGenericField<?> v) {
-		if (v.isNull()) {
+	public void add ( IGenericField<?> val) {
+		if (val.isNull()) {
 			nullValues++;
 			return;
 		}
 		notNullValues++;
-		
-		IGenericField<?> val = v.value();
-		if (val == maxValue) {
+		int cmpMax = val.compareGeneric(maxValue);
+		if (cmpMax == 0) {
 			maxCount++;
-		} else if (val.compareTo(maxValue)>0) {
+		} else if (cmpMax>0) {
 			maxValue = val;
 			maxCount = 1;
-		} else if (val == minValue) {
-			minCount++;
-		} else if (val.compareTo(maxValue)<0) {
-			minValue = val;
-			minCount = 1;
-		}
+		} else {
+			int cmpMin = val.compareGeneric(minValue);
+			if (cmpMin==0) {		
+				minCount++;
+			} else if (cmpMin<0) {
+				minValue = val;
+				minCount = 1;
+			}
+		}		
+	}
+	
+	public void del ( IGenericField<?> v) {
 		
 	}
 	
-	private void del ( IGenericField v) {
-		
-	}
-	
-	private void upd ( IGenericField v) {
+	public void upd ( IGenericField<?> v) {
 		
 	}
 	

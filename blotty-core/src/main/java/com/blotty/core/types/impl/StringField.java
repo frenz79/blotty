@@ -15,9 +15,16 @@ import com.blotty.core.types.FieldType;
 import com.blotty.core.types.IGenericField;
 
 public class StringField implements IGenericField<StringField> {
-
-	public static final StringField MAX_VALUE = null;
-	public static final StringField MIN_VALUE = null;
+	
+	public static final StringField EMPTY = StringField.of("");
+	public static final StringField MAX_VALUE = EMPTY;
+	public static final StringField MIN_VALUE = EMPTY;
+	public static final StringField NULL = new StringField( new byte[] {} ) {
+		@Override
+		public boolean isNull() {
+			return true;
+		}
+	};
 	
 	private byte[] value;
 	private int hash;

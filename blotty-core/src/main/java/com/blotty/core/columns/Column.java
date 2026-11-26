@@ -20,7 +20,6 @@ import com.blotty.core.types.impl.DoubleField;
 import com.blotty.core.types.impl.FloatField;
 import com.blotty.core.types.impl.IntegerField;
 import com.blotty.core.types.impl.LongField;
-import com.blotty.core.types.impl.NullField;
 import com.blotty.core.types.impl.ShortField;
 import com.blotty.core.types.impl.StringField;
 
@@ -33,7 +32,7 @@ public final class Column {
 	private final boolean isKey;
 	
 	private Map<String,Object> properties;
-	private Map<String,? extends IGenericField> valuesCache;
+	private Map<String,? extends IGenericField<?>> valuesCache;
 	
 	private ColumnStatistics statistics;
 	
@@ -76,12 +75,24 @@ public final class Column {
 	        : StringField.of(str);
 	}
 	
+	public IGenericField<?> fieldNull() throws RowsTypeException {
+		switch ( type ) {
+		case STRING_TYPE: return StringField.NULL;
+		case INTEGER_TYPE: return IntegerField.NULL;
+		case LONG_TYPE:  return LongField.NULL;
+		case BOOLEAN_TYPE: return BooleanField.NULL;
+		case DOUBLE_TYPE: return DoubleField.NULL;
+		case FLOAT_TYPE: return FloatField.NULL;
+		case SHORT_TYPE: return ShortField.NULL;
+		default: throw new RowsTypeException(String.format("Missing impl for type:%s", String.valueOf(type)));
+		}
+	}
+	
 	public IGenericField<?> fieldOf(String v) throws RowsTypeException {
 		if (v==null || v.length()==0 ) {
-			return NullField.NULL;
+			return StringField.NULL;
 		}
 		switch ( type ) {
-		case NULL: 	return NullField.NULL;
 		case STRING_TYPE: return from(v);
 		case INTEGER_TYPE: return IntegerField.of(v);
 		case LONG_TYPE:  return LongField.of(v);
@@ -95,7 +106,6 @@ public final class Column {
 	
 	public IGenericField<?> fieldOf(long v) throws RowsTypeException {
 		switch ( type ) {
-		case NULL: 	return NullField.NULL;
 		case STRING_TYPE: return from(String.valueOf(v));
 		case INTEGER_TYPE: return IntegerField.of((int)v);
 		case LONG_TYPE:  return LongField.of(v);
@@ -109,7 +119,6 @@ public final class Column {
 	
 	public IGenericField<?> fieldOf(int v) throws RowsTypeException {
 		switch ( type ) {
-		case NULL: return NullField.NULL;
 		case STRING_TYPE: return from(String.valueOf(v));
 		case INTEGER_TYPE: return IntegerField.of(v);
 		case LONG_TYPE:  return LongField.of((long)v);
@@ -123,7 +132,6 @@ public final class Column {
 
 	public IGenericField<?> fieldOf(float v) throws RowsTypeException {
 		switch ( type ) {
-		case NULL: return NullField.NULL;
 		case STRING_TYPE: return from(String.valueOf(v));
 		case INTEGER_TYPE: return IntegerField.of((int)v);
 		case LONG_TYPE:  return LongField.of((long)v);
@@ -137,7 +145,6 @@ public final class Column {
 	
 	public IGenericField<?> fieldOf(double v) throws RowsTypeException {
 		switch ( type ) {
-		case NULL: return NullField.NULL;
 		case STRING_TYPE: return from(String.valueOf(v));
 		case INTEGER_TYPE: return IntegerField.of((int)v);
 		case LONG_TYPE:  return LongField.of((long)v);
@@ -151,7 +158,6 @@ public final class Column {
 	
 	public IGenericField<?> fieldOf(boolean v) throws RowsTypeException {
 		switch ( type ) {
-		case NULL: return NullField.NULL;
 		case STRING_TYPE: return from(String.valueOf(v));
 	//	case INTEGER_TYPE: return IntegerField.of(v);
 	//	case LONG_TYPE:  return LongField.of((long)v);
@@ -165,7 +171,6 @@ public final class Column {
 	
 	public IGenericField<?> fieldOf(short v) throws RowsTypeException {
 		switch ( type ) {
-		case NULL: return NullField.NULL;
 		case STRING_TYPE: return from(String.valueOf(v));
 		case INTEGER_TYPE: return IntegerField.of((int)v);
 		case LONG_TYPE:  return LongField.of((long)v);

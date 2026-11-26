@@ -17,6 +17,12 @@ public class BooleanField implements IGenericField<BooleanField> {
 	
 	public static final BooleanField TRUE = new BooleanField( true );
 	public static final BooleanField FALSE = new BooleanField( false );
+	public static final BooleanField NULL = new BooleanField( false ) {
+		@Override
+		public boolean isNull() {
+			return true;
+		}
+	};
 	
 	public static BooleanField of(String v) {
 	    if (v == null) return FALSE;

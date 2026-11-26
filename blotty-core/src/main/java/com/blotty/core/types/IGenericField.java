@@ -17,15 +17,18 @@ public interface IGenericField<T extends IGenericField<T>> extends Comparable<T>
 	}
 	
 	public FieldType getType();
-
+	
+	/**
+	 * generic util to get real type
+	 */
 	public default T value() {
 		return (T)this;
 	}
-
-	public default int compareTo(IGenericField<?> v) {
+	
+	public default int compareGeneric(IGenericField<?> v) {
 		if (this==v) return 0;
 		if (v==null || v.isNull()) return 1;
 		if (this.isNull()) return -1;
-		return this.compareTo((T)v);
+		return compareTo((T)v);
 	}
 }
