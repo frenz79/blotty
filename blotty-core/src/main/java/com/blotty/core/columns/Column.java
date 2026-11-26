@@ -35,12 +35,11 @@ public final class Column {
 	private Map<String,Object> properties;
 	private Map<String,? extends IGenericField> valuesCache;
 	
-	private final ColumnStatistics statistics;
+	private ColumnStatistics statistics;
 	
 	public Column( String n, boolean isKey ){
 		this.name = n;
 		this.isKey = isKey;
-		this.statistics = new ColumnStatistics();
 	}
 	
 	public int getId() {
@@ -77,7 +76,7 @@ public final class Column {
 	        : StringField.of(str);
 	}
 	
-	public IGenericField fieldOf(String v) throws RowsTypeException {
+	public IGenericField<?> fieldOf(String v) throws RowsTypeException {
 		if (v==null || v.length()==0 ) {
 			return NullField.NULL;
 		}
@@ -94,7 +93,7 @@ public final class Column {
 		}		
 	}
 	
-	public IGenericField fieldOf(long v) throws RowsTypeException {
+	public IGenericField<?> fieldOf(long v) throws RowsTypeException {
 		switch ( type ) {
 		case NULL: 	return NullField.NULL;
 		case STRING_TYPE: return from(String.valueOf(v));
@@ -108,7 +107,7 @@ public final class Column {
 		}
 	}
 	
-	public IGenericField fieldOf(int v) throws RowsTypeException {
+	public IGenericField<?> fieldOf(int v) throws RowsTypeException {
 		switch ( type ) {
 		case NULL: return NullField.NULL;
 		case STRING_TYPE: return from(String.valueOf(v));
@@ -120,10 +119,9 @@ public final class Column {
 		case SHORT_TYPE: return ShortField.of((short)v);
 		default: throw new RowsTypeException(String.format("Missing impl for type:%s", String.valueOf(type)));
 		}
-	}
-	
+	}	
 
-	public IGenericField fieldOf(float v) throws RowsTypeException {
+	public IGenericField<?> fieldOf(float v) throws RowsTypeException {
 		switch ( type ) {
 		case NULL: return NullField.NULL;
 		case STRING_TYPE: return from(String.valueOf(v));
@@ -137,7 +135,7 @@ public final class Column {
 		}
 	}
 	
-	public IGenericField fieldOf(double v) throws RowsTypeException {
+	public IGenericField<?> fieldOf(double v) throws RowsTypeException {
 		switch ( type ) {
 		case NULL: return NullField.NULL;
 		case STRING_TYPE: return from(String.valueOf(v));
@@ -151,7 +149,7 @@ public final class Column {
 		}
 	}
 	
-	public IGenericField fieldOf(boolean v) throws RowsTypeException {
+	public IGenericField<?> fieldOf(boolean v) throws RowsTypeException {
 		switch ( type ) {
 		case NULL: return NullField.NULL;
 		case STRING_TYPE: return from(String.valueOf(v));
@@ -165,7 +163,7 @@ public final class Column {
 		}
 	}
 	
-	public IGenericField fieldOf(short v) throws RowsTypeException {
+	public IGenericField<?> fieldOf(short v) throws RowsTypeException {
 		switch ( type ) {
 		case NULL: return NullField.NULL;
 		case STRING_TYPE: return from(String.valueOf(v));
@@ -225,6 +223,7 @@ public final class Column {
 		
 		public Builder type(FieldType t) {
 			this.col.setType(t);
+			this.col.statistics = new ColumnStatistics(t);
 			return this;
 		}
 		

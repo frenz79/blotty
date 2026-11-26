@@ -23,8 +23,9 @@ public interface IGenericField<T extends IGenericField<T>> extends Comparable<T>
 	}
 
 	public default int compareTo(IGenericField<?> v) {
-		if (v==null) return 1;
 		if (this==v) return 0;
+		if (v==null || v.isNull()) return 1;
+		if (this.isNull()) return -1;
 		return this.compareTo((T)v);
 	}
 }

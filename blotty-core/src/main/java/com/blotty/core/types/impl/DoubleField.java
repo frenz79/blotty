@@ -11,12 +11,14 @@ package com.blotty.core.types.impl;
 import com.blotty.core.types.FieldType;
 import com.blotty.core.types.IGenericField;
 
-public class DoubleField implements IGenericField<Double> {
+public class DoubleField implements IGenericField<DoubleField> {
 
 	private double value;
 	
 	public static final DoubleField ZERO = new DoubleField( 0.0d );
 	public static final DoubleField ONE = new DoubleField( 1.0d );
+	public static final DoubleField MAX_VALUE = null;
+	public static final DoubleField MIN_VALUE = null;
 	
 	public static DoubleField of(String str) {
 		return new DoubleField( Double.valueOf(str) );
@@ -61,33 +63,11 @@ public class DoubleField implements IGenericField<Double> {
 	}
 
 	@Override
-	public int compareTo(IGenericField<Double> other) {
-	    if (other.isNull()) return 1;
-	    return Double.compare(this.value, ((DoubleField)other).value);
+	public int compareTo(DoubleField other) {
+	    return Double.compare(this.value, other.value);
 	}
 	
-	@Override
-	public int compareTo(Double o) {
-		if (o==null) return 1;
-		return (int)(value - o.doubleValue());
-	}
-
 	public double getValue() {
-		return value;
-	}
-	
-	@Override
-	public Double getDefaultMax() {
-		return Double.MAX_VALUE;
-	}
-
-	@Override
-	public Double getDefaultMin() {
-		return Double.MIN_VALUE;
-	}
-
-	@Override
-	public Double value() {
 		return value;
 	}
 }

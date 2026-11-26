@@ -21,6 +21,9 @@ public class IntegerField implements IGenericField<IntegerField> {
 	public static final IntegerField ONE_HUNDRED = new IntegerField( 100 );
 	public static final IntegerField ONE_THOUSAND = new IntegerField( 1000 );
 	
+	public static final IntegerField MAX_VALUE = null;
+	public static final IntegerField MIN_VALUE = null;
+	
 	public static IntegerField of(String str) {
 		return new IntegerField( Integer.valueOf(str) );
 	}

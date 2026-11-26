@@ -11,7 +11,7 @@ package com.blotty.core.types.impl;
 import com.blotty.core.types.FieldType;
 import com.blotty.core.types.IGenericField;
 
-public class LongField implements IGenericField<Long> {
+public class LongField implements IGenericField<LongField> {
 
 	private long value;
 	
@@ -20,6 +20,8 @@ public class LongField implements IGenericField<Long> {
 	public static final LongField TEN = new LongField( 10l );
 	public static final LongField ONE_HUNDRED = new LongField( 100l );
 	public static final LongField ONE_THOUSAND = new LongField( 1000l );
+	public static final LongField MAX_VALUE = null;
+	public static final LongField MIN_VALUE = null;
 	
 	public static LongField of(String str) {
 		return new LongField( Long.valueOf(str) );
@@ -35,15 +37,8 @@ public class LongField implements IGenericField<Long> {
 	}
 
 	@Override
-	public int compareTo(IGenericField<Long> other) {
-	    if (other.isNull()) return 1;
-	    return Long.compare(this.value, ((LongField)other).value);
-	}
-	
-	@Override
-	public int compareTo(Long o) {
-		if (o==null) return 1;
-		return (int)(value - o.longValue());
+	public int compareTo(LongField other) {
+	    return Long.compare(this.value, other.value);
 	}
 	
 	LongField( long v ){
@@ -75,21 +70,6 @@ public class LongField implements IGenericField<Long> {
 	}
 
 	public long getValue() {
-		return value;
-	}
-
-	@Override
-	public Long getDefaultMax() {
-		return Long.MAX_VALUE;
-	}
-
-	@Override
-	public Long getDefaultMin() {
-		return Long.MIN_VALUE;
-	}
-
-	@Override
-	public Long value() {
 		return value;
 	}
 }

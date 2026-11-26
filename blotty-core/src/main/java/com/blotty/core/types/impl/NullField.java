@@ -11,7 +11,7 @@ package com.blotty.core.types.impl;
 import com.blotty.core.types.FieldType;
 import com.blotty.core.types.IGenericField;
 
-public class NullField implements IGenericField<Void> {
+public class NullField implements IGenericField<NullField> {
 
 	public static final NullField NULL = new NullField();
 	
@@ -34,34 +34,13 @@ public class NullField implements IGenericField<Void> {
 	}
 	
 	@Override
-	public int compareTo(IGenericField<Void> other) {
+	public int compareTo(NullField other) {
 	    if (other == null || other.isNull()) return 0;
 	    return -1;
 	}	  
 	
 	@Override
-	public int compareTo(Void o) {
-		if (o==null) return 0;
-		 return -1;
-	}
-
-	@Override
 	public String toString() {
 		return "NULL";
-	}
-
-	@Override
-	public Void getDefaultMax() {
-		return null;
-	}
-
-	@Override
-	public Void getDefaultMin() {
-		return null;
-	}
-
-	@Override
-	public Void value() {
-		return null;
 	}
 }
