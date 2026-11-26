@@ -27,13 +27,30 @@ public class BinaryCondition implements IFilterCondition {
 	private final Operand left;
 	private final Operand right;
 	private final IBinaryOperator operator;
-	
+	/*
 	public BinaryCondition(Operand leftOperand, IBinaryOperator operator, Operand rightOperand ) {
 		this.left = leftOperand;
 		this.right = rightOperand;
 		this.operator = operator;
 	}
+	*/
+	
+	// Reuse cached strings for fast comparison ==
+	public BinaryCondition(Operand leftOperand, IBinaryOperator operator, Operand rightOperand) {
+		this.operator = operator;
+		this.left = resolveConst(rightOperand, leftOperand);
+		this.right = resolveConst(leftOperand, rightOperand);
+	}
 
+	private static Operand resolveConst(Operand colOperand, Operand constOperand) {
+		if (colOperand.isColumn() && colOperand.getColumn().isCacheable() && constOperand.isConst()) {
+			IGenericField<?> current = constOperand.getConst();
+			IGenericField<?> resolved = colOperand.getColumn().resolveCachedField(current);
+			return (resolved == current) ? constOperand : new Operand(resolved, Operand.Type.CONST);
+		}
+		return constOperand;
+	}
+		
 	public Operand getRight() {
 		return right;
 	}

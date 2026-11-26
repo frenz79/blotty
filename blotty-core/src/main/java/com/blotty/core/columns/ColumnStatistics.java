@@ -107,12 +107,10 @@ public class ColumnStatistics {
 		if (maxCount!=DIRTY_VALUE && val.compareGeneric(maxValue) == 0 && maxCount>0) {
 			maxCount--;
 			if (maxCount==0) maxCount = DIRTY_VALUE;
-			return;
 		} 
 		if (minCount!=DIRTY_VALUE && val.compareGeneric(minValue) == 0 && minCount>0) {
 			minCount--;
 			if (minCount==0) minCount = DIRTY_VALUE;
-			return;
 		}
 	}
 	

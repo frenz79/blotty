@@ -66,9 +66,14 @@ public class HashIndex extends AbstractIndex<HashIndexStatistics> {
 
 	@Override
 	public Collection<Row> lookup(IFilterCondition c) {
-		BinaryCondition bc = (BinaryCondition)c;
-		Collection<Row> rows = index.get(bc.getRight().getConst());
-		return rows==null?List.of():rows;
+		rLock.lock();
+		try {
+			BinaryCondition bc = (BinaryCondition)c;
+			Collection<Row> rows = index.get(bc.getRight().getConst());
+			return rows==null?List.of():rows;
+		} finally {
+			rLock.unlock();
+		}
 	}
 
 	@Override

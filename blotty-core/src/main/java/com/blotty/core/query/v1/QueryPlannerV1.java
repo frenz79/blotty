@@ -6,7 +6,7 @@
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  */
-package com.blotty.core.query;
+package com.blotty.core.query.v1;
 
 import java.util.List;
 
@@ -17,10 +17,14 @@ import com.blotty.core.commons.exceptions.RowsModelException;
 import com.blotty.core.indexes.AbstractIndex;
 import com.blotty.core.modifiers.filters.conditions.AndCondition;
 import com.blotty.core.modifiers.filters.conditions.IFilterCondition;
+import com.blotty.core.query.ConditionCollector;
+import com.blotty.core.query.IQueryPlanner;
+import com.blotty.core.query.QueryDefinition;
+import com.blotty.core.query.QueryPlan;
 import com.blotty.core.query.QueryPlan.RowSet;
 import com.blotty.core.rows.Row;
 
-public class QueryPlanner {
+public class QueryPlannerV1 implements IQueryPlanner {
 
 	 /**
      * Creates a query execution plan.
@@ -58,6 +62,7 @@ public class QueryPlanner {
      * OR branches are not optimized in the current implementation.
      * NOT subtrees are intentionally ignored by the ConditionCollector.
      */
+	@Override
 	public QueryPlan plan( QueryDefinition queryDef, AbstractDataModel model ) throws RowsModelException, FilterExpressionException {
 		if (!queryDef.hasFilter()) {
 			return useAllRows(model, null);

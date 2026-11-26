@@ -87,6 +87,14 @@ public final class Column {
 		        : StringField.of(v);
 	}
 	
+	public IGenericField<?> resolveCachedField(IGenericField<?> field) {
+		if (!cacheable || !(field instanceof StringField)) {
+			return field;
+		}
+		IGenericField<?> cached = valuesCache.get(field.toString());
+		return (cached != null) ? cached : field;
+	}
+	
 	public IGenericField<?> nullField() {
 		return type.ofNull();
 	}

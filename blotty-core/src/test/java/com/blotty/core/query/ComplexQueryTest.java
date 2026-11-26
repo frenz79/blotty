@@ -36,6 +36,7 @@ import com.blotty.core.modifiers.filters.conditions.unary.operators.IsNull;
 import com.blotty.core.modifiers.sorters.SorterConditionChain;
 import com.blotty.core.modifiers.sorters.SorterExpressionBuilder;
 import com.blotty.core.parsers.SQLQueryParser;
+import com.blotty.core.query.v1.QueryPlannerV1;
 import com.blotty.core.rows.Row;
 import com.blotty.core.storage.InMemoryRowsModel;
 import com.blotty.core.types.FieldType;
@@ -199,7 +200,7 @@ class ComplexQueryTest {
 	void testQueryPlannerSelectsMostSelectiveIndexAndComputesResidualFilter() throws Exception {
 		DataModel noIdxModel = createPopulatedModel(false);
 		DataModel idxModel = createPopulatedModel(true);
-		QueryPlanner planner = new QueryPlanner();
+		IQueryPlanner planner = new QueryPlannerV1();
 
 		// DEPT='ENG' matches 5 rows; ROLE='PRINCIPAL' matches 2 rows -> planner should pick HashIndex(ROLE)
 		FilterExpression filter = FilterExpression.newBuilder()
@@ -223,7 +224,7 @@ class ComplexQueryTest {
 	@Test
 	void testQueryPlannerIgnoresNotSubtreeForIndexing() throws Exception {
 		DataModel idxModel = createPopulatedModel(true);
-		QueryPlanner planner = new QueryPlanner();
+		IQueryPlanner planner = new QueryPlannerV1();
 
 		// NOT DEPT='ENG' must NOT use HashIndex(DEPT)='ENG'
 		FilterExpression filter = FilterExpression.newBuilder()
@@ -242,7 +243,7 @@ class ComplexQueryTest {
 	@Test
 	void testQueryPlannerSingleIndexedConditionClearsResidualFilter() throws Exception {
 		DataModel idxModel = createPopulatedModel(true);
-		QueryPlanner planner = new QueryPlanner();
+		IQueryPlanner planner = new QueryPlannerV1();
 
 		FilterExpression filter = FilterExpression.newBuilder()
 			.begin(BinaryCondition.Equal(Operand.of(roleCol), Operand.of("PRINCIPAL")))

@@ -50,6 +50,9 @@ public class Operand {
 	public static Operand of( boolean c ) {
 		return new Operand(BooleanField.of(c), Type.CONST);
 	}
+	public static Operand of( IGenericField<?> c ) {
+		return new Operand(c, Type.CONST);
+	}
 	
 	private final Type type;
 	private final Object operand;
