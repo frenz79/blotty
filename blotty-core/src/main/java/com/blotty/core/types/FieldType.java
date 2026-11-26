@@ -91,18 +91,18 @@ public enum FieldType {
 	public abstract IGenericField<?> ofNull();
 	
 	private final IGenericField<?> min;
-	private final IGenericField<?> man;
+	private final IGenericField<?> max;
 	
 	public IGenericField<?> getDefaultMax() {
-		return man;
+		return max;
 	}
 
 	public IGenericField<?> getDefaultMin() {
 		return min;
 	}
 
-	private FieldType(IGenericField<?> min, IGenericField<?> man) {
+	private FieldType(IGenericField<?> min, IGenericField<?> max) {
 		this.min = min;
-		this.man = man;
+		this.max = max;
 	}	
 }

@@ -110,9 +110,6 @@ public final class Column {
 
 	public void setCacheable(boolean cacheable) {
 		this.cacheable = cacheable;
-		if (cacheable) {
-			this.valuesCache = new ConcurrentHashMap<>();
-		}
 	}
 	
 	public ColumnStatistics getStatistics() {
@@ -159,7 +156,6 @@ public final class Column {
 		
 		public Builder type(FieldType t) {
 			this.col.setType(t);
-			this.col.statistics = new ColumnStatistics(t);
 			return this;
 		}
 		
@@ -177,6 +173,12 @@ public final class Column {
 		}
 		
 		public Column build() {
+			if (col.enabledStats) {
+				this.col.statistics = new ColumnStatistics(col.type);
+			}
+			if (col.cacheable) {
+				this.col.valuesCache = new ConcurrentHashMap<>();
+			}
 			return col;
 		}
 	}
