@@ -51,7 +51,7 @@ public class ColumnStatistics {
 	private void setUnsetDistributionStats(IGenericField<?> val, boolean set) {
 		int hashCode = val.hashCode();
 		this.distribution[ hashCode & 31 ] += (set)?1:-1;
-		if (this.distribution[ hashCode & 31 ]==0) {
+		if (set) {
 			this.footprint.set( hashCode & 511, set );
 		}
 	}
@@ -127,7 +127,10 @@ public class ColumnStatistics {
 				return;
 			}
 			if (newV.compareGeneric(maxValue)<0 && oldV.compareGeneric(maxValue)==0) {
-				maxCount = DIRTY_COUNT;
+				maxCount--;
+				if (maxCount==0) {
+					maxCount = DIRTY_COUNT;
+				}
 				return;
 			}
 		}		
@@ -138,14 +141,17 @@ public class ColumnStatistics {
 				return;
 			} 
 			if (newV.compareGeneric(minValue)>0 && oldV.compareGeneric(minValue)==0) {
-				minCount = DIRTY_COUNT;
+				minCount--;
+				if (minCount==0) {
+					minCount = DIRTY_COUNT;
+				}
 				return;
 			}
 		}
 	}
 	
 	public double getHashDensity() {
-		return footprint.cardinality() / footprint.size();
+		return ((double)footprint.cardinality()) / footprint.size();
 	}
 	
 	public long getNotNullValues() {
@@ -175,16 +181,8 @@ public class ColumnStatistics {
 	public IGenericField<?> getMaxValue() {
 		return maxValue;
 	}
-
-	public void setMaxValue(IGenericField<?> maxValue) {
-		this.maxValue = maxValue;
-	}
-
+	
 	public IGenericField<?> getMinValue() {
 		return minValue;
-	}
-
-	public void setMinValue(IGenericField<?> minValue) {
-		this.minValue = minValue;
 	}
 }
