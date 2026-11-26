@@ -39,6 +39,7 @@ public class ColumnStatistics {
 	
 	public void reset() {
 		this.totValues = 0;
+		this.nullValues = 0;
 		this.maxCount = 0;
 		this.minCount = 0;
 		this.maxValue = defaultMaxValue;
@@ -50,7 +51,9 @@ public class ColumnStatistics {
 	private void setUnsetDistributionStats(IGenericField<?> val, boolean set) {
 		int hashCode = val.hashCode();
 		this.distribution[ hashCode & 31 ] += (set)?1:-1;
-		this.footprint.set( hashCode & 511, set );
+		if (this.distribution[ hashCode & 31 ]==0) {
+			this.footprint.set( hashCode & 511, set );
+		}
 	}
 	
 	public void add ( IGenericField<?> val ) {
@@ -92,10 +95,12 @@ public class ColumnStatistics {
 		
 		if (maxCount!=DIRTY_COUNT && val.compareGeneric(maxValue) == 0 && maxCount>0) {
 			maxCount--;
+			if (maxCount==0) maxCount = DIRTY_COUNT;
 			return;
 		} 
 		if (minCount!=DIRTY_COUNT && val.compareGeneric(minValue) == 0 && minCount>0) {
 			minCount--;
+			if (minCount==0) minCount = DIRTY_COUNT;
 			return;
 		}
 	}
@@ -118,6 +123,7 @@ public class ColumnStatistics {
 		if (maxCount!=DIRTY_COUNT) { 
 			if(newV.compareGeneric(maxValue)>0) {
 				maxCount = 1;
+				maxValue = newV;
 				return;
 			}
 			if (newV.compareGeneric(maxValue)<0 && oldV.compareGeneric(maxValue)==0) {
@@ -128,6 +134,7 @@ public class ColumnStatistics {
 		if (minCount!=DIRTY_COUNT) {
 			if (newV.compareGeneric(minValue)<0) {
 				minCount = 1;
+				minValue = newV;
 				return;
 			} 
 			if (newV.compareGeneric(minValue)>0 && oldV.compareGeneric(minValue)==0) {
@@ -137,7 +144,7 @@ public class ColumnStatistics {
 		}
 	}
 	
-	public double getEntropy() {
+	public double getHashDensity() {
 		return footprint.cardinality() / footprint.size();
 	}
 	
@@ -158,10 +165,26 @@ public class ColumnStatistics {
 	}
 
 	public boolean isDirtyMax() {
-		return maxCount!=DIRTY_COUNT;
+		return maxCount==DIRTY_COUNT;
 	}
 
 	public boolean isDirtyMin() {
-		return minCount!=DIRTY_COUNT;
+		return minCount==DIRTY_COUNT;
+	}
+
+	public IGenericField<?> getMaxValue() {
+		return maxValue;
+	}
+
+	public void setMaxValue(IGenericField<?> maxValue) {
+		this.maxValue = maxValue;
+	}
+
+	public IGenericField<?> getMinValue() {
+		return minValue;
+	}
+
+	public void setMinValue(IGenericField<?> minValue) {
+		this.minValue = minValue;
 	}
 }
