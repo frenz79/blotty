@@ -12,6 +12,6 @@ import java.util.Comparator;
 
 import com.blotty.core.types.IGenericField;
 
-public interface ISorterOperator extends Comparator<IGenericField> {
+public interface ISorterOperator extends Comparator<IGenericField<?>> {
 
 }

@@ -35,8 +35,8 @@ public class SorterConditionChain implements ISorterCondition, Comparator<Row> {
 	public int compare(Row r1, Row r2) {
 		for (SorterExpression sorter : sorters) {
 			int colId = sorter.getColumm().getId();
-			IGenericField f1 = r1.getFields()[colId];
-			IGenericField f2 = r2.getFields()[colId];
+			IGenericField<?> f1 = r1.getFields()[colId];
+			IGenericField<?> f2 = r2.getFields()[colId];
 			int comp = sorter.getOperator().compare(f1, f2);
 			if (comp != 0) {
 				return comp;

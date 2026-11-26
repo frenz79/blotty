@@ -33,8 +33,8 @@ public abstract class AbstractIndex<S extends IndexStatistics> {
 	
 	public abstract boolean supports( IFilterCondition c );
 	public abstract Collection<Row> lookup( IFilterCondition c );
-	protected abstract void _insert(IGenericField key, Row r);
-	protected abstract void _delete(IGenericField key, Row r);
+	protected abstract void _insert(IGenericField<?> key, Row r);
+	protected abstract void _delete(IGenericField<?> key, Row r);
 	
 	public long estimatedCardinality(IFilterCondition c) {
 		return lookup(c).size();
@@ -74,8 +74,8 @@ public abstract class AbstractIndex<S extends IndexStatistics> {
 			int colId = getColumn().getId();
 			
 			if ( change.isModified(colId) ) {
-				IGenericField newK = r.getFields()[colId];
-				IGenericField oldK = change.oldValues().get(change.resolveId(colId));
+				IGenericField<?> newK = r.getFields()[colId];
+				IGenericField<?> oldK = change.oldValues().get(change.resolveId(colId));
 				
 				if (oldK.equals(newK)) {
 					// Should not happen!
@@ -107,7 +107,7 @@ public abstract class AbstractIndex<S extends IndexStatistics> {
 		}
 	}
 	
-	private IGenericField getKey(Row r) {
+	private IGenericField<?> getKey(Row r) {
 		return r.getFields()[getColumn().getId()];
 	}
 	public S getStatistics() {

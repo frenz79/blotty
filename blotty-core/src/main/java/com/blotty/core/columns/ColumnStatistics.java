@@ -8,6 +8,7 @@
  */
 package com.blotty.core.columns;
 
+import java.util.Arrays;
 import java.util.BitSet;
 
 import com.blotty.core.types.FieldType;
@@ -15,28 +16,52 @@ import com.blotty.core.types.IGenericField;
 
 public class ColumnStatistics {
 
+	private static final int DIRTY_COUNT = Integer.MIN_VALUE;
+	
+	private long totValues = 0;
 	private long nullValues = 0;
-	private long notNullValues = 0;
 	private IGenericField<?> maxValue;
 	private IGenericField<?> minValue;
-	private boolean dirtyMax = false;
-	private boolean dirtyMin = false;
 	private int maxCount = 0;
 	private int minCount = 0;	
 	private final BitSet footprint = new BitSet(512);
 	private final int[] distribution = new int[32];
 		
+	private final IGenericField<?> defaultMaxValue;
+	private final IGenericField<?> defaultMinValue;
+	
 	public ColumnStatistics( FieldType colType ) {
-		this.maxValue = colType.getDefaultMax();
-		this.minValue = colType.getDefaultMin();
+		// init max with min value and vice-versa
+		this.defaultMaxValue = colType.getDefaultMin();
+		this.defaultMinValue = colType.getDefaultMax();
+		reset();
 	}
 	
-	public void add ( IGenericField<?> val) {
+	public void reset() {
+		this.totValues = 0;
+		this.maxCount = 0;
+		this.minCount = 0;
+		this.maxValue = defaultMaxValue;
+		this.minValue = defaultMinValue;
+		Arrays.fill(distribution, 0);
+		footprint.clear();
+	}
+	
+	private void setUnsetDistributionStats(IGenericField<?> val, boolean set) {
+		int hashCode = val.hashCode();
+		this.distribution[ hashCode & 31 ] += (set)?1:-1;
+		this.footprint.set( hashCode & 511, set );
+	}
+	
+	public void add ( IGenericField<?> val ) {
+		totValues++;
 		if (val.isNull()) {
 			nullValues++;
 			return;
 		}
-		notNullValues++;
+		
+		setUnsetDistributionStats(val, true);
+
 		int cmpMax = val.compareGeneric(maxValue);
 		if (cmpMax == 0) {
 			maxCount++;
@@ -51,52 +76,92 @@ public class ColumnStatistics {
 				minValue = val;
 				minCount = 1;
 			}
+		}
+	}
+	
+	public void del ( IGenericField<?> val) {
+		totValues--;
+		if (val.isNull()) {
+			if (nullValues>0) {
+				nullValues--;
+			}
+			return;
+		}
+		
+		setUnsetDistributionStats(val, false);
+		
+		if (maxCount!=DIRTY_COUNT && val.compareGeneric(maxValue) == 0 && maxCount>0) {
+			maxCount--;
+			return;
+		} 
+		if (minCount!=DIRTY_COUNT && val.compareGeneric(minValue) == 0 && minCount>0) {
+			minCount--;
+			return;
+		}
+	}
+	
+	public void upd ( IGenericField<?> newV, IGenericField<?> oldV ) {
+		if (newV.isNull() && !oldV.isNull()) {
+			nullValues++;
+			setUnsetDistributionStats(oldV, false);
+			return;
+		} 
+		if (!newV.isNull() && oldV.isNull()) {
+			nullValues--;
+			setUnsetDistributionStats(newV, true);
+			return;
+		}
+		
+		setUnsetDistributionStats(oldV, false);
+		setUnsetDistributionStats(newV, true);
+		
+		if (maxCount!=DIRTY_COUNT) { 
+			if(newV.compareGeneric(maxValue)>0) {
+				maxCount = 1;
+				return;
+			}
+			if (newV.compareGeneric(maxValue)<0 && oldV.compareGeneric(maxValue)==0) {
+				maxCount = DIRTY_COUNT;
+				return;
+			}
 		}		
+		if (minCount!=DIRTY_COUNT) {
+			if (newV.compareGeneric(minValue)<0) {
+				minCount = 1;
+				return;
+			} 
+			if (newV.compareGeneric(minValue)>0 && oldV.compareGeneric(minValue)==0) {
+				minCount = DIRTY_COUNT;
+				return;
+			}
+		}
 	}
 	
-	public void del ( IGenericField<?> v) {
-		
+	public double getEntropy() {
+		return footprint.cardinality() / footprint.size();
 	}
 	
-	public void upd ( IGenericField<?> v) {
-		
+	public long getNotNullValues() {
+		return totValues-nullValues;
 	}
 	
-
 	public long getNullValues() {
 		return nullValues;
 	}
 
-	public long getNotNullValues() {
-		return notNullValues;
-	}
-
-	public void incNullValues() {
-		nullValues++;
-	}
-	
-	public void incNotNullValues() {
-		notNullValues++;
-	}
-	
-	public void decNullValues() {
-	    if (nullValues > 0) {
-	        nullValues--;
-	    }
-	}
-	
-	public void decNotNullValues() {
-	    if (notNullValues > 0) {
-	        notNullValues--;
-	    }
-	}
-
 	public long getTotalValues() {
-	    return nullValues + notNullValues;
+	    return totValues;
 	}
 
 	public double getNullRatio() {
-	   	long total = getTotalValues();
-	    return total == 0 ? 0 : ((double) nullValues) / total;
+	    return totValues == 0 ? 0 : ((double) nullValues) / totValues;
+	}
+
+	public boolean isDirtyMax() {
+		return maxCount!=DIRTY_COUNT;
+	}
+
+	public boolean isDirtyMin() {
+		return minCount!=DIRTY_COUNT;
 	}
 }

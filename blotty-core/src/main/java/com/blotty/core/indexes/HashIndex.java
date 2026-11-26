@@ -27,13 +27,13 @@ import com.blotty.core.types.IGenericField;
 
 public class HashIndex extends AbstractIndex<HashIndexStatistics> {
 
-	private final Map<IGenericField,Set<Row>> index = new HashMap<>();
+	private final Map<IGenericField<?>,Set<Row>> index = new HashMap<>();
 		
 	public HashIndex( Column column ) {
 		super(column, new HashIndexStatistics());
 	}
 
-	public void stream(IGenericField searchVal, IConsumer<Row> iConsumer) throws RowsModelException, FilterExpressionException {
+	public void stream(IGenericField<?> searchVal, IConsumer<Row> iConsumer) throws RowsModelException, FilterExpressionException {
 		rLock.lock();
 		try {
 			Set<Row> rows = index.get(searchVal);
@@ -72,7 +72,7 @@ public class HashIndex extends AbstractIndex<HashIndexStatistics> {
 	}
 
 	@Override
-	protected void _insert(IGenericField key, Row r) {
+	protected void _insert(IGenericField<?> key, Row r) {
 		index.computeIfAbsent(
 		        key,
 		        k -> new HashSet<>())
@@ -82,7 +82,7 @@ public class HashIndex extends AbstractIndex<HashIndexStatistics> {
 	}
 
 	@Override
-	protected void _delete(IGenericField key, Row r) {
+	protected void _delete(IGenericField<?> key, Row r) {
 		Set<Row> rows = index.get(key);
 		if (rows==null || rows.isEmpty()) {
 			index.remove(key);

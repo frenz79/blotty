@@ -29,6 +29,7 @@ public final class Column {
 	private final String name;
 	private FieldType type;
 	private boolean cacheable;
+	private boolean enabledStats;
 	private final boolean isKey;
 	
 	private Map<String,Object> properties;
@@ -205,6 +206,18 @@ public final class Column {
 			this.valuesCache = new ConcurrentHashMap<>();
 		}
 	}
+	
+	public ColumnStatistics getStatistics() {
+		return statistics;
+	}
+
+	public boolean isEnabledStats() {
+		return enabledStats;
+	}
+
+	public void setEnabledStats(boolean enabledStats) {
+		this.enabledStats = enabledStats;
+	}
 		
 	public static Builder newBuilder(String colName, boolean isKey) {
 		return new Builder(colName, isKey);
@@ -223,6 +236,16 @@ public final class Column {
 		
 		public Builder cacheable() {
 			this.col.setCacheable(true);
+			return this;
+		}
+		
+		public Builder enableStats() {
+			this.col.setEnabledStats(true);
+			return this;
+		}
+		
+		public Builder disableStats() {
+			this.col.setEnabledStats(false);
 			return this;
 		}
 		
@@ -248,9 +271,5 @@ public final class Column {
 		public Column build() {
 			return col;
 		}
-	}
-
-	public ColumnStatistics getStatistics() {
-		return statistics;
 	}
 }

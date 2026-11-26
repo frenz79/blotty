@@ -9,18 +9,17 @@
 package com.blotty.core;
 
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.blotty.core.columns.Column;
-import com.blotty.core.columns.ColumnStatistics;
 import com.blotty.core.columns.ColumnsModel;
 import com.blotty.core.commons.IConsumer;
 import com.blotty.core.commons.exceptions.FilterExpressionException;
 import com.blotty.core.commons.exceptions.RowsModelException;
 import com.blotty.core.indexes.AbstractIndex;
-import com.blotty.core.indexes.HashIndex;
 import com.blotty.core.rows.Row;
 import com.blotty.core.rows.Row.RowChange;
 import com.blotty.core.types.IGenericField;
@@ -46,42 +45,19 @@ public abstract class AbstractDataModel {
 	public Row getRow(int i) {
 		return rowsModel.getRow(i);
 	}
-		
-	private void updateStats(Row r, RowChange changes) {
-		for ( int i=0; i<getColumnsModel().getColumnsCount(); i++) {
-			if ( r.getFields()[i].isNull() ) {
-				getColumnsModel().getColumn(i).getStatistics().incNullValues();
-			} else {
-				getColumnsModel().getColumn(i).getStatistics().incNotNullValues();
-			}
-			if (changes!=null) {
-				for (int colId =  changes.modifiedCols().nextSetBit(0);
-				     colId >= 0;
-				     colId = changes.modifiedCols().nextSetBit(colId+1)) {
-				
-				    ColumnStatistics stats = getColumnsModel().getColumn(colId).getStatistics();
-				    IGenericField oldValue = changes.oldValues().get(changes.resolveId(colId));
-				
-				    IGenericField newValue = r.getFields()[colId];
-				
-				    if (oldValue.isNull() && !newValue.isNull()) {
-				        stats.decNullValues();
-				        stats.incNotNullValues();
-				    } else if (!oldValue.isNull() && newValue.isNull()) {				
-				        stats.decNotNullValues();
-				        stats.incNullValues();
-				    }
-				}
-			}
-		}
-	}
-
+	
 	private void updateIndexesAndStats(Row ...rows) {
 		for ( Row r : rows ) {
 			for ( AbstractIndex<?> idx : indexes ) {
 				idx.insert(r);
 			}
-			updateStats(r, null);
+			for ( int i=0; i<getColumnsModel().getColumnsCount(); i++) {
+				Column col = getColumnsModel().getColumn(i);
+				if (col.isEnabledStats()) {
+					IGenericField<?> oldValue = r.getFields()[i];
+					col.getStatistics().add(oldValue);
+				}
+			}
 		}
 	}
 	
@@ -109,7 +85,15 @@ public abstract class AbstractDataModel {
 			for ( AbstractIndex<?> idx : indexes ) {
 				idx.update(storedRow, changes);	
 			}
-			updateStats(storedRow, changes);
+			
+			BitSet modCols = changes.modifiedCols();			
+			for (int colId = modCols.nextSetBit(0); colId >= 0; colId = modCols.nextSetBit(colId+1)) {
+				Column col = getColumnsModel().getColumn(colId);
+				if (col.isEnabledStats()) {
+					IGenericField<?> oldValue = changes.oldValues().get(changes.resolveId(colId));
+					col.getStatistics().add(oldValue);
+				}
+			}
 		}
 		return changes;
 	}
@@ -118,12 +102,12 @@ public abstract class AbstractDataModel {
 		rowsModel.delRow(r);
 		for ( AbstractIndex<?> idx : indexes ) {
 			idx.delete(r);
-		}
+		}		
 		for ( int i=0; i<getColumnsModel().getColumnsCount(); i++) {
-			if ( r.getFields()[i].isNull() ) {
-				getColumnsModel().getColumn(i).getStatistics().decNullValues();
-			} else {
-				getColumnsModel().getColumn(i).getStatistics().decNotNullValues();
+			Column col = getColumnsModel().getColumn(i);
+			if (col.isEnabledStats()) {
+				IGenericField<?> oldValue = r.getFields()[i];
+				col.getStatistics().del(oldValue);
 			}
 		}
 		return this;
@@ -193,7 +177,7 @@ public abstract class AbstractDataModel {
 			@Override
 			public boolean stream(Row r) throws RowsModelException {
 				ret.append("|");
-				for ( IGenericField f : r.getFields() ) {
+				for ( IGenericField<?> f : r.getFields() ) {
 					String str = f.toString();
 					ret.append(str);
 					for ( int i=str.length(); i<colsSize.get(); i++ ) {

@@ -117,7 +117,7 @@ public class DataModelView extends AbstractDataModel implements IListener<Abstra
 		return getRowsModel().getRow( position );
 	}
 
-	public Row getRow( IGenericField key ) {
+	public Row getRow( IGenericField<?> key ) {
 		return getRowsModel().getRow( key );
 	}
 }

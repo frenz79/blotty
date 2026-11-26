@@ -11,10 +11,8 @@ package com.blotty.core.query;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.blotty.core.modifiers.filters.conditions.AndCondition;
 import com.blotty.core.modifiers.filters.conditions.IFilterCondition;
 import com.blotty.core.modifiers.filters.conditions.NotCondition;
-import com.blotty.core.modifiers.filters.conditions.OrCondition;
 
 public class ConditionCollector {
 

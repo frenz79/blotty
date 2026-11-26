@@ -25,7 +25,7 @@ public class UnaryCondition implements IFilterCondition {
 
 	@Override
 	public boolean apply(Row row) {
-		IGenericField[] fields = row.getFields();
+		IGenericField<?>[] fields = row.getFields();
 		return operator.apply(fields[left.getColumn().getId()]);
 	}
 }

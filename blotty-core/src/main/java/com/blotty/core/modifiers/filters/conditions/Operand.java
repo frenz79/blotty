@@ -63,8 +63,8 @@ public class Operand {
 		return (Column)operand;
 	}
 	
-	public IGenericField getConst() {
-		return (IGenericField)operand;
+	public IGenericField<?> getConst() {
+		return (IGenericField<?>)operand;
 	}
 	
 	public boolean isColumn() {

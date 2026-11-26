@@ -14,7 +14,7 @@ import com.blotty.core.types.IGenericField;
 public class IsNotNull extends IUnaryOperator {
 
 	@Override
-	public boolean apply(IGenericField f) {
+	public boolean apply(IGenericField<?> f) {
 		return !f.isNull();
 	}
 }

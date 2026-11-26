@@ -30,7 +30,7 @@ public abstract class AbstractRowsModel {
 	public abstract void sort(Comparator<Row> c) throws RowsModelException;
 	public abstract int getRowsCount();
 	public abstract Row getRow(int position);
-	public abstract Row getRow(IGenericField key);
+	public abstract Row getRow(IGenericField<?> key);
 
 	public AbstractRowsModel(ColumnsModel columnsModel) {
 		super();
@@ -41,7 +41,7 @@ public abstract class AbstractRowsModel {
 		return columnsModel;
 	}
 	
-	public IGenericField getKey( Row row ) {
+	public IGenericField<?> getKey( Row row ) {
 		return row.getFields()[ columnsModel.getKey().getId() ];
 	}
 }

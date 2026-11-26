@@ -18,6 +18,6 @@ public abstract class IBinaryOperator implements IFilterOperator {
 		return this.getClass().getSimpleName();
 	}
 	
-	public abstract boolean apply(IGenericField f1, IGenericField f2);
+	public abstract boolean apply(IGenericField<?> f1, IGenericField<?> f2);
 
 }

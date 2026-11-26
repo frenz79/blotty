@@ -18,6 +18,6 @@ public abstract class IUnaryOperator implements IFilterOperator{
 		return this.getClass().getSimpleName();
 	}
 	
-	public abstract boolean apply(IGenericField f);
+	public abstract boolean apply(IGenericField<?> f);
 
 }

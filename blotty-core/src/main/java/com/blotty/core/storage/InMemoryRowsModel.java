@@ -28,7 +28,7 @@ import com.blotty.core.types.IGenericField;
 
 public class InMemoryRowsModel extends AbstractRowsModel {
 
-	private final Map<IGenericField,Row> rowsByKey = new HashMap<>();
+	private final Map<IGenericField<?>,Row> rowsByKey = new HashMap<>();
 	private final List<Row> rows = new ArrayList<>();
 
 	private final ReadLock rLock;
@@ -43,7 +43,7 @@ public class InMemoryRowsModel extends AbstractRowsModel {
 
 	@Override
 	public void delRow( Row row ) throws RowsModelException {
-		IGenericField key = getKey(row);
+		IGenericField<?> key = getKey(row);
 		wlock.lock();
 		try {
 			if ( !this.rowsByKey.containsKey(key) ) {
@@ -58,7 +58,7 @@ public class InMemoryRowsModel extends AbstractRowsModel {
 	
 	@Override
 	public RowChange updRow( Row row, boolean trackChanges ) throws RowsModelException {
-		IGenericField key = getKey(row);
+		IGenericField<?> key = getKey(row);
 		wlock.lock();
 		try {
 			Row modelRow = rowsByKey.get(key);
@@ -73,7 +73,7 @@ public class InMemoryRowsModel extends AbstractRowsModel {
 	
 	@Override
 	public void addRow( Row row ) throws RowsModelException {
-		IGenericField key = getKey(row);
+		IGenericField<?> key = getKey(row);
 		wlock.lock();
 		try {
 			if ( this.rowsByKey.containsKey(key) ) {
@@ -91,7 +91,7 @@ public class InMemoryRowsModel extends AbstractRowsModel {
 		wlock.lock();
 		try {
 			for ( Row row : rows ) {
-				IGenericField key = getKey(row);
+				IGenericField<?> key = getKey(row);
 				if ( this.rowsByKey.containsKey(key) ) {
 					throw new RowsModelException(String.format("Duplicated key:%s", key));
 				}
@@ -136,7 +136,7 @@ public class InMemoryRowsModel extends AbstractRowsModel {
 	}
 
 	@Override
-	public Row getRow(IGenericField key) {
+	public Row getRow(IGenericField<?> key) {
 		rLock.lock();
 		try {
 			return rowsByKey.get(key);

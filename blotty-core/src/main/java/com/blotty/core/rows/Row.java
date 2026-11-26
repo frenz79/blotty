@@ -29,7 +29,7 @@ public class Row {
 		}
 	}
 
-	Row( IGenericField[] fields ) {
+	Row( IGenericField<?>[] fields ) {
 		this.fields = fields;
 	}
 	
@@ -53,7 +53,7 @@ public class Row {
 		}
 	}
 	
-	public IGenericField[] getFields() {
+	public IGenericField<?>[] getFields() {
 		return fields;
 	}
 	
@@ -76,7 +76,7 @@ public class Row {
 		return new RowChange(modifiedCols, oldValues);
 	}
 	
-	public Row set( Column c, IGenericField f) throws RowsTypeException {
+	public Row set( Column c, IGenericField<?> f) throws RowsTypeException {
 		if ( !f.isNull() && !f.getType().equals(c.getType()) ) {
 			throw new RowsTypeException(String.format("Row with type:%s cannot set with type:%s",c.getType(),f.getType() ));
 		}
@@ -127,12 +127,12 @@ public class Row {
 			return this;
 		}
 		
-		public Builder set(Column col, IGenericField v) throws RowsTypeException {
+		public Builder set(Column col, IGenericField<?> v) throws RowsTypeException {
 			this.row.set(col, v);
 			return this;
 		}
 		
-		public Builder set(String cName, IGenericField v) throws RowsTypeException {
+		public Builder set(String cName, IGenericField<?> v) throws RowsTypeException {
 			this.row.set(colModel.getColumn(cName), v);
 			return this;
 		}
@@ -156,7 +156,7 @@ public class Row {
 			return this;
 		}
 		
-		public Builder setValues(IGenericField ...values) throws RowsTypeException, RowsModelException {
+		public Builder setValues(IGenericField<?> ...values) throws RowsTypeException, RowsModelException {
 			int len = colModel.getColumnsCount();
 			
 			if (len!=values.length) {
