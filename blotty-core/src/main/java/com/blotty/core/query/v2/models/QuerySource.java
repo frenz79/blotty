@@ -21,5 +21,5 @@ public abstract class QuerySource {
 		return estimatedCardinality;
 	}
 	
-	abstract void apply( IConsumer<Row> consumer ) throws RowsModelException, FilterExpressionException;
+	public abstract void apply( IConsumer<Row> consumer ) throws RowsModelException, FilterExpressionException;
 }

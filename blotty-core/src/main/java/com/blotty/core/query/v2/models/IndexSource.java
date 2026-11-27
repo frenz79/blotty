@@ -13,7 +13,7 @@ public class IndexSource extends QuerySource {
 	private final IFilterCondition condition;
 	
 	public IndexSource(AbstractIndex<?> index, IFilterCondition condition) {
-		super();
+		super(index.estimatedCardinality(condition));
 		this.index = index;
 		this.condition = condition;
 	}
@@ -27,7 +27,7 @@ public class IndexSource extends QuerySource {
 	}
 
 	@Override
-	void apply(IConsumer<Row> consumer) throws RowsModelException, FilterExpressionException {
+	public void apply(IConsumer<Row> consumer) throws RowsModelException, FilterExpressionException {
 		for ( Row r : index.lookup(condition)) {
 			consumer.stream(r);
 		}

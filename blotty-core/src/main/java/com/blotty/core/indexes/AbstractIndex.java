@@ -36,7 +36,7 @@ public abstract class AbstractIndex<S extends IndexStatistics> {
 	protected abstract void _insert(IGenericField<?> key, Row r);
 	protected abstract void _delete(IGenericField<?> key, Row r);
 	
-	public long estimatedCardinality(IFilterCondition c) {
+	public int estimatedCardinality(IFilterCondition c) {
 		return lookup(c).size();
 	}
 	

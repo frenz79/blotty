@@ -5,8 +5,8 @@ public abstract class BinaryQuerySource extends QuerySource  {
 	private final QuerySource left;
 	private final QuerySource right;
 	
-	public BinaryQuerySource(QuerySource left, QuerySource right) {
-		super();
+	public BinaryQuerySource(QuerySource left, QuerySource right, int estimatedCardinality) {
+		super(estimatedCardinality);
 		this.left = left;
 		this.right = right;
 	}

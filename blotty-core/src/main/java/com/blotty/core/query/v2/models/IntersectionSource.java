@@ -11,7 +11,7 @@ import com.blotty.core.rows.Row;
 public final class IntersectionSource extends BinaryQuerySource {
 
 	public IntersectionSource(QuerySource left, QuerySource right) {
-		super(left, right);
+		super(left, right, Math.min(left.estimatedCardinality(), right.estimatedCardinality()));
 	}
 
 	/**

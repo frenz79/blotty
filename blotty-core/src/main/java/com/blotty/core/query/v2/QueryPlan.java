@@ -14,4 +14,19 @@ public class QueryPlan {
 	public QuerySource getSource() {
 		return source;
 	}
+	
+	public int getEstimatedRows() {
+		// TODO
+		return -1;
+	}
+	
+	public double getEstimatedComplexity() {
+		// TODO
+		return -1;
+	}
+	
+	public Object exaplainPlan() {
+		// TODO
+		return null;
+	}
 }

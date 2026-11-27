@@ -13,7 +13,7 @@ public class FullScanSource extends QuerySource {
 	private final AbstractDataModel dataModel;
 	
 	public FullScanSource( IFilterCondition condition, AbstractDataModel dataModel) {
-		super();
+		super(dataModel.getRowsCount());
 		this.condition = condition;
 		this.dataModel = dataModel;
 	}
@@ -23,8 +23,15 @@ public class FullScanSource extends QuerySource {
 	}
 
 	@Override
-	void apply(IConsumer<Row> consumer) throws RowsModelException, FilterExpressionException {
-		dataModel.stream(consumer);
+	public void apply(IConsumer<Row> consumer) throws RowsModelException, FilterExpressionException {
+		dataModel.stream(
+			row -> {
+				if (condition.apply(row)) {
+					consumer.stream(row);
+				}
+				return true;
+			}				
+		);
 	}
 
 	public AbstractDataModel getDataModel() {

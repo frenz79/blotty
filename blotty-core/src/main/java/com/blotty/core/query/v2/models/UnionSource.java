@@ -11,17 +11,17 @@ import com.blotty.core.rows.Row;
 public final class UnionSource extends BinaryQuerySource {
 
 	public UnionSource(QuerySource left, QuerySource right) {
-		super(left, right);
+		super(left, right, left.estimatedCardinality() + right.estimatedCardinality());
 	}
 
 	@Override
-	void apply(IConsumer<Row> consumer) throws RowsModelException, FilterExpressionException {
+	public void apply(IConsumer<Row> consumer) throws RowsModelException, FilterExpressionException {
 		int lCardinality = getLeft().estimatedCardinality();
 		int rCardinality = getRight().estimatedCardinality();
 		
 		// Edge cases
 		if (lCardinality==0 && rCardinality==0) {
-			// Nothing to do..one side is empty!
+			// Nothing to do..all sides are empty!
 			return;
 		}
 		if (lCardinality==0 || rCardinality==0) {
