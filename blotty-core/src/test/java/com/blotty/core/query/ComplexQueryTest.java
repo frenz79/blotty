@@ -200,7 +200,7 @@ class ComplexQueryTest {
 	void testQueryPlannerSelectsMostSelectiveIndexAndComputesResidualFilter() throws Exception {
 		DataModel noIdxModel = createPopulatedModel(false);
 		DataModel idxModel = createPopulatedModel(true);
-		IQueryPlanner planner = new QueryPlannerV1();
+		AbstractQueryPlanner planner = new QueryPlannerV1();
 
 		// DEPT='ENG' matches 5 rows; ROLE='PRINCIPAL' matches 2 rows -> planner should pick HashIndex(ROLE)
 		FilterExpression filter = FilterExpression.newBuilder()
@@ -224,7 +224,7 @@ class ComplexQueryTest {
 	@Test
 	void testQueryPlannerIgnoresNotSubtreeForIndexing() throws Exception {
 		DataModel idxModel = createPopulatedModel(true);
-		IQueryPlanner planner = new QueryPlannerV1();
+		AbstractQueryPlanner planner = new QueryPlannerV1();
 
 		// NOT DEPT='ENG' must NOT use HashIndex(DEPT)='ENG'
 		FilterExpression filter = FilterExpression.newBuilder()
@@ -243,7 +243,7 @@ class ComplexQueryTest {
 	@Test
 	void testQueryPlannerSingleIndexedConditionClearsResidualFilter() throws Exception {
 		DataModel idxModel = createPopulatedModel(true);
-		IQueryPlanner planner = new QueryPlannerV1();
+		AbstractQueryPlanner planner = new QueryPlannerV1();
 
 		FilterExpression filter = FilterExpression.newBuilder()
 			.begin(BinaryCondition.Equal(Operand.of(roleCol), Operand.of("PRINCIPAL")))

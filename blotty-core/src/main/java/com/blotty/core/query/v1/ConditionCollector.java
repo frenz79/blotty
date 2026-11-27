@@ -6,7 +6,7 @@
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  */
-package com.blotty.core.query;
+package com.blotty.core.query.v1;
 
 import java.util.ArrayList;
 import java.util.List;
