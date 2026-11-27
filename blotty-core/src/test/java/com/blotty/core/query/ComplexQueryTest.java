@@ -13,7 +13,9 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -210,11 +212,15 @@ class ComplexQueryTest {
 		QueryDefinition query = new QueryDefinition(filter, null);
 
 		QueryPlan noIdxPlan = planner.plan(query, noIdxModel);
-		assertEquals(8, noIdxPlan.getCandidateRows().getRows().size());
+		List<Row> list = new ArrayList<>();
+		noIdxPlan.getSource().apply( r -> {list.add(r);return true;});
+		assertEquals(8, list.size());
 		assertNotNull(noIdxPlan.getResidualFilter());
 
 		QueryPlan idxPlan = planner.plan(query, idxModel);
-		assertEquals(2, idxPlan.getCandidateRows().getRows().size());
+		idxPlan.getSource().apply( r -> {list.add(r);return true;});
+		list.clear();
+		assertEquals(2, list.size());
 		assertNotNull(idxPlan.getResidualFilter());
 
 		DataModelView view = idxModel.createView("selectiveView", query);
@@ -233,7 +239,9 @@ class ComplexQueryTest {
 		QueryDefinition query = new QueryDefinition(filter, null);
 
 		QueryPlan plan = planner.plan(query, idxModel);
-		assertEquals(8, plan.getCandidateRows().getRows().size());
+		List<Row> list = new ArrayList<>();
+		plan.getSource().apply( r -> {list.add(r);return true;});
+		assertEquals(8, list.size());
 		assertTrue(plan.getResidualFilter() instanceof NotCondition);
 
 		DataModelView view = idxModel.createView("notEngView", query);
@@ -249,8 +257,8 @@ class ComplexQueryTest {
 			.begin(BinaryCondition.Equal(Operand.of(roleCol), Operand.of("PRINCIPAL")))
 			.build();
 		QueryPlan plan = planner.plan(new QueryDefinition(filter, null), idxModel);
-
-		assertEquals(2, plan.getCandidateRows().getRows().size());
+		List<Row> list = new ArrayList<>();
+		assertEquals(2, list.size());
 		assertNull(plan.getResidualFilter());
 	}
 }

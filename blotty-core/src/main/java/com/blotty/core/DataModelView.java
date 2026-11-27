@@ -12,7 +12,6 @@ import com.blotty.core.commons.IListener;
 import com.blotty.core.commons.exceptions.FilterExpressionException;
 import com.blotty.core.commons.exceptions.RowsModelException;
 import com.blotty.core.modifiers.filters.FilterExpression;
-import com.blotty.core.modifiers.filters.conditions.IFilterCondition;
 import com.blotty.core.modifiers.sorters.SorterConditionChain;
 import com.blotty.core.query.AbstractQueryPlanner;
 import com.blotty.core.query.QueryDefinition;
@@ -42,13 +41,10 @@ public class DataModelView extends AbstractDataModel implements IListener<Abstra
 
 	private void populate() throws RowsModelException, FilterExpressionException {
 		QueryPlan queryPlan = queryPlanner.plan(queryDef, parentDataModel);
-		
-		for ( Row row : queryPlan.getCandidateRows().getRows() ) {
-			IFilterCondition filter = queryPlan.getResidualFilter();
-			if (filter==null || filter.apply(row)) {
-				addRow( row );
-			}
-		}
+		queryPlan.getSource().apply( row -> {
+			addRow( row );
+			return true;
+		});
 				
 		if ( queryDef.hasSorter() ) {
 			getRowsModel().sort(queryDef.getSorter());
