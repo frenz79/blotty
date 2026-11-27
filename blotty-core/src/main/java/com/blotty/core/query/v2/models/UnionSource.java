@@ -42,7 +42,16 @@ public final class UnionSource extends BinaryQuerySource {
 			return;
 		}
 		
+		int initSize = lCardinality;
+		if (initSize==Integer.MAX_VALUE || initSize<0) {
+			initSize = 0;
+		}
+		initSize += rCardinality;
+		if (initSize==Integer.MAX_VALUE || initSize<0) {
+			initSize = 0;
+		}			
 		Set<Row> unionSet = new HashSet<>(lCardinality+rCardinality);
+		
 		IConsumer<Row> tmpConsumer = new IConsumer<Row>() {
 			@Override
 			public boolean stream(Row item) throws RowsModelException, FilterExpressionException {

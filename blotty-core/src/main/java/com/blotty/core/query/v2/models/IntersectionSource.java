@@ -40,7 +40,8 @@ public final class IntersectionSource extends BinaryQuerySource {
 			firstCardinality = rCardinality;
 		}
 		
-		Set<Row> firstRows = new HashSet<>(firstCardinality);
+		int initCap = Math.min(Math.max(16, firstCardinality), 1024);
+		Set<Row> firstRows = new HashSet<>(initCap);
 		
 		first.apply(new IConsumer<>() {
 			@Override
@@ -54,7 +55,7 @@ public final class IntersectionSource extends BinaryQuerySource {
 			@Override
 			public boolean stream(Row item) throws RowsModelException, FilterExpressionException {
 				if (firstRows.contains(item)) {
-					consumer.stream(item);
+					return consumer.stream(item);
 				}
 				return true;
 			}

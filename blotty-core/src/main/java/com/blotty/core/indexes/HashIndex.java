@@ -55,13 +55,13 @@ public class HashIndex extends AbstractIndex<HashIndexStatistics> {
 		if (!(bc.getOperator() instanceof Equal)) {
 			return false;
 		}
-		if (!(bc.getLeft().isColumn())) {
-			return false;
+		if (bc.getLeft().isColumn() && bc.getRight().isConst()) {
+			return bc.getLeft().getColumn().equals(getColumn());
 		}
-		if (!(bc.getRight().isConst())) {
-			return false;
+		if (bc.getRight().isColumn() && bc.getLeft().isConst()) {
+			return bc.getRight().getColumn().equals(getColumn());
 		}
-		return bc.getLeft().getColumn().equals(getColumn());
+		return false;
 	}
 
 	@Override
@@ -69,8 +69,9 @@ public class HashIndex extends AbstractIndex<HashIndexStatistics> {
 		rLock.lock();
 		try {
 			BinaryCondition bc = (BinaryCondition)c;
-			Collection<Row> rows = index.get(bc.getRight().getConst());
-			return rows==null?List.of():rows;
+			IGenericField<?> key = bc.getRight().isConst() ? bc.getRight().getConst() : bc.getLeft().getConst();
+			Set<Row> rows = index.get(key);
+			return (rows == null || rows.isEmpty()) ? List.of() : List.copyOf(rows);
 		} finally {
 			rLock.unlock();
 		}

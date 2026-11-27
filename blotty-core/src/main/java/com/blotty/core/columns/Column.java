@@ -26,7 +26,7 @@ public final class Column {
 	private final boolean isKey;
 	
 	private Map<String,Object> properties;
-	private Map<String,? extends IGenericField<?>> valuesCache;
+	private Map<String,IGenericField<?>> valuesCache;
 	
 	private ColumnStatistics statistics;
 	
@@ -82,8 +82,14 @@ public final class Column {
 		return type.of(v);
 	}
 	public IGenericField<?> newField(String v) {
+		if (v == null || v.isEmpty()) {
+			return type.ofNull();
+		}
+		if (type != FieldType.STRING_TYPE) {
+			return type.of(v);
+		}
 		return (isCacheable())
-		        ? (StringField) valuesCache.computeIfAbsent(v, StringField::of)
+		        ? valuesCache.computeIfAbsent(v, StringField::of)
 		        : StringField.of(v);
 	}
 	

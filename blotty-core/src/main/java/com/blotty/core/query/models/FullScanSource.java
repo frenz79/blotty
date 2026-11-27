@@ -27,8 +27,8 @@ public class FullScanSource extends QuerySource {
 	public void apply(IConsumer<Row> consumer) throws RowsModelException, FilterExpressionException {
 		dataModel.stream(
 			row -> {
-				if (condition.apply(row)) {
-					consumer.stream(row);
+				if (condition == null || condition.apply(row)) {
+					return consumer.stream(row);
 				}
 				return true;
 			}				

@@ -30,7 +30,9 @@ public class IndexSource extends QuerySource {
 	@Override
 	public void apply(IConsumer<Row> consumer) throws RowsModelException, FilterExpressionException {
 		for ( Row r : index.lookup(condition)) {
-			consumer.stream(r);
+			if (!consumer.stream(r)) {
+				break;
+			}
 		}
 	}
 }

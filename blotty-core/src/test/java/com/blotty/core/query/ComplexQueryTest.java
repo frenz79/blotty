@@ -214,12 +214,12 @@ class ComplexQueryTest {
 		QueryPlan noIdxPlan = planner.plan(query, noIdxModel);
 		List<Row> list = new ArrayList<>();
 		noIdxPlan.getSource().apply( r -> {list.add(r);return true;});
-		assertEquals(8, list.size());
-		assertNotNull(noIdxPlan.getResidualFilter());
+		assertEquals(1, list.size());
+		assertNull(noIdxPlan.getResidualFilter());
 
 		QueryPlan idxPlan = planner.plan(query, idxModel);
-		idxPlan.getSource().apply( r -> {list.add(r);return true;});
 		list.clear();
+		idxPlan.getSource().apply( r -> {list.add(r);return true;});
 		assertEquals(2, list.size());
 		assertNotNull(idxPlan.getResidualFilter());
 
@@ -241,8 +241,8 @@ class ComplexQueryTest {
 		QueryPlan plan = planner.plan(query, idxModel);
 		List<Row> list = new ArrayList<>();
 		plan.getSource().apply( r -> {list.add(r);return true;});
-		assertEquals(8, list.size());
-		assertTrue(plan.getResidualFilter() instanceof NotCondition);
+		assertEquals(3, list.size());
+		assertNull(plan.getResidualFilter());
 
 		DataModelView view = idxModel.createView("notEngView", query);
 		assertEquals(Set.of("5", "6", "7"), extractKeys(view));
@@ -258,7 +258,43 @@ class ComplexQueryTest {
 			.build();
 		QueryPlan plan = planner.plan(new QueryDefinition(filter, null), idxModel);
 		List<Row> list = new ArrayList<>();
+		plan.getSource().apply( r -> {list.add(r);return true;});
 		assertEquals(2, list.size());
 		assertNull(plan.getResidualFilter());
+	}
+
+	@Test
+	void testQueryPlannerV2AndOrNotWithAndWithoutIndexes() throws Exception {
+		DataModel noIdxModel = createPopulatedModel(false);
+		DataModel idxModel = createPopulatedModel(true);
+		AbstractQueryPlanner v2 = new com.blotty.core.query.v2.QueryPlannerV2();
+
+		// OR with two indexed branches: DEPT = 'HR' OR ROLE = 'PRINCIPAL' -> PK 2, 6, 7
+		FilterExpression orFilter = new FilterExpression(
+			new OrCondition(
+				BinaryCondition.Equal(Operand.of(deptCol), Operand.of("HR")),
+				BinaryCondition.Equal(Operand.of(roleCol), Operand.of("PRINCIPAL"))
+			)
+		);
+		QueryDefinition orQuery = new QueryDefinition(orFilter, null);
+		DataModelView v2NoIdxOr = new DataModelView("v2NoIdxOr", orQuery, noIdxModel, v2);
+		DataModelView v2IdxOr = new DataModelView("v2IdxOr", orQuery, idxModel, v2);
+		assertEquals(Set.of("2", "6", "7"), extractKeys(v2NoIdxOr));
+		assertEquals(extractKeys(v2NoIdxOr), extractKeys(v2IdxOr));
+
+		// Complex AND + OR + NOT with V2: DEPT = 'ENG' AND (AGE < 25 OR AGE > 55) AND NOT ROLE = 'QA'
+		FilterExpression complexFilter = FilterExpression.newBuilder()
+			.begin(BinaryCondition.Equal(Operand.of(deptCol), Operand.of("ENG")))
+			.and(new OrCondition(
+				BinaryCondition.LesserThan(Operand.of(ageCol), Operand.of(25)),
+				BinaryCondition.GreaterThan(Operand.of(ageCol), Operand.of(55))
+			))
+			.andNot(BinaryCondition.Equal(Operand.of(roleCol), Operand.of("QA")))
+			.build();
+		QueryDefinition complexQuery = new QueryDefinition(complexFilter, null);
+		DataModelView v2NoIdxComplex = new DataModelView("v2NoIdxComplex", complexQuery, noIdxModel, v2);
+		DataModelView v2IdxComplex = new DataModelView("v2IdxComplex", complexQuery, idxModel, v2);
+		assertEquals(Set.of("1", "3", "8"), extractKeys(v2NoIdxComplex));
+		assertEquals(extractKeys(v2NoIdxComplex), extractKeys(v2IdxComplex));
 	}
 }

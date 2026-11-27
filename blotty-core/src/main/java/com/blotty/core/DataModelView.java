@@ -12,6 +12,7 @@ import com.blotty.core.commons.IListener;
 import com.blotty.core.commons.exceptions.FilterExpressionException;
 import com.blotty.core.commons.exceptions.RowsModelException;
 import com.blotty.core.modifiers.filters.FilterExpression;
+import com.blotty.core.modifiers.filters.conditions.IFilterCondition;
 import com.blotty.core.modifiers.sorters.SorterConditionChain;
 import com.blotty.core.query.AbstractQueryPlanner;
 import com.blotty.core.query.QueryDefinition;
@@ -31,18 +32,25 @@ public class DataModelView extends AbstractDataModel implements IListener<Abstra
 	private final AbstractQueryPlanner queryPlanner;
 	
 	public DataModelView(String id, QueryDefinition queryDef, DataModel parentDataModel) throws RowsModelException, FilterExpressionException {
+		this(id, queryDef, parentDataModel, new QueryPlannerV1());
+	}
+
+	public DataModelView(String id, QueryDefinition queryDef, DataModel parentDataModel, AbstractQueryPlanner queryPlanner) throws RowsModelException, FilterExpressionException {
 		super(id, new InMemoryRowsModel(parentDataModel.getColumnsModel()));
 		this.queryDef = queryDef;
 		this.parentDataModel = parentDataModel;
-		this.queryPlanner = new QueryPlannerV1();
+		this.queryPlanner = queryPlanner;
 		populate();
 		this.parentDataModel.addRowsListener(id, this);
 	}
 
 	private void populate() throws RowsModelException, FilterExpressionException {
 		QueryPlan queryPlan = queryPlanner.plan(queryDef, parentDataModel);
+		IFilterCondition residual = queryPlan.getResidualFilter();
 		queryPlan.getSource().apply( row -> {
-			addRow( row );
+			if (residual == null || residual.apply(row)) {
+				addRow( row );
+			}
 			return true;
 		});
 				

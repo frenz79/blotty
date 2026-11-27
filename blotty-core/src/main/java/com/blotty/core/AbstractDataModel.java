@@ -91,7 +91,7 @@ public abstract class AbstractDataModel {
 				Column col = getColumnsModel().getColumn(colId);
 				if (col.isEnabledStats()) {
 					IGenericField<?> oldValue = changes.oldValues().get(changes.resolveId(colId));
-					col.getStatistics().add(oldValue);
+					col.getStatistics().upd(storedRow.getFields()[colId], oldValue);
 				}
 			}
 		}

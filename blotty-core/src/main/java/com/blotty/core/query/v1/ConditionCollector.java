@@ -13,6 +13,7 @@ import java.util.List;
 
 import com.blotty.core.modifiers.filters.conditions.IFilterCondition;
 import com.blotty.core.modifiers.filters.conditions.NotCondition;
+import com.blotty.core.modifiers.filters.conditions.OrCondition;
 
 public class ConditionCollector {
 
@@ -23,22 +24,8 @@ public class ConditionCollector {
 	}
 	
 	private void visit(IFilterCondition node, List<IFilterCondition> result ) {
-		/*
-		if (node instanceof AndCondition and) {
-			visit(and.getLeft(), result);
-			visit(and.getRight(), result);
-			return;
-		}
-		if (node instanceof OrCondition or) {
-			visit(or.getLeft(), result);
-			visit(or.getRight(), result);
-			return;
-		}
-		*/
-		if (node instanceof NotCondition) {
-			// visit(not.getCondition(), result);
-			// NOT subtrees are not indexable:
-			// Avoid NOT STATUS='OPEN' to use HashIndex(STATUS)='OPEN'
+		if (node instanceof NotCondition || node instanceof OrCondition) {
+			// NOT and OR subtrees are not indexable in V1
 			return;
 		}
 		
