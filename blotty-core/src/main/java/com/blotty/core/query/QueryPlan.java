@@ -15,7 +15,7 @@ import java.util.Set;
 import com.blotty.core.modifiers.filters.conditions.IFilterCondition;
 import com.blotty.core.rows.Row;
 
-public class QueryPlan {
+public class  {
 
 	public static class RowSet {
 		private final Set<Row> rows;

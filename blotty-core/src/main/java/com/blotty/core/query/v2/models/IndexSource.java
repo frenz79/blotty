@@ -1,0 +1,35 @@
+package com.blotty.core.query.v2.models;
+
+import com.blotty.core.commons.IConsumer;
+import com.blotty.core.commons.exceptions.FilterExpressionException;
+import com.blotty.core.commons.exceptions.RowsModelException;
+import com.blotty.core.indexes.AbstractIndex;
+import com.blotty.core.modifiers.filters.conditions.IFilterCondition;
+import com.blotty.core.rows.Row;
+
+public class IndexSource extends QuerySource {
+
+	private final AbstractIndex<?> index;
+	private final IFilterCondition condition;
+	
+	public IndexSource(AbstractIndex<?> index, IFilterCondition condition) {
+		super();
+		this.index = index;
+		this.condition = condition;
+	}
+
+	public AbstractIndex<?> getIndex() {
+		return index;
+	}
+
+	public IFilterCondition getCondition() {
+		return condition;
+	}
+
+	@Override
+	void apply(IConsumer<Row> consumer) throws RowsModelException, FilterExpressionException {
+		for ( Row r : index.lookup(condition)) {
+			consumer.stream(r);
+		}
+	}
+}

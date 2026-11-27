@@ -8,38 +8,33 @@ import com.blotty.core.modifiers.filters.conditions.IFilterCondition;
 import com.blotty.core.modifiers.filters.conditions.OrCondition;
 import com.blotty.core.query.AbstractQueryPlanner;
 import com.blotty.core.query.QueryDefinition;
-import com.blotty.core.query.QueryPlan;
-import com.blotty.core.query.v2.models.IntersectionNode;
-import com.blotty.core.query.v2.models.PredicateNode;
+import com.blotty.core.query.v2.QueryPlan;
+import com.blotty.core.query.v2.models.ConditionSource;
+import com.blotty.core.query.v2.models.IntersectionSource;
 import com.blotty.core.query.v2.models.QuerySource;
-import com.blotty.core.query.v2.models.UnionNode;
+import com.blotty.core.query.v2.models.UnionSource;
 
 public class QueryPlannerV2 extends AbstractQueryPlanner {
 
 	@Override
 	public QueryPlan apply(QueryDefinition queryDef, AbstractDataModel model) throws RowsModelException, FilterExpressionException {
-	
-		PredicateNode root;
-		visit( queryDef.getFilter().getRoot(), null );
-		
-		return null;
+		QuerySource root = buildPlan( queryDef.getFilter().getRoot() );
+		return new QueryPlan(root);
 	}
 
-	private IFilterCondition visit(IFilterCondition parentCondition, PredicateNode parentNode) {
-		for ( IFilterCondition condition : parentCondition.children() ) {
-			if (condition instanceof AndCondition and) {
-				IntersectionNode node = new IntersectionNode(
-					new QuerySource( visit( and.getLeft() , parentNode)  ),
-					new QuerySource( visit( and.getRight(), parentNode) )
-				);			
-			} else if (condition instanceof OrCondition or) {
-				UnionNode node = new UnionNode(
-					new QuerySource( visit( or.getLeft() , parentNode)  ),
-					new QuerySource( visit( or.getRight(), parentNode) )
-				);			
-			}
+	private QuerySource buildPlan(IFilterCondition condition) {
+		if (condition instanceof AndCondition and) {
+			return new IntersectionSource(
+				buildPlan( and.getLeft() ),
+				buildPlan( and.getRight()) );			
 		}
-		return null;
-	}
 
+		if (condition instanceof OrCondition or) {
+			return new UnionSource(
+				buildPlan( or.getLeft() ),
+				buildPlan( or.getRight()) );			
+		}
+		
+		return new ConditionSource(condition);
+	}
 }

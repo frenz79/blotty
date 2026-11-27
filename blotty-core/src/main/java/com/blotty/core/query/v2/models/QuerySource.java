@@ -1,18 +1,25 @@
 package com.blotty.core.query.v2.models;
 
-import com.blotty.core.modifiers.filters.conditions.IFilterCondition;
+import com.blotty.core.commons.IConsumer;
+import com.blotty.core.commons.exceptions.FilterExpressionException;
+import com.blotty.core.commons.exceptions.RowsModelException;
+import com.blotty.core.rows.Row;
 
-public class QuerySource {
-
-	private final IFilterCondition condition;
-
-	public QuerySource(IFilterCondition condition) {
-		super();
-		this.condition = condition;
-	}
-
-	public IFilterCondition getCondition() {
-		return condition;
+public abstract class QuerySource {
+	
+	private final int estimatedCardinality;
+	
+	public QuerySource(int estimatedCardinality) {
+		this.estimatedCardinality = estimatedCardinality;
 	}
 	
+	public QuerySource() {
+		this(Integer.MAX_VALUE);
+	}
+	
+	public int estimatedCardinality() {
+		return estimatedCardinality;
+	}
+	
+	abstract void apply( IConsumer<Row> consumer ) throws RowsModelException, FilterExpressionException;
 }
