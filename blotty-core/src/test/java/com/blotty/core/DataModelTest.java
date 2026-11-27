@@ -16,6 +16,7 @@ import com.blotty.core.modifiers.filters.FilterExpression;
 import com.blotty.core.modifiers.filters.conditions.Operand;
 import com.blotty.core.modifiers.filters.conditions.binary.BinaryCondition;
 import com.blotty.core.query.QueryDefinition;
+import com.blotty.core.query.v2.QueryPlannerV2;
 import com.blotty.core.rows.Row;
 import com.blotty.core.storage.InMemoryRowsModel;
 import com.blotty.core.types.FieldType;
@@ -31,7 +32,7 @@ class DataModelTest {
 		).build();
 				
 		// Adding rows using addRow from model
-		DataModel dataModel = (DataModel) new DataModel( new InMemoryRowsModel(colModel) )
+		DataModel dataModel = (DataModel) new DataModel( new InMemoryRowsModel(colModel), new QueryPlannerV2() )
 			.addRow( Row.newBuilder(colModel)
 				.set(colModel.getKey(), "KEY_1")
 				.set(colModel.getColumn("COL_1"), "V1_1")
@@ -94,7 +95,7 @@ class DataModelTest {
 			.add(Column.newBuilder("COL_2").type(FieldType.STRING_TYPE)
 		).build();
 			
-		DataModel dataModel = (DataModel) new DataModel( new InMemoryRowsModel(colModel) )
+		DataModel dataModel = (DataModel) new DataModel( new InMemoryRowsModel(colModel), new QueryPlannerV2() )
 			.addRow(Row.newBuilder(colModel).set("PK", "K1").set("COL_1", "1"))
 			.addRow(Row.newBuilder(colModel).set("PK", "K2").set("COL_1", "2"))
 			.addRow(Row.newBuilder(colModel).set("PK", "K3").set("COL_1", "3"))

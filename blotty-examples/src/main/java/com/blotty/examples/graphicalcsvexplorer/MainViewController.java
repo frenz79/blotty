@@ -23,6 +23,7 @@ import com.blotty.core.modifiers.filters.conditions.Operand;
 import com.blotty.core.modifiers.filters.conditions.binary.BinaryCondition;
 import com.blotty.core.modifiers.sorters.SorterExpressionBuilder;
 import com.blotty.core.query.QueryDefinition;
+import com.blotty.core.query.v2.QueryPlannerV2;
 import com.blotty.core.rows.Row;
 import com.blotty.core.rows.Row.Builder;
 import com.blotty.core.storage.InMemoryRowsModel;
@@ -56,7 +57,7 @@ public class MainViewController {
 				}
 				
 				colModel = colModelBuilder.build();
-				dataModel = new DataModel( new InMemoryRowsModel(colModel) );
+				dataModel = new DataModel( new InMemoryRowsModel(colModel), new QueryPlannerV2() );
 				// 1Million benchmark
 				// dataModel.addIndex( new HashIndex(colModel.getColumn("city")));
 				view.setTableColumns( colModel );

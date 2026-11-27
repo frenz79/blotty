@@ -13,6 +13,7 @@ import com.blotty.core.modifiers.filters.conditions.Operand;
 import com.blotty.core.modifiers.filters.conditions.binary.BinaryCondition;
 import com.blotty.core.modifiers.sorters.SorterExpressionBuilder;
 import com.blotty.core.query.QueryDefinition;
+import com.blotty.core.query.v2.QueryPlannerV2;
 import com.blotty.core.rows.Row;
 import com.blotty.core.storage.InMemoryRowsModel;
 import com.blotty.core.types.FieldType;
@@ -27,7 +28,7 @@ class DataModelViewTest {
 				.add(Column.newBuilder("VAL").type(FieldType.INTEGER_TYPE)
 			).build();
 	
-		DataModel dataModel = new DataModel(new InMemoryRowsModel(colModel));
+		DataModel dataModel = new DataModel(new InMemoryRowsModel(colModel), new QueryPlannerV2());
 		dataModel.addRow( Row.newBuilder(colModel).setValues("K1", "30") );
 		dataModel.addRow( Row.newBuilder(colModel).setValues("K2", "10") );
 
@@ -58,7 +59,7 @@ class DataModelViewTest {
 				.add(Column.newBuilder("SCORE").type(FieldType.INTEGER_TYPE)
 			).build();
 
-		DataModel dataModel = new DataModel(new InMemoryRowsModel(colModel));
+		DataModel dataModel = new DataModel(new InMemoryRowsModel(colModel), new QueryPlannerV2());
 		dataModel.addRow( Row.newBuilder(colModel).setValues("1", "Alice", "85") );
 		dataModel.addRow( Row.newBuilder(colModel).setValues("2", "Bob", "95") );
 		dataModel.addRow( Row.newBuilder(colModel).setValues("3", "Charlie", "60") );

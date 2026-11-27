@@ -21,7 +21,6 @@ import com.blotty.core.query.QueryDefinition;
 import com.blotty.core.query.QueryPlan;
 import com.blotty.core.query.models.FullScanSource;
 import com.blotty.core.query.models.IndexSource;
-import com.blotty.core.query.models.IndexSource;
 
 public class QueryPlannerV1 extends AbstractQueryPlanner {
 

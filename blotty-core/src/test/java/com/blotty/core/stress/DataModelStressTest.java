@@ -34,6 +34,7 @@ import com.blotty.core.modifiers.sorters.SorterConditionChain;
 import com.blotty.core.modifiers.sorters.SorterExpressionBuilder;
 import com.blotty.core.parsers.SQLQueryParser;
 import com.blotty.core.query.QueryDefinition;
+import com.blotty.core.query.v2.QueryPlannerV2;
 import com.blotty.core.rows.Row;
 import com.blotty.core.storage.InMemoryRowsModel;
 import com.blotty.core.types.FieldType;
@@ -84,7 +85,7 @@ public class DataModelStressTest {
 	@DisplayName("1. Benchmark Inserimento Sequenziale Singolo Thread")
 	void testSingleThreadInsertion() throws Exception {
 		int totalRecords = 50_000;
-		DataModel model = new DataModel(new InMemoryRowsModel(columnsModel));
+		DataModel model = new DataModel(new InMemoryRowsModel(columnsModel), new QueryPlannerV2());
 
 		long start = System.nanoTime();
 		for (int i = 0; i < totalRecords; i++) {
@@ -106,7 +107,7 @@ public class DataModelStressTest {
 		int recordsPerThread = 10_000;
 		int totalRecords = threadsCount * recordsPerThread;
 
-		DataModel model = new DataModel(new InMemoryRowsModel(columnsModel));
+		DataModel model = new DataModel(new InMemoryRowsModel(columnsModel), new QueryPlannerV2());
 		ExecutorService executor = Executors.newFixedThreadPool(threadsCount);
 		CountDownLatch startLatch = new CountDownLatch(1);
 		CountDownLatch endLatch = new CountDownLatch(threadsCount);
@@ -150,7 +151,7 @@ public class DataModelStressTest {
 	@DisplayName("3. Stress Collisione Chiavi Concorrente (Atomicità wlock)")
 	void testConcurrentDuplicateKeyCollisions() throws Exception {
 		int threadsCount = 20;
-		DataModel model = new DataModel(new InMemoryRowsModel(columnsModel));
+		DataModel model = new DataModel(new InMemoryRowsModel(columnsModel), new QueryPlannerV2());
 		ExecutorService executor = Executors.newFixedThreadPool(threadsCount);
 		CountDownLatch startLatch = new CountDownLatch(1);
 		CountDownLatch endLatch = new CountDownLatch(threadsCount);
@@ -191,7 +192,7 @@ public class DataModelStressTest {
 	@DisplayName("4. Benchmark Filtering & SQL Query Parsing su Large Dataset")
 	void testFilteringPerformance() throws Exception {
 		int totalRecords = 50_000;
-		DataModel model = new DataModel(new InMemoryRowsModel(columnsModel));
+		DataModel model = new DataModel(new InMemoryRowsModel(columnsModel), new QueryPlannerV2());
 		for (int i = 0; i < totalRecords; i++) {
 			model.addRow(createSampleRow(columnsModel, "ROW_" + i, i));
 		}
@@ -227,7 +228,7 @@ public class DataModelStressTest {
 	@DisplayName("5. Benchmark Sorting Multi-Colonna e Verifica Invariante di Ordinamento")
 	void testSortingPerformanceAndCorrectness() throws Exception {
 		int totalRecords = 20_000;
-		DataModel model = new DataModel(new InMemoryRowsModel(columnsModel));
+		DataModel model = new DataModel(new InMemoryRowsModel(columnsModel), new QueryPlannerV2());
 		for (int i = 0; i < totalRecords; i++) {
 			model.addRow(createSampleRow(columnsModel, "S_" + i, i));
 		}
@@ -264,7 +265,7 @@ public class DataModelStressTest {
 		int numReaders = 4;
 		int durationSeconds = 3;
 
-		DataModel model = new DataModel(new InMemoryRowsModel(columnsModel));
+		DataModel model = new DataModel(new InMemoryRowsModel(columnsModel), new QueryPlannerV2());
 
 		// Prepopolamento base
 		for (int i = 0; i < 5000; i++) {
@@ -343,7 +344,7 @@ public class DataModelStressTest {
 	@Order(7)
 	@DisplayName("7. Stress Aggiornamento Dinamico della View con Scrittori Paralleli")
 	void testDataModelViewDynamicUpdatesConcurrently() throws Exception {
-		DataModel model = new DataModel(new InMemoryRowsModel(columnsModel));
+		DataModel model = new DataModel(new InMemoryRowsModel(columnsModel), new QueryPlannerV2());
 
 		// Vista con filtro (Solo Active=true) e ordinata per AGE
 		FilterExpression filter = FilterExpression.newBuilder()
@@ -399,7 +400,7 @@ public class DataModelStressTest {
 	@DisplayName("8. Benchmark Inserimento Batch Singolo Thread")
 	void testSingleThreadBatchInsertion() throws Exception {
 		int totalRecords = 50_000;
-		DataModel model = new DataModel(new InMemoryRowsModel(columnsModel));
+		DataModel model = new DataModel(new InMemoryRowsModel(columnsModel), new QueryPlannerV2());
 
 		long start = System.nanoTime();
 		Row[] rows = new Row[totalRecords];
@@ -422,7 +423,7 @@ public class DataModelStressTest {
 	@DisplayName("9. Benchmark Filtering & SQL Query Parsing su Large Dataset using Index")
 	void testFilteringPerformanceWithIndex() throws Exception {
 		int totalRecords = 50_000;
-		DataModel model = new DataModel(new InMemoryRowsModel(columnsModel));
+		DataModel model = new DataModel(new InMemoryRowsModel(columnsModel), new QueryPlannerV2());
 		for (int i = 0; i < totalRecords; i++) {
 			model.addRow(createSampleRow(columnsModel, "ROW_" + i, i));
 		}

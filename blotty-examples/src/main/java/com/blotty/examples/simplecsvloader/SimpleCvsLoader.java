@@ -16,6 +16,7 @@ import com.blotty.core.modifiers.filters.conditions.binary.BinaryCondition;
 import com.blotty.core.modifiers.sorters.SorterExpressionBuilder;
 import com.blotty.core.parsers.SQLQueryParser;
 import com.blotty.core.query.QueryDefinition;
+import com.blotty.core.query.v2.QueryPlannerV2;
 import com.blotty.core.rows.Row;
 import com.blotty.core.storage.InMemoryRowsModel;
 import com.blotty.core.types.FieldType;
@@ -35,7 +36,7 @@ public class SimpleCvsLoader {
 				.add(Column.newBuilder("Number of employees").type(FieldType.INTEGER_TYPE))				
 				.build();
 		
-		DataModel dataModel = new DataModel( new InMemoryRowsModel(colModel) );
+		DataModel dataModel = new DataModel( new InMemoryRowsModel(colModel), new QueryPlannerV2() );
 		
 		Reader in = new FileReader("src/test/resources/organizations-10000.csv");
 		Iterable<CSVRecord> records = CSVFormat.DEFAULT.parse(in);

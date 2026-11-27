@@ -36,6 +36,7 @@ import com.blotty.core.modifiers.filters.conditions.binary.BinaryCondition;
 import com.blotty.core.modifiers.filters.conditions.binary.operators.Equal;
 import com.blotty.core.modifiers.sorters.SorterExpressionBuilder;
 import com.blotty.core.query.QueryDefinition;
+import com.blotty.core.query.v2.QueryPlannerV2;
 import com.blotty.core.rows.AbstractRowEvent;
 import com.blotty.core.rows.AbstractRowEvent.RowAction;
 import com.blotty.core.rows.Row;
@@ -80,7 +81,7 @@ class DataModelEventsTest {
 
 	@Test
 	void testInsertUpdateDeleteEventsAndListenerLifecycle() throws Exception {
-		DataModel model = new DataModel(new InMemoryRowsModel(colModel));
+		DataModel model = new DataModel(new InMemoryRowsModel(colModel), new QueryPlannerV2());
 		HashIndex categoryIndex = new HashIndex(categoryCol);
 		model.addIndex(categoryIndex);
 
@@ -146,7 +147,7 @@ class DataModelEventsTest {
 
 	@Test
 	void testFilteredViewAddEventAndBatchInsertEvent() throws Exception {
-		DataModel model = new DataModel(new InMemoryRowsModel(colModel));
+		DataModel model = new DataModel(new InMemoryRowsModel(colModel), new QueryPlannerV2());
 		List<AbstractRowEvent> events = Collections.synchronizedList(new ArrayList<>());
 		model.addRowsListener("batchAudit", events::add);
 
@@ -174,7 +175,7 @@ class DataModelEventsTest {
 		int rowsPerThread = 500;
 		int totalRows = threads * rowsPerThread;
 
-		DataModel model = new DataModel(new InMemoryRowsModel(colModel));
+		DataModel model = new DataModel(new InMemoryRowsModel(colModel), new QueryPlannerV2());
 		HashIndex categoryIndex = new HashIndex(categoryCol);
 		model.addIndex(categoryIndex);
 
@@ -237,7 +238,7 @@ class DataModelEventsTest {
 		int rowsPerThread = 200;
 		int totalRows = threads * rowsPerThread;
 
-		DataModel model = new DataModel(new InMemoryRowsModel(colModel));
+		DataModel model = new DataModel(new InMemoryRowsModel(colModel), new QueryPlannerV2());
 		HashIndex categoryIndex = new HashIndex(categoryCol);
 		model.addIndex(categoryIndex);
 
@@ -301,7 +302,7 @@ class DataModelEventsTest {
 		int rowsPerThread = 200;
 		int totalRows = threads * rowsPerThread;
 
-		DataModel model = new DataModel(new InMemoryRowsModel(colModel));
+		DataModel model = new DataModel(new InMemoryRowsModel(colModel), new QueryPlannerV2());
 		HashIndex categoryIndex = new HashIndex(categoryCol);
 		model.addIndex(categoryIndex);
 
@@ -362,7 +363,7 @@ class DataModelEventsTest {
 		int readerThreads = 2;
 		int opsPerWriter = 200; // inserts 200, updates 100, deletes 50 -> 150 remaining per thread
 
-		DataModel model = new DataModel(new InMemoryRowsModel(colModel));
+		DataModel model = new DataModel(new InMemoryRowsModel(colModel), new QueryPlannerV2());
 		HashIndex categoryIndex = new HashIndex(categoryCol);
 		model.addIndex(categoryIndex);
 

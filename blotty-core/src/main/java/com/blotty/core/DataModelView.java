@@ -31,10 +31,11 @@ public class DataModelView extends AbstractDataModel implements IListener<Abstra
 	private final DataModel parentDataModel;
 	private final AbstractQueryPlanner queryPlanner;
 	
+	/*
 	public DataModelView(String id, QueryDefinition queryDef, DataModel parentDataModel) throws RowsModelException, FilterExpressionException {
 		this(id, queryDef, parentDataModel, new QueryPlannerV1());
 	}
-
+	*/
 	public DataModelView(String id, QueryDefinition queryDef, DataModel parentDataModel, AbstractQueryPlanner queryPlanner) throws RowsModelException, FilterExpressionException {
 		super(id, new InMemoryRowsModel(parentDataModel.getColumnsModel()));
 		this.queryDef = queryDef;

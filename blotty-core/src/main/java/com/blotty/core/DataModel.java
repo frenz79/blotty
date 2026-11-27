@@ -14,6 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import com.blotty.core.commons.IListener;
 import com.blotty.core.commons.exceptions.FilterExpressionException;
 import com.blotty.core.commons.exceptions.RowsModelException;
+import com.blotty.core.query.AbstractQueryPlanner;
 import com.blotty.core.query.QueryDefinition;
 import com.blotty.core.rows.AbstractRowEvent;
 import com.blotty.core.rows.Row;
@@ -25,18 +26,25 @@ import com.blotty.core.rows.Row.RowChange;
 public class DataModel extends AbstractDataModel {
 	
 	private Map<String,IListener<AbstractRowEvent>> rowsEventListeners = new ConcurrentHashMap<>();
+	private final AbstractQueryPlanner defaultQueryPlanner;
 	
-	public DataModel( AbstractRowsModel rowsModel ) {
+	public DataModel( AbstractRowsModel rowsModel, AbstractQueryPlanner queryPlanner ) {
 		super(rowsModel);
+		this.defaultQueryPlanner = queryPlanner;
 	}
 	
-	public DataModel( String id, AbstractRowsModel rowsModel ) {
+	public DataModel( String id, AbstractRowsModel rowsModel, AbstractQueryPlanner queryPlanner ) {
 		super(id, rowsModel);
+		this.defaultQueryPlanner = queryPlanner;
 	}
 		
-	public DataModelView createView( String viewId, QueryDefinition queryDef ) throws RowsModelException, FilterExpressionException {
-		DataModelView view = new DataModelView( viewId, queryDef, this );
+	public DataModelView createView( String viewId, QueryDefinition queryDef, AbstractQueryPlanner aQueryPlanner ) throws RowsModelException, FilterExpressionException {
+		DataModelView view = new DataModelView( viewId, queryDef, this, aQueryPlanner );
 		return view;
+	}
+	
+	public DataModelView createView( String viewId, QueryDefinition queryDef ) throws RowsModelException, FilterExpressionException {
+		return createView( viewId, queryDef, defaultQueryPlanner );
 	}
 	
 	@Override

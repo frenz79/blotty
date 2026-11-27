@@ -9,6 +9,7 @@ import com.blotty.core.DataModel;
 import com.blotty.core.columns.Column;
 import com.blotty.core.columns.ColumnsModel;
 import com.blotty.core.commons.exceptions.RowsModelException;
+import com.blotty.core.query.v2.QueryPlannerV2;
 import com.blotty.core.storage.InMemoryRowsModel;
 import com.blotty.core.types.FieldType;
 
@@ -22,7 +23,7 @@ class RowBuilderTest {
 				.add(Column.newBuilder("LAST_NAME").type(FieldType.STRING_TYPE)
 			).build();
 	
-		DataModel model = new DataModel(new InMemoryRowsModel(colModel));
+		DataModel model = new DataModel(new InMemoryRowsModel(colModel), new QueryPlannerV2());
 		model.addRow( Row.newBuilder(colModel).setValues("1", "John", "Doe") );
 		model.addRow( Row.newBuilder(colModel).set("ID", "2").set("FIRST_NAME", "Jane").set("LAST_NAME", "Smith") );
 

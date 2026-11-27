@@ -13,6 +13,7 @@ import com.blotty.core.commons.exceptions.FilterExpressionException;
 import com.blotty.core.commons.exceptions.RowsModelException;
 import com.blotty.core.commons.exceptions.RowsTypeException;
 import com.blotty.core.parsers.SQLQueryParser;
+import com.blotty.core.query.v2.QueryPlannerV2;
 import com.blotty.core.rows.Row;
 import com.blotty.core.storage.InMemoryRowsModel;
 import com.blotty.core.types.FieldType;
@@ -29,7 +30,7 @@ class SorterExpressionBuilderTest {
 			.add(Column.newBuilder("COL_3").type(FieldType.INTEGER_TYPE)
 		).build();	
 		
-		DataModel dataModel = new DataModel( new InMemoryRowsModel(colModel) );
+		DataModel dataModel = new DataModel( new InMemoryRowsModel(colModel), new QueryPlannerV2() );
 
 		dataModel
 			.addRow(Row.newBuilder(colModel).set(colModel.getKey(), "K1").set(colModel.getColumn("COL_1"), "A").set(colModel.getColumn("COL_2"), "A").set(colModel.getColumn("COL_3"), IntegerField.of(1)).build())

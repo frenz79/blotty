@@ -39,6 +39,7 @@ import com.blotty.core.modifiers.sorters.SorterConditionChain;
 import com.blotty.core.modifiers.sorters.SorterExpressionBuilder;
 import com.blotty.core.parsers.SQLQueryParser;
 import com.blotty.core.query.v1.QueryPlannerV1;
+import com.blotty.core.query.v2.QueryPlannerV2;
 import com.blotty.core.rows.Row;
 import com.blotty.core.storage.InMemoryRowsModel;
 import com.blotty.core.types.FieldType;
@@ -76,7 +77,7 @@ class ComplexQueryTest {
 	}
 
 	private DataModel createPopulatedModel(boolean withIndexes) throws Exception {
-		DataModel model = new DataModel(new InMemoryRowsModel(colModel));
+		DataModel model = new DataModel(new InMemoryRowsModel(colModel), new QueryPlannerV2());
 
 		model.addRow(buildRow("1", "ENG", "DEV", 24, 55000.0, true, "Junior Java"));
 		model.addRow(buildRow("2", "ENG", "PRINCIPAL", 42, 120000.0, true, "Tech Lead"));
