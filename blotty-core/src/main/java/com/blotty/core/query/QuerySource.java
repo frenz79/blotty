@@ -1,4 +1,4 @@
-package com.blotty.core.query.v2.models;
+package com.blotty.core.query;
 
 import com.blotty.core.commons.IConsumer;
 import com.blotty.core.commons.exceptions.FilterExpressionException;

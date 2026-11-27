@@ -1,7 +1,5 @@
 package com.blotty.core.query.v2;
 
-import java.nio.channels.spi.AbstractInterruptibleChannel;
-
 import com.blotty.core.AbstractDataModel;
 import com.blotty.core.commons.exceptions.FilterExpressionException;
 import com.blotty.core.commons.exceptions.RowsModelException;
@@ -12,11 +10,11 @@ import com.blotty.core.modifiers.filters.conditions.NotCondition;
 import com.blotty.core.modifiers.filters.conditions.OrCondition;
 import com.blotty.core.query.AbstractQueryPlanner;
 import com.blotty.core.query.QueryDefinition;
-import com.blotty.core.query.v2.QueryPlan;
-import com.blotty.core.query.v2.models.FullScanSource;
-import com.blotty.core.query.v2.models.IndexSource;
+import com.blotty.core.query.QueryPlan;
+import com.blotty.core.query.QuerySource;
+import com.blotty.core.query.models.FullScanSource;
+import com.blotty.core.query.models.IndexSource;
 import com.blotty.core.query.v2.models.IntersectionSource;
-import com.blotty.core.query.v2.models.QuerySource;
 import com.blotty.core.query.v2.models.UnionSource;
 
 public class QueryPlannerV2 extends AbstractQueryPlanner {

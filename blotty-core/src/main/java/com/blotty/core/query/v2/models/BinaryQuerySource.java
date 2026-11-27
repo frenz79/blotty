@@ -1,5 +1,7 @@
 package com.blotty.core.query.v2.models;
 
+import com.blotty.core.query.QuerySource;
+
 public abstract class BinaryQuerySource extends QuerySource  {
 
 	private final QuerySource left;

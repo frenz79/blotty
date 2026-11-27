@@ -19,6 +19,7 @@ import com.blotty.core.modifiers.filters.conditions.IFilterCondition;
 import com.blotty.core.query.AbstractQueryPlanner;
 import com.blotty.core.query.QueryDefinition;
 import com.blotty.core.query.QueryPlan;
+import com.blotty.core.query.models.FullScanSource;
 
 public class QueryPlannerV1 extends AbstractQueryPlanner {
 
@@ -90,9 +91,9 @@ public class QueryPlannerV1 extends AbstractQueryPlanner {
 		 * compute the residual filter.
 		 */
 		if (bestIndex != null) {
-			IFilterCondition residual = removeCondition(	queryDef.getFilter().getRoot(), bestCond );
+			IFilterCondition residual = removeCondition(queryDef.getFilter().getRoot(), bestCond );
 			return new QueryPlan(
-					bestIndex.lookup(bestCond),
+					new FullScanSource(bestCond, model),
 					residual
 					);
 		}

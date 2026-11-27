@@ -1,60 +1,41 @@
-/*
- * Copyright 2026 Francesco Bianchi
- *
- * Licensed under the Apache License, Version 2.0.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- */
 package com.blotty.core.query;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-
 import com.blotty.core.modifiers.filters.conditions.IFilterCondition;
-import com.blotty.core.rows.Row;
 
-public class  {
+public class QueryPlan {
+	
+	private final QuerySource source;
+	private final IFilterCondition residualFilter;
+	
+	public QueryPlan(QuerySource source) {
+		this(source,null);
+	}
 
-	public static class RowSet {
-		private final Set<Row> rows;
-
-		public RowSet(Collection<Row> r) {
-			this.rows = new HashSet<Row>(r);
-		}
-		
-		public RowSet() {
-			this.rows = new HashSet<Row>();
-		}
-
-		public Set<Row> getRows() {
-			return rows;
-		}
-
-		public void addRow(Row row) {
-			rows.add(row);
-		}
+	public QueryPlan(QuerySource source, IFilterCondition residualFilter) {
+		this.source = source;
+		this.residualFilter = residualFilter;
 	}
 	
-    private final RowSet candidateRows;
-    private final IFilterCondition residualFilter;
-
-	public QueryPlan(Collection<Row> rows, IFilterCondition residual) {
-		this.candidateRows = new RowSet(rows);
-		this.residualFilter = residual;
+	public QuerySource getSource() {
+		return source;
 	}
 	
-	public QueryPlan(IFilterCondition residual) {
-		this.candidateRows = new RowSet();
-		this.residualFilter = residual;
+	public int getEstimatedRows() {
+		// TODO
+		return -1;
 	}
-
-	public RowSet getCandidateRows() {
-		return candidateRows;
+	
+	public double getEstimatedComplexity() {
+		// TODO
+		return -1;
+	}
+	
+	public Object exaplainPlan() {
+		// TODO
+		return null;
 	}
 
 	public IFilterCondition getResidualFilter() {
 		return residualFilter;
 	}
-} 
+}

@@ -6,6 +6,7 @@ import java.util.Set;
 import com.blotty.core.commons.IConsumer;
 import com.blotty.core.commons.exceptions.FilterExpressionException;
 import com.blotty.core.commons.exceptions.RowsModelException;
+import com.blotty.core.query.QuerySource;
 import com.blotty.core.rows.Row;
 
 public final class UnionSource extends BinaryQuerySource {

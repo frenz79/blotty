@@ -1,21 +1,26 @@
-package com.blotty.core.query.v2.models;
+package com.blotty.core.query.models;
 
-import com.blotty.core.AbstractDataModel;
 import com.blotty.core.commons.IConsumer;
 import com.blotty.core.commons.exceptions.FilterExpressionException;
 import com.blotty.core.commons.exceptions.RowsModelException;
+import com.blotty.core.indexes.AbstractIndex;
 import com.blotty.core.modifiers.filters.conditions.IFilterCondition;
+import com.blotty.core.query.QuerySource;
 import com.blotty.core.rows.Row;
 
-public class FullScanSource extends QuerySource {
+public class IndexSource extends QuerySource {
 
+	private final AbstractIndex<?> index;
 	private final IFilterCondition condition;
-	private final AbstractDataModel dataModel;
 	
-	public FullScanSource( IFilterCondition condition, AbstractDataModel dataModel) {
-		super(dataModel.getRowsCount());
+	public IndexSource(AbstractIndex<?> index, IFilterCondition condition) {
+		super(index.estimatedCardinality(condition));
+		this.index = index;
 		this.condition = condition;
-		this.dataModel = dataModel;
+	}
+
+	public AbstractIndex<?> getIndex() {
+		return index;
 	}
 
 	public IFilterCondition getCondition() {
@@ -24,17 +29,8 @@ public class FullScanSource extends QuerySource {
 
 	@Override
 	public void apply(IConsumer<Row> consumer) throws RowsModelException, FilterExpressionException {
-		dataModel.stream(
-			row -> {
-				if (condition.apply(row)) {
-					consumer.stream(row);
-				}
-				return true;
-			}				
-		);
-	}
-
-	public AbstractDataModel getDataModel() {
-		return dataModel;
+		for ( Row r : index.lookup(condition)) {
+			consumer.stream(r);
+		}
 	}
 }
